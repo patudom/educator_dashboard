@@ -7,6 +7,7 @@ If you using a new environment you need to have several packages install
 
 To create an environment when using `conda` use `conda create --name solara` and then `conda activate solara`
 ```
+conda install python ipython jupyter
 pip install solara
 pip install pandas
 pip install plotly==5.15.0
