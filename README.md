@@ -13,3 +13,10 @@ pip install solara
 pip install pandas
 pip install plotly==5.15.0
 ```
+
+
+To run the dashboard
+
+```
+solara run sol.py
+```
