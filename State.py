@@ -114,7 +114,7 @@ class StateList():
     def __init__(self, list_of_states):
         self.states = [State(state) for state in list_of_states]
     
-    def __getattribute__(self, __name: str) -> list[State]:
+    def __getattribute__(self, __name):
         try:
             return object.__getattribute__(self, __name)
         except AttributeError:
