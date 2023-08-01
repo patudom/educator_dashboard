@@ -21,3 +21,6 @@ To run the dashboard
 cd educator_dashboard
 solara run pages
 ```
+
+
+To edit the CSS edit the file `educator_dashboard/assets/custom.css`. You need to refresh the page to see the changes. Sometimes a reset is need to change components that are already on the page.
