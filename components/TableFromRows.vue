@@ -35,4 +35,8 @@ export default {
 #table-from-rows > table tr td:last-child {
   width: 100%;
 }
+
+#table-from-rows > table > tbody > tr:hover {
+  background-color: #d7d7d7;
+}
 </style>

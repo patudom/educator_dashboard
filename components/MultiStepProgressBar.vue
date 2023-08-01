@@ -102,20 +102,17 @@ export default {
   /* outline: 3px solid grey; */
   padding: 2px;
   height: fit-content;
-  background-color: white;
+  /* background-color: white; */
 }
 
 .multi-progress-bar:hover {
-  box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
-  transform: scale(1.05);
+  transform: scale(1.01);
 }
 
 .step-wrapper {
   position: relative;
-  /* outline: .5px solid white; */
   padding-inline: 0;
   padding-block: 0;
-  /* background-color: #fffa; */
 }
 
 .meter {
