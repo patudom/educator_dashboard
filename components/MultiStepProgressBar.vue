@@ -5,23 +5,25 @@ const msg = ref('Hello World!')
 </script>
 
 <template>
-  <div id="progress-bar" :style="cssProps">
-    
-    <div v-for="step in steps" 
-        :key="step" 
-        class="step-wrapper"
-        >
-        <div 
-          :class="[getStepClass(step), 'meter']"
-          :style="{ width: getStepProgress(step), height: `${height}` }"
-          ></div>
+  <div class="progress-container">
+    <div class="multi-progress-bar" :style="cssProps">
+      
+      <div v-for="step in steps" 
+          :key="step" 
+          class="step-wrapper"
+          >
+          <div 
+            :class="[getStepClass(step), 'meter']"
+            :style="{ width: getStepProgress(step), height: `${height}` }"
+            ></div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
+  name: 'MultiStepProgressBar',
   props: {
     steps: {
       type: Number,
@@ -39,6 +41,11 @@ export default {
       type: Number,
       default: "20px"
       }
+  },
+
+  mounted() {
+    console.log("MultiStepProgressBar mounted");
+    console.log(`steps: ${this.steps} currentStep: ${this.currentStep} currentStepProgress: ${this.currentStepProgress}`)
   },
 
   methods: {
@@ -62,7 +69,7 @@ export default {
       } else if (step === this.currentStep) {
         return this.currentStepProgress + '%';
       } else {
-        return '0%';
+        return '50%';
       }
     }
   },
@@ -81,13 +88,16 @@ export default {
 
 <style>
 
-#progress-bar {
+.progress-container {
+}
+
+.multi-progress-bar {
   display: grid;
   grid-template-columns: repeat(var(--number-steps), 1fr) ;
-  width: 100%;
-  /* border: 1px solid grey; */
-  gap: 5px;
-  align-items: center;
+  min-width: 200px;
+  /* outline: 1px solid grey; */
+  gap: 0px;
+  padding: 2px;
   height: fit-content;
 }
 

@@ -24,9 +24,8 @@ def Page():
     
     first_run = solara.use_reactive(True)
     SetClass(class_id, df, data, roster, first_run.value)
-    first_run.set(False)
+    # first_run.set(False)
     
-   
     Dashboard(df, data) 
 
 
