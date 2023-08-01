@@ -6,5 +6,6 @@ def MultiStepProgressBar(
     currentStep = None,
     currentStepProgress = None,
     height = None,
+    gap="0px",
     ): pass
     

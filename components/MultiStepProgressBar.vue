@@ -5,23 +5,25 @@ const msg = ref('Hello World!')
 </script>
 
 <template>
-  <div id="progress-bar" :style="cssProps">
-    
-    <div v-for="step in steps" 
-        :key="step" 
-        class="step-wrapper"
-        >
-        <div 
-          :class="[getStepClass(step), 'meter']"
-          :style="{ width: getStepProgress(step), height: `${height}` }"
-          ></div>
+  <div class="progress-container">
+    <div class="multi-progress-bar" :style="{gap: `${gap}`, ...cssProps}">
+      
+      <div v-for="step in steps" 
+          :key="step" 
+          :class="['step-wrapper', getStepClass(step)+'-lighter']"
+          >
+          <div 
+            :class="[getStepClass(step), 'meter']"
+            :style="{ width: getStepProgress(step), height: `${height}` }"
+            ></div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
+  name: 'MultiStepProgressBar',
   props: {
     steps: {
       type: Number,
@@ -38,7 +40,16 @@ export default {
     height: {
       type: Number,
       default: "20px"
-      }
+    },
+    gap: {
+      type: Number,
+      default: "0px"
+    }
+  },
+
+  mounted() {
+    console.log("MultiStepProgressBar mounted");
+    console.log(`steps: ${this.steps} currentStep: ${this.currentStep} currentStepProgress: ${this.currentStepProgress}`)
   },
 
   methods: {
@@ -81,22 +92,27 @@ export default {
 
 <style>
 
-#progress-bar {
+.progress-container {
+}
+
+.multi-progress-bar {
   display: grid;
   grid-template-columns: repeat(var(--number-steps), 1fr) ;
-  width: 100%;
-  /* border: 1px solid grey; */
-  gap: 5px;
-  align-items: center;
+  min-width: 200px;
+  /* outline: 3px solid grey; */
+  padding: 2px;
   height: fit-content;
+  /* background-color: white; */
+}
+
+.multi-progress-bar:hover {
+  transform: scale(1.01);
 }
 
 .step-wrapper {
   position: relative;
-  outline: .5px solid white;
   padding-inline: 0;
   padding-block: 0;
-  background-color: #fffa;
 }
 
 .meter {
@@ -108,16 +124,27 @@ export default {
 
 
 .completed {
-  background-color: #4CAF50;
+  background-color: rgb(76, 175, 80);
+}
+
+.completed-lighter {
+  background-color: rgb(76, 175, 80,0.25);
 }
 
 .in-progress {
-  background-color: #2196F3;
+  background-color: rgb(33, 150, 243);
+}
+
+.in-progress-lighter {
+  background-color: rgb(33, 150, 243,0.55);
 }
 
 .not-started {
-  background-color: #ca3030;
+  background-color: rgb(202, 48, 48);
 }
 
+.not-started-lighter {
+  background-color: rgb(202, 48, 48,0.25);
+}
 
 </style>
