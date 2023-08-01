@@ -2,6 +2,7 @@
 import solara
 
 from components.MultiStepProgressBar import MultiStepProgressBar
+from components.TableFromRows import TableFromRows
 
 
 @solara.component_vue('ProgressRow.vue')
@@ -26,9 +27,6 @@ def StudentProgressRow(student_id = None,
         'id': student_id,
         'name': student_name,
         'total_points': total_points,
-        'steps': number_of_stages,
-        'currentStep': current_stage,
-        'currentStepProgress': current_stage_progress,
     }
     
     ProgressRow(student=student, 
@@ -36,23 +34,27 @@ def StudentProgressRow(student_id = None,
                                                 currentStep=current_stage, 
                                                 currentStepProgress=current_stage_progress, 
                                                 height='4px'))
-    
-    
+ 
 
 @solara.component
 def StudentProgressTable(df):
-    with solara.Card():
-        for i in range(len(df.value)):
-            current_progress = df.value.iloc[i].progress.split('%')[0]
-            if current_progress.isnumeric():
-                current_progress = int(current_progress)
-            else:
-                current_progress = 100
-            StudentProgressRow(student_id = int(df.value.iloc[i].student_id), 
+    rows = []
+    for i in range(len(df.value)):
+        current_progress = df.value.iloc[i].progress.split('%')[0]
+        if current_progress.isnumeric():
+            current_progress = int(current_progress)
+        else:
+            current_progress = 100
+        rows.append(
+            StudentProgressRow(
+                            student_id = int(df.value.iloc[i].student_id), 
                             student_name = df.value.iloc[i].username, 
                             total_points = int(df.value.iloc[i].total_score), 
                             number_of_stages = 6, 
                             current_stage = int(df.value.iloc[i].max_stage_index), 
                             current_stage_progress = current_progress
                             )
-    
+        )
+    with solara.Card():
+        TableFromRows(headers=['Student ID', 'Student Name', 'Total Points', 'Progress'], 
+                      rows=rows)

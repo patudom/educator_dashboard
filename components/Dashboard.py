@@ -11,7 +11,7 @@ import plotly.graph_objects as go
 from components.ClassPlot import ClassPlot
 from components.SetClass import SetClass
 from components.TableDisplay import TableDisplay
-from components.StudentProgress import StudentProgress
+from components.StudentProgress import StudentProgressTable
 
 
 @solara.component
@@ -58,21 +58,21 @@ def Dashboard(df, data):
     
     StudentProgressTable(df)
 
-    with solara.Row():
-        
-        def on_plot_click(points):
-            print("plot clicked")
-            if points is not None:
-                selected_index = points['points']['point_indexes'][0]
-                student_id.set(data.value.iloc[selected_index].student_id)
-            else:
-                student_id.set(None)
-        
-
-        ClassPlot(data.value, on_click=on_plot_click, select_on = 'student_id', selected = student_id)
-        
-        if student_id:
-            with solara.Column():
-                cols = ['student_id', 'velocity_value', 'est_dist_value', 'obs_wave_value', 'ang_size_value']
-                StudentData(dataframe = data, id_col="student_id", sid = student_id, cols_to_display = cols)
-                
+    with solara.Card(elevation=1):
+        with solara.Row():
+            
+            def on_plot_click(points):
+                print("plot clicked")
+                if points is not None:
+                    selected_index = points['points']['point_indexes'][0]
+                    student_id.set(data.value.iloc[selected_index].student_id)
+                else:
+                    student_id.set(None)
+            
+            with solara.Columns([1,1]):
+                ClassPlot(data.value, on_click=on_plot_click, select_on = 'student_id', selected = student_id)
+            
+                if student_id:
+                    cols = ['student_id', 'velocity_value', 'est_dist_value', 'obs_wave_value', 'ang_size_value']
+                    StudentData(dataframe = data, id_col="student_id", sid = student_id, cols_to_display = cols)
+                    
