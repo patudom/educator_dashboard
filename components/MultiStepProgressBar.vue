@@ -6,11 +6,11 @@ const msg = ref('Hello World!')
 
 <template>
   <div class="progress-container">
-    <div class="multi-progress-bar" :style="cssProps">
+    <div class="multi-progress-bar" :style="{gap: `${gap}`, ...cssProps}">
       
       <div v-for="step in steps" 
           :key="step" 
-          class="step-wrapper"
+          :class="['step-wrapper', getStepClass(step)+'-lighter']"
           >
           <div 
             :class="[getStepClass(step), 'meter']"
@@ -40,7 +40,11 @@ export default {
     height: {
       type: Number,
       default: "20px"
-      }
+    },
+    gap: {
+      type: Number,
+      default: "0px"
+    }
   },
 
   mounted() {
@@ -69,7 +73,7 @@ export default {
       } else if (step === this.currentStep) {
         return this.currentStepProgress + '%';
       } else {
-        return '50%';
+        return '0%';
       }
     }
   },
@@ -95,18 +99,23 @@ export default {
   display: grid;
   grid-template-columns: repeat(var(--number-steps), 1fr) ;
   min-width: 200px;
-  /* outline: 1px solid grey; */
-  gap: 0px;
+  /* outline: 3px solid grey; */
   padding: 2px;
   height: fit-content;
+  background-color: white;
+}
+
+.multi-progress-bar:hover {
+  box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
+  transform: scale(1.05);
 }
 
 .step-wrapper {
   position: relative;
-  outline: .5px solid white;
+  /* outline: .5px solid white; */
   padding-inline: 0;
   padding-block: 0;
-  background-color: #fffa;
+  /* background-color: #fffa; */
 }
 
 .meter {
@@ -118,16 +127,27 @@ export default {
 
 
 .completed {
-  background-color: #4CAF50;
+  background-color: rgb(76, 175, 80);
+}
+
+.completed-lighter {
+  background-color: rgb(76, 175, 80,0.25);
 }
 
 .in-progress {
-  background-color: #2196F3;
+  background-color: rgb(33, 150, 243);
+}
+
+.in-progress-lighter {
+  background-color: rgb(33, 150, 243,0.55);
 }
 
 .not-started {
-  background-color: #ca3030;
+  background-color: rgb(202, 48, 48);
 }
 
+.not-started-lighter {
+  background-color: rgb(202, 48, 48,0.25);
+}
 
 </style>

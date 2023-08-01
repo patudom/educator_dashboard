@@ -34,7 +34,7 @@ def StudentProgressRow(student_id = None,
                 progress_bar=MultiStepProgressBar(steps=number_of_stages, 
                                                 currentStep=current_stage, 
                                                 currentStepProgress=current_stage_progress, 
-                                                height='4px'))
+                                                height='0.5em', gap="5px"))
  
 
 @solara.component
