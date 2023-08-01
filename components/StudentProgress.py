@@ -1,5 +1,6 @@
 
 import solara
+from pandas import DataFrame
 
 from components.MultiStepProgressBar import MultiStepProgressBar
 from components.TableFromRows import TableFromRows
@@ -37,21 +38,39 @@ def StudentProgressRow(student_id = None,
  
 
 @solara.component
-def StudentProgressTable(df):
+def StudentProgressTable(progress_data):
+    """
+    progress_data should be either a dataframe or a dictionary
+    this will work with reactive or non-reactive data
+    
+    If a dictionary it can be either a list of records
+    or a record with a list of values for each key
+    """
+    
+    # make sure we are using the actual data
+    if isinstance(progress_data, solara.Reactive):
+        data = progress_data.value
+    else:
+        data = progress_data
+    
+    # make sure we have a dataframe
+    if isinstance(data, dict):
+        data = DataFrame(data)
+    
     rows = []
-    for i in range(len(df.value)):
-        current_progress = df.value.iloc[i].progress.split('%')[0]
+    for i in range(len(data)):
+        current_progress = data['progress'][i].split('%')[0]
         if current_progress.isnumeric():
             current_progress = int(current_progress)
         else:
             current_progress = 100
         rows.append(
             StudentProgressRow(
-                            student_id = int(df.value.iloc[i].student_id), 
-                            student_name = df.value.iloc[i].username, 
-                            total_points = int(df.value.iloc[i].total_score), 
+                            student_id = int(data['student_id'][i]), 
+                            student_name = data['username'][i],
+                            total_points = int(data['total_score'][i]), 
                             number_of_stages = 6, 
-                            current_stage = int(df.value.iloc[i].max_stage_index), 
+                            current_stage = int(data['max_stage_index'][i]), 
                             current_stage_progress = current_progress
                             )
         )

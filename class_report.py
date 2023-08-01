@@ -42,22 +42,25 @@ class Roster():
         self.story_state = new_out['story_state']
         
         
+        keys = self.l2d(self.story_state['stages']).keys()
+        self.stages = []
+        for key in sorted(keys):
+            self.stages.append([s['state'] for s in self.l2d(self.story_state['stages'])[key]])
+        # self.stage1 = [s['state'] for s in self.l2d(self.story_state['stages'])['1']]
+        # self.stage2 = [s['state'] for s in self.l2d(self.story_state['stages'])['2']]
+        # self.stage3 = [s['state'] for s in self.l2d(self.story_state['stages'])['3']]
+        # self.stage4 = [s['state'] for s in self.l2d(self.story_state['stages'])['4']]
+        # self.stage5 = [s['state'] for s in self.l2d(self.story_state['stages'])['5']]
+        # self.stage6 = [s['state'] for s in self.l2d(self.story_state['stages'])['6']]
         
-        self.stage1 = [s['state'] for s in self.l2d(self.story_state['stages'])['1']]
-        self.stage2 = [s['state'] for s in self.l2d(self.story_state['stages'])['2']]
-        self.stage3 = [s['state'] for s in self.l2d(self.story_state['stages'])['3']]
-        self.stage4 = [s['state'] for s in self.l2d(self.story_state['stages'])['4']]
-        self.stage5 = [s['state'] for s in self.l2d(self.story_state['stages'])['5']]
-        self.stage6 = [s['state'] for s in self.l2d(self.story_state['stages'])['6']]
         
-        
-        self.stages = [
-            self.stage1,
-            self.stage3,
-            self.stage4,
-            self.stage5,
-            self.stage6
-        ]
+        # self.stages = [
+        #     self.stage1,
+        #     self.stage3,
+        #     self.stage4,
+        #     self.stage5,
+        #     self.stage6
+        # ]
         
         
         self.new_story_state = StateList([student['story_state'] for student in self.roster])
