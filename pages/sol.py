@@ -1,4 +1,8 @@
-import solara
+import os
+import sys
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
+
 import solara
 
 from components.Dashboard import Dashboard, SetClass
@@ -21,7 +25,7 @@ first_run = solara.reactive(True)
 
 @solara.component
 def Page():
-    
+    print(sys.path)
     SetClass(class_id, df, data, roster, first_run)
     
     if class_id.value is not None:
