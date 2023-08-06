@@ -8,15 +8,19 @@ def SetClass(class_id, student_summary, student_data, roster, first_run = False)
     def on_value(value):
         if value is None:
             return
-        elif int(value) <= 183:
-            class_id.set(None)
-            return
+        # elif int(value) <= 183:
+        #     class_id.set(None)
+        #     return
         else:
             class_id.set(int(value))
             print("setting class id", value)
             roster.set(Roster(int(value)))
-            student_summary.set(roster.value.short_report())
-            student_data.set(DataFrame(roster.value.get_class_data()))
+            if roster.value.short_report() is not None:
+                student_summary.set(roster.value.short_report())
+                student_data.set(DataFrame(roster.value.get_class_data()))
+            else:
+                student_summary.set(None)
+                student_data.set(None)
             
     
     if first_run.value and class_id.value is not None:

@@ -37,8 +37,11 @@ export default {
 
   mounted() {
     console.log("ProgressRow mounted");
-    console.log(student)
   },
+
+  methods: {
+    
+  }
 };
 </script>
 
