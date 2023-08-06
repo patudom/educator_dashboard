@@ -29,10 +29,7 @@ def initStudentID(student_id, roster):
         
 
 @solara.component
-def Dashboard(df, data, roster):
-    if df.value is None:
-        solara.Markdown("No class selected", style="color: red; font-size: 2em" )
-        return
+def Dashboard(df, data, roster): 
     
     student_id = solara.use_reactive(None)
     

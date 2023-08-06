@@ -5,28 +5,33 @@ from pandas import DataFrame
 
 @solara.component
 def SetClass(class_id, student_summary, student_data, roster, first_run = False):
+    
+    print('in SetClass')
+    
+    
     def on_value(value):
+        print("SetClass: on_value", value)
         if value is None:
-            return
-        # elif int(value) <= 183:
-        #     class_id.set(None)
-        #     return
-        else:
+            print("SetClass: class_id is None")
+            class_id.set(None)
+            roster.set(None)
+            student_summary.set(None)
+            student_data.set(None)
+        elif first_run.value or (class_id.value != value):
+            print("SetClass: class id", value)
             class_id.set(int(value))
-            print("setting class id", value)
             roster.set(Roster(int(value)))
-            if roster.value.short_report() is not None:
-                student_summary.set(roster.value.short_report())
-                student_data.set(DataFrame(roster.value.get_class_data()))
-            else:
-                student_summary.set(None)
-                student_data.set(None)
-            
+            student_summary.set(roster.value.short_report())
+            student_data.set(DataFrame(roster.value.get_class_data()))
     
     if first_run.value and class_id.value is not None:
-        print("first run")
-        first_run.set(False)
+        print("SetClass: first run", )
         on_value(class_id.value)
+        first_run.set(False)
+        
+
+            
+    
     
     if class_id.value is None:
         warning_text = """There was a problem with this class. Look at the python output to see what. We currently can't handle class ids below 183.

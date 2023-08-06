@@ -7,10 +7,11 @@ def QuestionSummary(df = None, sid = None):
     """
     Show response summary for entire class
     """
-    if df is not None:
-        if isinstance(df, solara.Reactive):
-            df = df.value
+    if isinstance(df, solara.Reactive):
+        solara.DataFrame(df.value)
+    else:
         solara.DataFrame(df)
+        
         
 
 @solara.component
@@ -18,9 +19,9 @@ def StudentQuestion(df = None):
     """
     Show the responses for a single student
     """
-    if df is not None:
-        if isinstance(df, solara.Reactive):
-            df = df.value
+    if isinstance(df, solara.Reactive):
+        solara.DataFrame(df.value)
+    else:
         solara.DataFrame(df)
         
         
@@ -30,9 +31,11 @@ def IndividualStudentResponses(roster, sid=None):
     Show response detail for each student
     sid is the currently selected student
     """
-    if not isinstance(sid, solara.Reactive):
-        sid = solara.reactive(sid)
     
+    if roster.value is None:
+        return
+    
+
     questions = roster.value.questions()
     sids = questions['student_id'].to_list()
     with solara.lab.Tabs(
@@ -51,8 +54,8 @@ def IndividualStudentResponses(roster, sid=None):
 
 @solara.component
 def StudentQuestions(roster, sid = None):
-    if not isinstance(sid, solara.Reactive):
-        sid = solara.reactive(sid)
+    if roster.value is None:
+        return
     
     questions = roster.value.questions()
     with solara.Columns([1,1]):

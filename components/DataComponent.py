@@ -8,6 +8,9 @@ def DataSummary(data = None, student_id = None, on_student_id = None):
     """
     Display a summary of the data
     """
+    
+    print('Displaying data summary')
+    
     if data.value is None:
         return
     
@@ -15,7 +18,7 @@ def DataSummary(data = None, student_id = None, on_student_id = None):
         on_student_id = student_id.set
     
     def on_plot_click(points):
-        print("plot clicked")
+        print("DataSummary: ClassPlot clicked")
         if points is not None:
             selected_index = points['points']['point_indexes'][0]
             on_student_id(data.value.iloc[selected_index].student_id)
@@ -32,18 +35,21 @@ def StudentData(dataframe = None, id_col = 'student_id',  sid = None, cols_to_di
     """
     Display a single student's data
     """
-    if sid is None:
-        print("no sid")
+    
+    print('Displaying single students data')
+    
+    if sid.value is None:
+        print("StudentData: no sid")
         return
     
-    if dataframe is None:
-        print("no dataframe")
+    if dataframe.value is None:
+        print("StudentData: no dataframe")
         return
 
     single_student_df = dataframe.value[dataframe.value[id_col] == sid.value]
     
     def on_value(value):
-        print("setting sid", value)
+        print("StudentData: on_value: setting sid", value)
         sid.set(int(value))
         if on_sid is not None:
             on_sid(int(value))
