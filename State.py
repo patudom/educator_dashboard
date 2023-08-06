@@ -92,6 +92,8 @@ class State:
                 elif self.stage_index < int(key):
                     # if false, then stage key is not complete
                     val = 0 #markers.index(stage['marker']) + 1
+                else:
+                    val = 0
 
                 current.append(val)
         # print(total, current)
