@@ -1,9 +1,9 @@
 
 
 import pandas as pd
-from nested_dataframe import flatten
-from State import State, StateList
-from Query import QueryCosmicDSApi
+from .nested_dataframe import flatten
+from .State import State, StateList
+from .Query import QueryCosmicDSApi
 
 HUBBLE_ROUTE_PATH = "hubbles_law"
 

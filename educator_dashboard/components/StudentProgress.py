@@ -2,8 +2,8 @@
 import solara
 from pandas import DataFrame
 
-from components.MultiStepProgressBar import MultiStepProgressBar
-from components.TableFromRows import TableFromRows
+from educator_dashboard.components.MultiStepProgressBar import MultiStepProgressBar
+from educator_dashboard.components.TableFromRows import TableFromRows
 
 
 @solara.component_vue('ProgressRow.vue')

@@ -6,7 +6,7 @@ API_URL = "https://api.cosmicds.cfa.harvard.edu"
 HUBBLE_ROUTE_PATH = "hubbles_law"
 
 
-from State import State, StateList
+from .State import State, StateList
     
 class QueryCosmicDSApi():
     

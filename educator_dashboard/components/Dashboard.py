@@ -1,6 +1,6 @@
 import solara
 
-from class_report import Roster
+
 from typing import cast
 
 from pandas import DataFrame
@@ -8,14 +8,11 @@ from pandas import DataFrame
 import plotly.express as px
 import plotly.graph_objects as go
 
-from components.ClassPlot import ClassPlot
-from components.SetClass import SetClass
-from components.TableDisplay import TableDisplay
-from components.StudentProgress import StudentProgressTable
-from components.ResponsesComponents import StudentQuestions
-from components.ResponsesComponents import IndividualStudentResponses
-from components.DataComponent import DataSummary
-from components.DataComponent import StudentData
+from educator_dashboard.components.StudentProgress import StudentProgressTable
+from educator_dashboard.components.ResponsesComponents import StudentQuestions
+from educator_dashboard.components.ResponsesComponents import IndividualStudentResponses
+from educator_dashboard.components.DataComponent import DataSummary
+from educator_dashboard.components.DataComponent import StudentData
 
 @solara.component
 def initStudentID(student_id, roster):
@@ -37,14 +34,14 @@ def Dashboard(df, data, roster):
     # make sure the student_id is valid
     initStudentID(student_id, roster)
     
-    
+
     def on_cell_click(column, row_index):   
         student_id.set(df.value.iloc[row_index].student_id)
 
     cell_actions = [solara.CellAction(name=None, icon="mdi-account-details",on_click=on_cell_click)]
 
     # TableDisplay(df.value,items_per_page=len(df.value)//3,cell_actions = cell_actions)
-    
+    solara.Markdown(f"**Hello World**")
     with solara.Column():
         StudentProgressTable(df)
     

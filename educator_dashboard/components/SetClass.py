@@ -1,6 +1,6 @@
 import solara
 
-from class_report import Roster
+from educator_dashboard.database.class_report import Roster
 from pandas import DataFrame
 
 @solara.component

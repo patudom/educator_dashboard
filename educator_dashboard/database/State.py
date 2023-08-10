@@ -2,7 +2,7 @@
 import warnings
 warnings.filterwarnings('ignore') # ignore warnings
 
-from markers import markers
+from .markers import markers
 
 from numpy import nan
 class State:

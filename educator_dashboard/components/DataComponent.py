@@ -1,6 +1,6 @@
 import solara
-from components.ClassPlot import ClassPlot
-from components.TableDisplay import TableDisplay
+from educator_dashboard.components.ClassPlot import ClassPlot
+from educator_dashboard.components.TableDisplay import TableDisplay
 
 
 @solara.component
