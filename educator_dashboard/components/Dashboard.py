@@ -8,11 +8,11 @@ from pandas import DataFrame
 import plotly.express as px
 import plotly.graph_objects as go
 
-from educator_dashboard.components.StudentProgress import StudentProgressTable
-from educator_dashboard.components.ResponsesComponents import StudentQuestions
-from educator_dashboard.components.ResponsesComponents import IndividualStudentResponses
-from educator_dashboard.components.DataComponent import DataSummary
-from educator_dashboard.components.DataComponent import StudentData
+from .StudentProgress import StudentProgressTable
+from .ResponsesComponents import StudentQuestions
+from .ResponsesComponents import IndividualStudentResponses
+from .DataComponent import DataSummary
+from .DataComponent import StudentData
 
 @solara.component
 def initStudentID(student_id, roster):
@@ -41,7 +41,7 @@ def Dashboard(df, data, roster):
     cell_actions = [solara.CellAction(name=None, icon="mdi-account-details",on_click=on_cell_click)]
 
     # TableDisplay(df.value,items_per_page=len(df.value)//3,cell_actions = cell_actions)
-    solara.Markdown(f"**Hello World**")
+
     with solara.Column():
         StudentProgressTable(df)
     

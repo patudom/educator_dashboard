@@ -13,6 +13,8 @@ class Roster():
     
     def __init__(self, class_id = None):
         
+        self.refresh = False
+        
         self.class_id = class_id
         self.query = QueryCosmicDSApi(class_id = class_id, story=HUBBLE_ROUTE_PATH)
         self.data = None
