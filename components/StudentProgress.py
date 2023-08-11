@@ -47,11 +47,10 @@ def StudentProgressTable(progress_data):
     or a record with a list of values for each key
     """
     
-    # make sure we are using the actual data
-    if isinstance(progress_data, solara.Reactive):
-        data = progress_data.value
-    else:
-        data = progress_data
+    if progress_data.value is None:
+        return
+    
+    data = progress_data.value
     
     # make sure we have a dataframe
     if isinstance(data, dict):
@@ -66,9 +65,9 @@ def StudentProgressTable(progress_data):
             current_progress = 100
         rows.append(
             StudentProgressRow(
-                            student_id = int(data['student_id'][i]), 
+                            student_id = str(data['student_id'][i]), 
                             student_name = data['username'][i],
-                            total_points = int(data['total_score'][i]), 
+                            total_points = str(data['total_score'][i]), 
                             number_of_stages = 6, 
                             current_stage = int(data['max_stage_index'][i]), 
                             current_stage_progress = current_progress

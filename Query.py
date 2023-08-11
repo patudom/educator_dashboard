@@ -23,6 +23,10 @@ class QueryCosmicDSApi():
     @staticmethod
     def l2d(list_of_dicts):
         "list of dicts to dict of lists"
+        if isinstance(list_of_dicts, dict):
+            return list_of_dicts
+        if isinstance(list_of_dicts, list) and len(list_of_dicts) == 0:
+            return {}
         keys = list_of_dicts[0].keys()
         dict_of_lists = {k: np.asarray([o[k] for o in list_of_dicts]) for k in keys}
         return dict_of_lists

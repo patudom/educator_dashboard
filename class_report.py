@@ -25,6 +25,13 @@ class Roster():
         self.data = None
         
         if len(self.roster) == 0:
+            self.student_id = []
+            self.story_name = ''
+            self.story_state = {}
+            self.stages = []
+            self.new_story_state = StateList([])
+            self.last_modified = ''
+            self.stage_index = 0
             return
         keys = self.roster[0].keys()
         new_out = self.l2d(self.roster)
@@ -44,23 +51,14 @@ class Roster():
         
         keys = self.l2d(self.story_state['stages']).keys()
         self.stages = []
+        def getstate(stage):
+            if isinstance(stage, dict) and ('state' in stage.keys()):
+                return stage['state']
+            else:
+                print(f'no state in class {self.class_id}')
+                return {'stage':{}, 'marker':None, 'responses':[], 'mc_scores':[], 'total_score':0, 'state':{}, 'title': None}
         for key in sorted(keys):
-            self.stages.append([s['state'] for s in self.l2d(self.story_state['stages'])[key]])
-        # self.stage1 = [s['state'] for s in self.l2d(self.story_state['stages'])['1']]
-        # self.stage2 = [s['state'] for s in self.l2d(self.story_state['stages'])['2']]
-        # self.stage3 = [s['state'] for s in self.l2d(self.story_state['stages'])['3']]
-        # self.stage4 = [s['state'] for s in self.l2d(self.story_state['stages'])['4']]
-        # self.stage5 = [s['state'] for s in self.l2d(self.story_state['stages'])['5']]
-        # self.stage6 = [s['state'] for s in self.l2d(self.story_state['stages'])['6']]
-        
-        
-        # self.stages = [
-        #     self.stage1,
-        #     self.stage3,
-        #     self.stage4,
-        #     self.stage5,
-        #     self.stage6
-        # ]
+            self.stages.append([getstate(s)  for s in self.l2d(self.story_state['stages'])[key]])
         
         
         self.new_story_state = StateList([student['story_state'] for student in self.roster])
@@ -79,13 +77,13 @@ class Roster():
     
 
     @staticmethod
-    def list_of_dicts_to_dict_of_lists(list_of_dicts):
+    def list_of_dicts_to_dict_of_lists(list_of_dicts, fill_val = None):
         keys = list_of_dicts[0].keys()
-        dict_of_lists = {k: [o[k] for o in list_of_dicts] for k in keys}
+        dict_of_lists = {k: [o[k] if k in o.keys() else fill_val for o in list_of_dicts] for k in keys}
         return dict_of_lists
     
-    def l2d(self, list_of_dicts):
-        return self.list_of_dicts_to_dict_of_lists(list_of_dicts)
+    def l2d(self, list_of_dicts, fill_val = None):
+        return self.list_of_dicts_to_dict_of_lists(list_of_dicts, fill_val)
     
     def get_class_data(self, refresh = False):
         if self.data is None or refresh:
@@ -119,20 +117,28 @@ class Roster():
             return None
         return [student for student in self.roster if student['student_id'] == student_id][0]
     
-    def make_dataframe(self, dictionary):
+    def make_dataframe(self, dictionary, include_student_id = True, include_class_id = True, include_username = True):
         # take the dictionary and make a dataframe
         # add self.student_ids as a column
-        if 'student_id' not in dictionary.keys():
+        
+        if 'student_id' not in dictionary.keys() and include_student_id:
             dictionary['student_id'] = self.student_ids
-        if 'class_id' not in dictionary.keys():
+        if 'class_id' not in dictionary.keys() and include_class_id:
             dictionary['class_id'] = self.class_id
-        if 'username' not in dictionary.keys():
+        if 'username' not in dictionary.keys() and include_username:
             dictionary['username'] = self.students['username'].values
         # if isinstance(dictionary, pd.DataFrame):
         #     return dictionary.set_index('student_id')
         
-        # place student_id, class_id, and username as the first three columns
-        first_cols = ['student_id', 'class_id', 'username']
+        # add cols conditionally on inclusion
+        first_cols = []
+        if include_student_id:
+            first_cols.append('student_id')
+        if include_class_id:
+            first_cols.append('class_id')
+        if include_username:
+            first_cols.append('username')
+        
         cols = first_cols + [col for col in dictionary.keys() if col not in first_cols]
         dictionary = {k:dictionary[k] for k in cols}
         # df = pd.DataFrame(dictionary).set_index('student_id')
@@ -147,16 +153,45 @@ class Roster():
                 out = self.data
             return pd.DataFrame(out)
     
+    
+    def multiple_choice_questions(self):
+        if len(self.roster) > 0:
+            out = self.l2d(self.story_state['mc_scoring'])
+            out.update({'student_id':self.student_ids})
+            return out
+        else:
+            return {'student_id': self.student_ids}
+    
+    def free_response_questions(self):
+        if len(self.roster) > 0:
+            out = self.l2d(self.story_state['responses'])
+            out.update({'student_id':self.student_ids})
+            return out
+        else:
+            return {'student_id': self.student_ids}
+    
+    def questions(self):
+        fr = self.free_response_questions()
+        mc = self.multiple_choice_questions()
+        df_fr = flatten(self.make_dataframe(fr, include_class_id=False, include_username=False))
+        df_mc = flatten(self.make_dataframe(mc, include_class_id=False, include_username=False))
+        return pd.merge(df_mc, df_fr, how='left', on='student_id')
+    
+    
     @property
     def student_ids(self):
         if len(self.roster) > 0:
             return [student['student_id'] for student in self.roster]
+        else:
+            return []
     
     @property
     def responses(self):
         if len(self.roster) > 0:
             df = pd.DataFrame([student['story_state']['responses'] for student in self.roster])
             return self.make_dataframe(flatten(df))
+        else:
+            return self.make_dataframe(pd.DataFrame())
     
     
     @property
@@ -164,12 +199,18 @@ class Roster():
         if len(self.roster) > 0:
             students = self.l2d([student['student'] for student in self.roster])
             return self.make_dataframe(students)
+        else:
+            return pd.DataFrame({'student_id':[], 'username':[], 'class_id':[]})
+    
     @property
     def out_of(self):
         if len(self.roster) == 0:
             return
         out_of = []
         for mc_score in self.story_state['mc_scoring']:
+            if mc_score is None or (len(mc_score) == 0):
+                out_of.append(0)
+                continue
             num = 0
             for key, val in mc_score.items():
                 num += len(val)
@@ -190,11 +231,21 @@ class Roster():
         "refreshing data"
         # self.grab_data()
         roster = self
+        if len(roster.roster) == 0:
+            return None
+        if hasattr(roster,'stages'):
+            data = [[s.get('marker',None) for s in stage] for stage in roster.stages]
+            cols = ['Stage 1 marker', 'Stage 3 marker', 'Stage 4 marker', 'Stage 5 marker', 'Stage 6 marker']
+            c1 = {k:v for k,v in zip(cols, data)}
+            df = pd.DataFrame(c1)
+            df['student_id'] = roster.student_id['student_id']
+        else:
+            df = pd.DataFrame({'student_id':roster.student_id['student_id']})
+       
         data = [[s.get('marker',None) for s in stage] for stage in roster.stages]
         cols = ['Stage 1 marker', 'Stage 3 marker', 'Stage 4 marker', 'Stage 5 marker', 'Stage 6 marker']
         c1 = {k:v for k,v in zip(cols, data)}
-        response = flatten(pd.DataFrame(roster.story_state['responses']))
-        response['student_id'] = roster.student_id['student_id']
+        
         df = pd.DataFrame(c1)
         df['student_id'] = roster.student_id['student_id']
         # add a string column containing roster.students['username']
@@ -212,7 +263,9 @@ class Roster():
         summ = roster.get_class_summary()
         df['Hubble_Constant'] = summ['H0'].apply(lambda x: round(x,2))
         df['Age'] = summ['age'].apply(lambda x: round(x,2))
-
+        
+        response = flatten(pd.DataFrame(roster.story_state['responses']))
+        response['student_id'] = roster.student_id['student_id']
         df = df.merge(response, on='student_id', how='left')
         last_modified = pd.to_datetime(roster.last_modified['last_modified']).tz_convert('US/Eastern').strftime("%Y-%m-%d %H:%M:%S (Eastern)") # in Easterm time
         df['last_modified'] = last_modified
@@ -222,11 +275,17 @@ class Roster():
         "refreshing data"
         # self.grab_data()
         roster = self
-        data = [[s.get('marker',None) for s in stage] for stage in roster.stages]
-        cols = ['Stage 1 marker', 'Stage 3 marker', 'Stage 4 marker', 'Stage 5 marker', 'Stage 6 marker']
-        c1 = {k:v for k,v in zip(cols, data)}
-        df = pd.DataFrame(c1)
-        df['student_id'] = roster.student_id['student_id']
+        if len(roster.roster) == 0:
+            return None
+        if hasattr(roster,'stages'):
+            data = [[s.get('marker',None) for s in stage] for stage in roster.stages]
+            cols = ['Stage 1 marker', 'Stage 3 marker', 'Stage 4 marker', 'Stage 5 marker', 'Stage 6 marker']
+            c1 = {k:v for k,v in zip(cols, data)}
+            df = pd.DataFrame(c1)
+            df['student_id'] = roster.student_id['student_id']
+        else:
+            df = pd.DataFrame({'student_id':roster.student_id['student_id']})
+
         # add a string column containing roster.students['username']
         df['username'] = roster.students['username'].values
         df['class_id'] = roster.class_id
