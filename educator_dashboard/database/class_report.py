@@ -13,7 +13,13 @@ class Roster():
     
     def __init__(self, class_id = None):
         
-        self.refresh = False
+        self._mc_questions = None
+        self._fr_questions = None
+        self._data = None
+        self._report = None
+        self._short_report = None
+        
+        self._refresh = False
         
         self.class_id = class_id
         self.query = QueryCosmicDSApi(class_id = class_id, story=HUBBLE_ROUTE_PATH)
@@ -88,12 +94,12 @@ class Roster():
         return self.list_of_dicts_to_dict_of_lists(list_of_dicts, fill_val)
     
     def get_class_data(self, refresh = False):
-        if self.data is None or refresh:
+        if self.data is None or self._refresh or refresh:
             self.data = self.query.get_class_data(class_id = self.class_id)
         return self.data
 
     def get_class_summary(self, refresh = False):
-        if self.class_summary is None or refresh:
+        if self.class_summary is None or self._refresh or refresh:
             measurements = self.measurements(refresh = refresh) 
             def get_slope(x, y):
                 # slope through origin
@@ -110,8 +116,9 @@ class Roster():
                 else:
                     H0.append(nan)
                     Age.append(nan)
+            self.class_summary = self.make_dataframe(pd.DataFrame({'H0':H0, 'age':Age}))
 
-        return self.make_dataframe(pd.DataFrame({'H0':H0, 'age':Age}))
+        return self.class_summary
     
     def get_student_by_id(self, student_id):
         if student_id not in self.student_ids:
@@ -157,17 +164,24 @@ class Roster():
     
     
     def multiple_choice_questions(self):
+        if (self._mc_questions is not None) and (not self._refresh):
+            return self._mc_questions
         if len(self.roster) > 0:
             out = self.l2d(self.story_state['mc_scoring'])
             out.update({'student_id':self.student_ids})
+            self._mc_questions = out
             return out
         else:
             return {'student_id': self.student_ids}
     
     def free_response_questions(self):
+        if (self._fr_questions) is not None and (not self._refresh):
+            return self._fr_questions
+        
         if len(self.roster) > 0:
             out = self.l2d(self.story_state['responses'])
             out.update({'student_id':self.student_ids})
+            self._fr_questions = out
             return out
         else:
             return {'student_id': self.student_ids}
@@ -231,7 +245,13 @@ class Roster():
     
     def report(self):
         "refreshing data"
-        # self.grab_data()
+        
+        if self._report is not None and not self._refresh:
+            return self._report
+        
+        if self._refresh:
+            self.grab_data()
+
         roster = self
         if len(roster.roster) == 0:
             return None
@@ -271,11 +291,18 @@ class Roster():
         df = df.merge(response, on='student_id', how='left')
         last_modified = pd.to_datetime(roster.last_modified['last_modified']).tz_convert('US/Eastern').strftime("%Y-%m-%d %H:%M:%S (Eastern)") # in Easterm time
         df['last_modified'] = last_modified
+        
+        self._report = df
+        
         return df
     
     def short_report(self):
-        "refreshing data"
-        # self.grab_data()
+        if self._short_report is not None and not self._refresh:
+            return self._short_report
+        
+        if self._refresh:
+            self.grab_data()
+        
         roster = self
         if len(roster.roster) == 0:
             return None
@@ -306,7 +333,23 @@ class Roster():
 
         last_modified = pd.to_datetime(roster.last_modified['last_modified']).tz_convert('US/Eastern').strftime("%Y-%m-%d %H:%M:%S (Eastern)") # in Easterm time
         df['last_modified'] = last_modified
+        
+        self._short_report = df
+        
         return df
+    
+    def refresh_data(self):
+        self._refresh = True
+        print('****** Refreshing data ******')
+        print(' >>> Grabbing class states')
+        self.grab_data()
+        print(' >>> Getting free response questions')
+        self.free_response_questions()
+        print(' >>> Getting multiple choice questions')
+        self.multiple_choice_questions()
+        print(' >>> Getting class data')
+        self.get_class_data()
+        self._refresh = False
 
 
 
