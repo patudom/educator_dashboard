@@ -1,6 +1,7 @@
 import requests
 import json
 import numpy as np
+from urllib.parse import urljoin
 
 API_URL = "https://api.cosmicds.cfa.harvard.edu"
 HUBBLE_ROUTE_PATH = "hubbles_law"
@@ -31,7 +32,8 @@ class QueryCosmicDSApi():
         dict_of_lists = {k: np.asarray([o[k] for o in list_of_dicts]) for k in keys}
         return dict_of_lists
     
-    def get(self,url):
+    @staticmethod
+    def get(url):
         response = requests.request("GET", url)
         return response
         
@@ -47,7 +49,7 @@ class QueryCosmicDSApi():
         endpoint = f'roster-info/{class_id}'
         if (story is not None) and (story != ''):
             endpoint += f'/{story}'
-        url = '/'.join([self.url_head, endpoint])
+        url = urljoin(self.url_head, endpoint)
         self.roster_url = url
         req = self.get(url)
         return req.json()
@@ -59,7 +61,7 @@ class QueryCosmicDSApi():
         story = self.story or story
 
         endpoint = f'{story}/measurements/{student_id}'
-        url = '/'.join([self.url_head, endpoint])
+        url = urljoin(self.url_head, endpoint)
         self.student_url = url
         req = self.get(url)
         try:
@@ -149,15 +151,19 @@ class QueryCosmicDSApi():
         story = story or self.story
         
         endpoint = 'hubbles_law/sample-measurements'
-        url = '/'.join([self.url_head, endpoint])
+        url = urljoin(self.url_head, endpoint)
         self.example_galaxy_url = url
         req = self.get(url)
         return req.json()
-
-    def get_question(self, question_tag):
-        story = self.story or story
+    
+    @classmethod
+    def get_question(cls, question_tag):
         endpoint = f'/question/{question_tag}'
-        url = '/'.join([self.url_head, endpoint])
-        self.question_url = url
-        req = self.get(url)
+        url = urljoin(cls.url_head, endpoint)
+        cls.question_url = url
+        print(url)
+        req = cls.get(url)
+        if req.status_code == 404:
+            print(f"Question {question_tag} not found")
+            return None
         return req.json()
