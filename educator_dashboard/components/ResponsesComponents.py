@@ -43,7 +43,7 @@ def StudentQuestion(df = None):
     dquest, set_dquest = solara.use_state(None)
     
     def cell_action(column, row_index):
-        if column == 'question':
+        if column == 'Question':
             tag = fr_questions[column].iloc[row_index]
             # take everything after first period, there may be more than 1
             if '.' in tag:
