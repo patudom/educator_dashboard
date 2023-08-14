@@ -31,7 +31,7 @@ def StudentProgressRow(student_id = None,
             print(event, student_id)
             on_student_id(student_id)
     
-    ProgressRow(student=student, 
+    ProgressRow(column_data=student, 
                 on_selected=on_row_click,
                 progress_bar=MultiStepProgressBar(steps=number_of_stages, 
                                                 currentStep=current_stage, 

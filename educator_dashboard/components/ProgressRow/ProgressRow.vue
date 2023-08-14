@@ -1,12 +1,12 @@
-<!-- progress row shows student name id and multistepprogressbar -->
+<!-- progress row shows column_data name id and an externally defined progress bar -->
 <template>
   <tr 
     class="progress-table-row"
-    @click="() => selected = student"
+    @click="() => selected = column_data"
     >
     
-    <td v-for="key in Object.keys(student)" :key="key" :class="`progress-table-td progress-table-${key}`">
-      {{ student[key] }}
+    <td v-for="key in Object.keys(column_data)" :key="key" :class="`progress-table-td progress-table-${key}`">
+      {{ column_data[key] }}
     </td>
 
     <td
@@ -24,7 +24,7 @@ export default {
   name: "ProgressRow",
 
   props: {
-    student: {
+    column_data: {
       type: Object,
       required: true
     },
