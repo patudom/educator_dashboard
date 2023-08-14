@@ -47,6 +47,11 @@ def StudentProgressTable(progress_data, on_student_id =None):
     
     If a dictionary it can be either a list of records
     or a record with a list of values for each key
+    
+    progress_data should have the following keys:
+    student_id, username, total_score, max_stage_index, progress
+    where progress is the progress of the max stage
+    
     """
     
     if progress_data.value is None:
@@ -59,16 +64,15 @@ def StudentProgressTable(progress_data, on_student_id =None):
         data = DataFrame(data)
     
     def on_student_id_wrapper(student_id):
-        print("StudentProgressTable", student_id)
         on_student_id(int(student_id))
     
     rows = []
     for i in range(len(data)):
-        current_progress = data['progress'][i].split('%')[0]
-        if current_progress.isnumeric():
-            current_progress = int(current_progress)
+        max_stage_progress = data['progress'][i].split('%')[0]
+        if max_stage_progress.isnumeric():
+            max_stage_progress = int(max_stage_progress)
         else:
-            current_progress = 100
+            max_stage_progress = 100
         rows.append(
             StudentProgressRow(
                             student_id = str(data['student_id'][i]), 
@@ -76,7 +80,7 @@ def StudentProgressTable(progress_data, on_student_id =None):
                             total_points = str(data['total_score'][i]), 
                             number_of_stages = 6, 
                             current_stage = int(data['max_stage_index'][i]), 
-                            current_stage_progress = current_progress,
+                            current_stage_progress = max_stage_progress,
                             on_student_id = on_student_id_wrapper
                             ) 
         )
