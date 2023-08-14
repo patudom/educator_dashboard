@@ -4,11 +4,7 @@ from pandas import DataFrame
 
 from .MultiStepProgressBar import MultiStepProgressBar
 from .TableFromRows import TableFromRows
-
-
-@solara.component_vue('ProgressRow.vue')
-def ProgressRow(student=None, progress_bar = None, selected = None, on_selected = None):
-    pass
+from .ProgressRow import ProgressRow
 
 @solara.component
 def StudentProgressRow(student_id = None, 
