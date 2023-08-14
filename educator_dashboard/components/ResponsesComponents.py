@@ -2,6 +2,7 @@ import solara
 from pandas import DataFrame
 
 # from solara.components.dataframe import HistogramCard
+from ..database.Query import QueryCosmicDSApi as Query
 
 import solara.express as px
 
@@ -36,7 +37,23 @@ def StudentQuestion(df = None):
     mc_questions = table[table.question.apply(lambda x: len(str(x).split('.'))==3)]
     #fr_questions rows with value where len(value.split('.'))==2
     fr_questions = table[table.question.apply(lambda x: len(str(x).split('.'))==2)]
+    fr_questions = fr_questions.rename(columns={'score': 'Answer', 'question': 'Question'})
     
+    
+    dquest, set_dquest = solara.use_state(None)
+    
+    def cell_action(column, row_index):
+        if column == 'question':
+            tag = fr_questions[column].iloc[row_index]
+            # take everything after first period, there may be more than 1
+            if '.' in tag:
+                tag = tag.split('.', 1)[1]
+            qjson = Query.get_question(tag)
+            if qjson is not None:
+                q = qjson['question']['text']
+                set_dquest(q)
+        
+    cell_actions = [solara.CellAction('Show Question', icon='mdi-help-box', on_click=cell_action)]
     # multiple choice questions
     with solara.Columns([1,1]):
         with solara.Column():
@@ -46,7 +63,9 @@ def StudentQuestion(df = None):
             # solara.FigurePlotly(fig.)
         with solara.Column():
             solara.Markdown('**Free Response**')
-            solara.DataFrame(fr_questions)
+            if dquest is not None:
+                solara.Markdown(f"**Question**: {dquest}")
+            solara.DataFrame(fr_questions, cell_actions=cell_actions)
         
         
 @solara.component
