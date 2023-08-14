@@ -43,7 +43,7 @@ def Dashboard(df, data, roster):
     # TableDisplay(df.value,items_per_page=len(df.value)//3,cell_actions = cell_actions)
 
     with solara.Column():
-        StudentProgressTable(df)
+        StudentProgressTable(df, on_student_id=student_id.set)
     
         solara.Markdown(f"**Student {student_id}**")
     

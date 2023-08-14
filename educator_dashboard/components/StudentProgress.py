@@ -7,7 +7,7 @@ from .TableFromRows import TableFromRows
 
 
 @solara.component_vue('ProgressRow.vue')
-def ProgressRow(student=None, progress_bar = None):
+def ProgressRow(student=None, progress_bar = None, selected = None, on_selected = None):
     pass
 
 @solara.component
@@ -17,6 +17,7 @@ def StudentProgressRow(student_id = None,
                     number_of_stages = None,
                     current_stage = None,
                     current_stage_progress = None,
+                    on_student_id = None
                     ):
     """
     The student progress should show
@@ -30,7 +31,12 @@ def StudentProgressRow(student_id = None,
         'total_points': total_points,
     }
     
+    def on_row_click(event):
+            print(event, student_id)
+            on_student_id(student_id)
+    
     ProgressRow(student=student, 
+                on_selected=on_row_click,
                 progress_bar=MultiStepProgressBar(steps=number_of_stages, 
                                                 currentStep=current_stage, 
                                                 currentStepProgress=current_stage_progress, 
@@ -38,7 +44,7 @@ def StudentProgressRow(student_id = None,
  
 
 @solara.component
-def StudentProgressTable(progress_data):
+def StudentProgressTable(progress_data, on_student_id =None):
     """
     progress_data should be either a dataframe or a dictionary
     this will work with reactive or non-reactive data
@@ -56,6 +62,10 @@ def StudentProgressTable(progress_data):
     if isinstance(data, dict):
         data = DataFrame(data)
     
+    def on_student_id_wrapper(student_id):
+        print("StudentProgressTable", student_id)
+        on_student_id(int(student_id))
+    
     rows = []
     for i in range(len(data)):
         current_progress = data['progress'][i].split('%')[0]
@@ -70,9 +80,12 @@ def StudentProgressTable(progress_data):
                             total_points = str(data['total_score'][i]), 
                             number_of_stages = 6, 
                             current_stage = int(data['max_stage_index'][i]), 
-                            current_stage_progress = current_progress
-                            )
+                            current_stage_progress = current_progress,
+                            on_student_id = on_student_id_wrapper
+                            ) 
         )
+    
     with solara.Card():
         TableFromRows(headers=['Student ID', 'Student Name', 'Total Points', 'Progress'], 
-                      rows=rows)
+                      rows=rows,
+                      )

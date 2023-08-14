@@ -1,6 +1,9 @@
 <!-- progress row shows student name id and multistepprogressbar -->
 <template>
-  <tr class="progress-table-row">
+  <tr 
+    class="progress-table-row"
+    @click="() => selected = student"
+    >
     
     <td v-for="key in Object.keys(student)" :key="key" :class="`progress-table-td progress-table-${key}`">
       {{ student[key] }}
@@ -32,6 +35,10 @@ export default {
     style: {
       type: Object,
       default: () => ({height: "4px"})
+    },
+    selected: {
+      type: Object,
+      required: true
     }
   },
 
