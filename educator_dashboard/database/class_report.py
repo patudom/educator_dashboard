@@ -74,16 +74,6 @@ class Roster():
         self.new_story_state = StateList([student['story_state'] for student in self.roster])
         self.last_modified = new_out['last_modified']
         self.stage_index = self.new_story_state.stage_index
-        
-        
-        
-        
-        
-        
-        
-        # mc_scores = self.l2d(self.story_state['mc_scores'])
-        
-        # df = pd.DataFrame.from_dict(self.students).set_index('student_id')
     
 
     @staticmethod
