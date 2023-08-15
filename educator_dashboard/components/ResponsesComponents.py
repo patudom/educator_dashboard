@@ -7,6 +7,8 @@ from pandas import DataFrame
 # from solara.components.dataframe import HistogramCard
 from ..database.Query import QueryCosmicDSApi as Query
 
+from .Collapsable import Collapsable
+
 import re
 
 import solara.express as px
@@ -22,32 +24,8 @@ def QuestionSummary(df = None, sid = None):
         solara.DataFrame(df)
 
 
-
 @solara.component
-def StudentQuestion(row_series = None):
-    """
-    Show the responses for a single student
-    """
-    
-    if isinstance(row_series, solara.Reactive):
-        # solara.DataFrame(df.value)
-        table = row_series.value
-    else:
-        # solara.DataFrame(df)
-        table = row_series
-    # table = table.to_frame()
-    table['question'] = table.index
-    
-    # solara.DataFrame(table)
-    
-    # if table is not None:
-    #     return
-    
-    mc_questions = table[table.tag.apply(lambda x: len(str(x).split('.'))==3)]
-    fr_questions = table[table.tag.apply(lambda x: len(str(x).split('.'))==2)]
-    fr_questions = fr_questions.rename(columns={'value': 'Answer', 'question': 'Question'})
-    
-    
+def FreeResponseQuestionSingleStudent(fr_questions):
     dquest, set_dquest = solara.use_state(None)
     
     def fr_cell_action(column, row_index):
@@ -62,6 +40,15 @@ def StudentQuestion(row_series = None):
         
     fr_cell_actions = [solara.CellAction('Show Question', icon='mdi-help-box', on_click=fr_cell_action)]
     
+    solara.Markdown('## Free Responses')
+    if dquest is not None:
+        solara.Markdown(f"**Question**: {dquest}")
+    solara.DataFrame(fr_questions[['Question','Answer']], cell_actions=fr_cell_actions)
+    
+@solara.component
+def MultipleChoiceQuestionSingleStudent(mc_questions):
+    dquest, set_dquest = solara.use_state(None)
+    
     def mc_cell_action(column, row_index):
         tag = mc_questions['tag'].iloc[row_index]
         # take everything after first period, there may be more than 1
@@ -73,43 +60,67 @@ def StudentQuestion(row_series = None):
             set_dquest(q)
         
     mc_cell_actions = [solara.CellAction('Show Question', icon='mdi-help-box', on_click=mc_cell_action)]
+    
+    solara.Markdown('')
+
+    df = DataFrame()
+
+    tag = mc_questions.tag
+    df['question'] = mc_questions.question[::3]
+    df['score'] = mc_questions['value'][tag.str.contains('score')].values
+    df['tries'] = mc_questions['value'][tag.str.contains('tries')].values
+    df['choice'] = mc_questions['value'][tag.str.contains('choice')].values
+    # df['tag'] = mc_questions['tag'][tag.str.contains('choice')].values
+
+    completed = sum(df.score.notna())
+    total = len(df)
+    points = sum(df.score.dropna().astype(int))
+    total_points = 10 * total
+    solara.Markdown("""
+                    ## Multiple Choice
+                    Student completed {} out of {} multiple choice questions </br> Multiple Choice Score: {}/{}
+                    """.format(completed, total, points, total_points))    
+
+    
+    fig = px.histogram(df.dropna(), 'tries', custom_data= ['question'], labels={'tries': "# of Tries"})
+    
+    with Collapsable(header='Show Question Table'):
+        if dquest is not None:
+            solara.Markdown(f"**Question**: {dquest}")
+        solara.DataFrame(df, items_per_page=len(df), cell_actions=mc_cell_actions)
+    
+
+
+@solara.component
+def StudentQuestion(dataframe = None):
+    """
+    Show the responses for a single student
+    """
+    
+    if isinstance(dataframe, solara.Reactive):
+        # solara.DataFrame(df.value)
+        table = dataframe.value
+    else:
+        # solara.DataFrame(df)
+        table = dataframe
+    # table = table.to_frame()
+    table['question'] = table.index
+    
+    
+    mc_questions = table[table.tag.apply(lambda x: len(str(x).split('.'))==3)]
+    fr_questions = table[table.tag.apply(lambda x: len(str(x).split('.'))==2)]
+    
+    fr_questions = fr_questions.rename(columns={'value': 'Answer', 'question': 'Question'})
+    
+    
+    
     # multiple choice questions
     with solara.Columns([1,1]):
         with solara.Column():
-            solara.Markdown('**Multiple Choice**')
-
-            df = DataFrame()
-
-            tag = mc_questions.tag
-            df['question'] = mc_questions.question[::3]
-            df['score'] = mc_questions['value'][tag.str.contains('score')].values
-            df['tries'] = mc_questions['value'][tag.str.contains('tries')].values
-            df['choice'] = mc_questions['value'][tag.str.contains('choice')].values
-            # df['tag'] = mc_questions['tag'][tag.str.contains('choice')].values
-
-            completed = sum(df.score.notna())
-            total = len(df)
-            solara.Markdown('Student completed {} out of {} multiple choice questions'.format(completed, total))
-
-            points = sum(df.score.dropna().astype(int))
-            total_points = 10 * total
-            
-            solara.Markdown('Multiple Choice Score: {}/{}'.format(points, total_points))
-            
-            fig = px.histogram(df.dropna(), 'tries', custom_data= ['question'], labels={'tries': "# of Tries"})
-            
-            with rv.ExpansionPanels():
-                with rv.ExpansionPanel():
-                    with rv.ExpansionPanelHeader():
-                        solara.Markdown('Show Question Table')
-                    with rv.ExpansionPanelContent():
-                        solara.DataFrame(df, items_per_page=len(df), cell_actions=mc_cell_actions)
+            MultipleChoiceQuestionSingleStudent(mc_questions)
             
         with solara.Column():
-            solara.Markdown('**Free Responses**')
-            if dquest is not None:
-                solara.Markdown(f"**Question**: {dquest}")
-            solara.DataFrame(fr_questions[['Question','Answer']], cell_actions=fr_cell_actions)
+            FreeResponseQuestionSingleStudent(fr_questions)
         
         
 @solara.component
