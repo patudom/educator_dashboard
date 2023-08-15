@@ -176,4 +176,4 @@ class QueryCosmicDSApi():
         print(url)
         req = self.get(url)
         if req.status_code == 200:
-            return req.json()
+            return {q['tag']:q for q in req.json()['questions']}

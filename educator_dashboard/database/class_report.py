@@ -189,8 +189,8 @@ class Roster():
         self._questions = pd.merge(df_mc, df_fr, how='left', on='student_id')
         return self._questions
     
-    def get_questions_text(self, tag):
-        return self.query.get_question(tag)
+    def get_questions_text(self):
+        return self.query.get_questions()
     
     def question_keys(self, testing = False):
         if (self._question_keys is not None) and (not self._refresh):
@@ -199,18 +199,19 @@ class Roster():
         self._question_keys = {}
         keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
         
+        questions = self.get_questions_text()
         for k in keys:
             if testing:
-                q = {'question': {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}}
+                q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
             else:
-                q = self.get_questions_text(k)
+                q = questions[k]
             
             if q is not None:
-                short = q['question']['shorthand']
+                short = q['shorthand']
                 if short == '':
                     short = ' '.join(k.replace('_', ' ').replace('-', ' ').split())
                     short = short[0].upper() + short[1:]
-                self._question_keys[k] = {'text':q['question']['text'], 'shorthand':short}
+                self._question_keys[k] = {'text':q['text'], 'shorthand':short}
                 
         return self._question_keys
                 
