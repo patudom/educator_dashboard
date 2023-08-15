@@ -185,7 +185,7 @@ class Roster():
         fr = self.free_response_questions()
         mc = self.multiple_choice_questions()
         df_fr = flatten(self.make_dataframe(fr, include_class_id=False, include_username=False))
-        df_mc = flatten(self.make_dataframe(mc, include_class_id=False, include_username=False))
+        df_mc = flatten(self.make_dataframe(mc, include_class_id=False, include_username=False)).astype('Int64')
         self._questions = pd.merge(df_mc, df_fr, how='left', on='student_id')
         return self._questions
     
