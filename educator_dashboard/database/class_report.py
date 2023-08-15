@@ -15,6 +15,8 @@ class Roster():
         
         self._mc_questions = None
         self._fr_questions = None
+        self._questions = None
+        self._question_keys = None
         self._data = None
         self._report = None
         self._short_report = None
@@ -187,12 +189,42 @@ class Roster():
             return {'student_id': self.student_ids}
     
     def questions(self):
+        if (self._questions is not None) and (not self._refresh):
+            return self._questions
+        
         fr = self.free_response_questions()
         mc = self.multiple_choice_questions()
         df_fr = flatten(self.make_dataframe(fr, include_class_id=False, include_username=False))
         df_mc = flatten(self.make_dataframe(mc, include_class_id=False, include_username=False))
-        return pd.merge(df_mc, df_fr, how='left', on='student_id')
+        self._questions = pd.merge(df_mc, df_fr, how='left', on='student_id')
+        return self._questions
     
+    def get_questions_text(self, tag):
+        return self.query.get_question(tag)
+    
+    def question_keys(self, testing = False):
+        if (self._question_keys is not None) and (not self._refresh):
+            return self._question_keys
+
+        self._question_keys = {}
+        keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
+        
+        for k in keys:
+            if testing:
+                q = {'question': {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}}
+            else:
+                q = self.get_questions_text(k)
+            
+            if q is not None:
+                short = q['question']['shorthand']
+                if short == '':
+                    short = ' '.join(k.replace('_', ' ').replace('-', ' ').split())
+                    short = short[0].upper() + short[1:]
+                self._question_keys[k] = {'text':q['question']['text'], 'shorthand':short}
+                
+        return self._question_keys
+                
+        
     
     @property
     def student_ids(self):
@@ -343,10 +375,8 @@ class Roster():
         print('****** Refreshing data ******')
         print(' >>> Grabbing class states')
         self.grab_data()
-        print(' >>> Getting free response questions')
-        self.free_response_questions()
-        print(' >>> Getting multiple choice questions')
-        self.multiple_choice_questions()
+        print(' >>> Getting questions')
+        self.question_keys()
         print(' >>> Getting class data')
         self.get_class_data()
         self._refresh = False

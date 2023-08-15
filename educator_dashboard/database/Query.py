@@ -167,3 +167,13 @@ class QueryCosmicDSApi():
             print(f"Question {question_tag} not found")
             return None
         return req.json()
+    
+    def get_questions(self, story = None):
+        story = self.story or story
+        endpoint = f'questions/{story}'
+        url = urljoin(self.url_head, endpoint)
+        self.questions_url = url
+        print(url)
+        req = self.get(url)
+        if req.status_code == 200:
+            return req.json()

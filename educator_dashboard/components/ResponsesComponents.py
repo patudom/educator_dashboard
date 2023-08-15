@@ -1,8 +1,13 @@
 import solara
+
+# equivalent to from reacton import ipyvuetify as rv
+from solara.alias import rv
 from pandas import DataFrame
 
 # from solara.components.dataframe import HistogramCard
 from ..database.Query import QueryCosmicDSApi as Query
+
+import re
 
 import solara.express as px
 
@@ -15,57 +20,96 @@ def QuestionSummary(df = None, sid = None):
         solara.DataFrame(df.value)
     else:
         solara.DataFrame(df)
-        
+
 
 
 @solara.component
-def StudentQuestion(df = None):
+def StudentQuestion(row_series = None):
     """
     Show the responses for a single student
     """
     
-    if isinstance(df, solara.Reactive):
+    if isinstance(row_series, solara.Reactive):
         # solara.DataFrame(df.value)
-        table = df.value
+        table = row_series.value
     else:
         # solara.DataFrame(df)
-        table = df
-        
-    # table is pandas dataframe with columns: question and score
+        table = row_series
+    # table = table.to_frame()
+    table['question'] = table.index
+    
     # solara.DataFrame(table)
-    #mc_questions rows with value where len(value.split('.'))==3
-    mc_questions = table[table.question.apply(lambda x: len(str(x).split('.'))==3)]
-    #fr_questions rows with value where len(value.split('.'))==2
-    fr_questions = table[table.question.apply(lambda x: len(str(x).split('.'))==2)]
-    fr_questions = fr_questions.rename(columns={'score': 'Answer', 'question': 'Question'})
+    
+    # if table is not None:
+    #     return
+    
+    mc_questions = table[table.tag.apply(lambda x: len(str(x).split('.'))==3)]
+    fr_questions = table[table.tag.apply(lambda x: len(str(x).split('.'))==2)]
+    fr_questions = fr_questions.rename(columns={'value': 'Answer', 'question': 'Question'})
     
     
     dquest, set_dquest = solara.use_state(None)
     
-    def cell_action(column, row_index):
-        if column == 'Question':
-            tag = fr_questions[column].iloc[row_index]
-            # take everything after first period, there may be more than 1
-            if '.' in tag:
-                tag = tag.split('.', 1)[1]
-            qjson = Query.get_question(tag)
-            if qjson is not None:
-                q = qjson['question']['text']
-                set_dquest(q)
+    def fr_cell_action(column, row_index):
+        tag = fr_questions['tag'].iloc[row_index]
+        # take everything after first period, there may be more than 1
+        if '.' in tag:
+            tag = tag.split('.', 1)[1]
+        qjson = Query.get_question(tag)
+        if qjson is not None:
+            q = qjson['question']['text']
+            set_dquest(q)
         
-    cell_actions = [solara.CellAction('Show Question', icon='mdi-help-box', on_click=cell_action)]
+    fr_cell_actions = [solara.CellAction('Show Question', icon='mdi-help-box', on_click=fr_cell_action)]
+    
+    def mc_cell_action(column, row_index):
+        tag = mc_questions['tag'].iloc[row_index]
+        # take everything after first period, there may be more than 1
+        if '.' in tag:
+            tag = tag.split('.')[1]
+        qjson = Query.get_question(tag)
+        if qjson is not None:
+            q = qjson['question']['text']
+            set_dquest(q)
+        
+    mc_cell_actions = [solara.CellAction('Show Question', icon='mdi-help-box', on_click=mc_cell_action)]
     # multiple choice questions
     with solara.Columns([1,1]):
         with solara.Column():
             solara.Markdown('**Multiple Choice**')
-            # solara.DataFrame(mc_questions)
-            px.histogram(mc_questions.dropna(), 'score', custom_data= ['question'],)
-            # solara.FigurePlotly(fig.)
+
+            df = DataFrame()
+
+            tag = mc_questions.tag
+            df['question'] = mc_questions.question[::3]
+            df['score'] = mc_questions['value'][tag.str.contains('score')].values
+            df['tries'] = mc_questions['value'][tag.str.contains('tries')].values
+            df['choice'] = mc_questions['value'][tag.str.contains('choice')].values
+            # df['tag'] = mc_questions['tag'][tag.str.contains('choice')].values
+
+            completed = sum(df.score.notna())
+            total = len(df)
+            solara.Markdown('Student completed {} out of {} multiple choice questions'.format(completed, total))
+
+            points = sum(df.score.dropna().astype(int))
+            total_points = 10 * total
+            
+            solara.Markdown('Multiple Choice Score: {}/{}'.format(points, total_points))
+            
+            fig = px.histogram(df.dropna(), 'tries', custom_data= ['question'], labels={'tries': "# of Tries"})
+            
+            with rv.ExpansionPanels():
+                with rv.ExpansionPanel():
+                    with rv.ExpansionPanelHeader():
+                        solara.Markdown('Show Question Table')
+                    with rv.ExpansionPanelContent():
+                        solara.DataFrame(df, items_per_page=len(df), cell_actions=mc_cell_actions)
+            
         with solara.Column():
-            solara.Markdown('**Free Response**')
+            solara.Markdown('**Free Responses**')
             if dquest is not None:
                 solara.Markdown(f"**Question**: {dquest}")
-            solara.DataFrame(fr_questions, cell_actions=cell_actions)
+            solara.DataFrame(fr_questions[['Question','Answer']], cell_actions=fr_cell_actions)
         
         
 @solara.component
@@ -78,29 +122,48 @@ def IndividualStudentResponses(roster, sid=None):
     if roster.value is None:
         return
     
-
+    # we need to replace the tag with the short version of the question
     questions = roster.value.questions()
+    qtags = [c for c in questions.columns if '.' in c]
+    qkeys = roster.value.question_keys()
+    short_qs =  list(map(lambda x: qkeys.get(x.split('.')[1])['shorthand'] , qtags))
+    replacements = dict(zip(qtags, short_qs))
+    questions = questions.rename(columns = replacements)
+    
     sids = questions['student_id'].to_list()
     with solara.lab.Tabs(
-        value = 0 if (sid.value is None or sid.value not in sids) else sids.index(sid.value), 
-        on_value = lambda x: sid.set(sids[x])
-        ):
+            value = 0 if (sid.value is None or sid.value not in sids) else sids.index(sid.value), 
+            on_value = lambda x: sid.set(sids[x])
+            ):
         for i, row in questions.iterrows(): 
             with solara.lab.Tab(str(row['student_id'])):
+                
                 solara.Markdown(f"**Student {row['student_id']}**")
-                df = row.drop('student_id').rename('score').to_frame()
-                # copy the index to a column
-                df['question'] = df.index
-                # drop rows where question contains score or choice in string
-                df = df[~df['question'].str.contains('score|choice')]
-                StudentQuestion(df[['question', 'score']])
+                
+                # drop student id and rename series to value
+                df = row.drop('student_id').rename('value').to_frame()
+                
+                # add full N.tag.?(triest|score|choice) tag as a column
+                df['tag'] = qtags
+                
+                StudentQuestion(df)
+
 
 @solara.component
-def StudentQuestions(roster, sid = None):
+def StudentQuestionsSummary(roster, sid = None):
     if roster.value is None:
         return
     
+    # we need to replace the tag with the short version of the question
     questions = roster.value.questions()
+    # questions have a '.' because we flattened a nested json file
+    qtags = [c for c in questions.columns if '.' in c]
+    qkeys = roster.value.question_keys()
+    
+    replacements = dict(zip(qtags, map(lambda x: qkeys.get(x.split('.')[1])['shorthand'] , qtags)))
+    replacements.update({'student_id': 'Student ID'})
+    questions = questions.rename(columns = replacements)
+    
     with solara.Columns([1,1]):
         with solara.Column():
             QuestionSummary(questions, sid = sid)
