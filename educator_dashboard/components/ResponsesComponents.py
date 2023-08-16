@@ -81,8 +81,10 @@ def MultipleChoiceQuestionSingleStudent(mc_questions):
                     Student completed {} out of {} multiple choice questions </br> Multiple Choice Score: {}/{}
                     """.format(completed, total, points, total_points))    
 
-    
-    fig = px.histogram(df.dropna(), 'tries', custom_data= ['question'], labels={'tries': "# of Tries"})
+    df_nona = df.dropna()
+    df_nona['tries'] = df_nona['tries'].astype(int)
+    fig = px.histogram(df_nona, 'tries', custom_data= ['question'], labels={'tries': "# of Tries"})
+    # solara.DataFrame(df.dropna())
     
     with Collapsable(header='Show Question Table'):
         if dquest is not None:
