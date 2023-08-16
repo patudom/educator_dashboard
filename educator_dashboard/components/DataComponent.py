@@ -62,12 +62,12 @@ def StudentData(dataframe = None, id_col = 'student_id',  sid = None, cols_to_di
     with solara.Column(gap="0px"):
         with solara.Columns([1,1]):
             with solara.Column():
-                if allow_id_set:
-                    # val = str(sid.value)
-                    solara.InputText(label="Student ID",  value = str(sid), on_value=on_value)
-                else:
-                    solara.Markdown(f"**Student {sid}**")
-            with solara.Column():
+                # if allow_id_set:
+                #     # val = str(sid.value)
+                #     solara.InputText(label="Student ID",  value = str(sid), on_value=on_value)
+                # else:
+                #     solara.Markdown(f"**Student {sid}**")
+            # with solara.Column():
                 #hubble's constant
                 # age of universe
                 h0 = get_slope(single_student_df['est_dist_value'], single_student_df['velocity_value'])
