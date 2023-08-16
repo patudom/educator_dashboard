@@ -11,7 +11,8 @@ from .Collapsable import Collapsable
 
 import re
 
-import solara.express as px
+# import solara.express as px
+import plotly.express as px
 
 @solara.component
 def QuestionSummary(df = None, sid = None):
@@ -85,7 +86,9 @@ def MultipleChoiceQuestionSingleStudent(mc_questions):
 
     df_nona = df.dropna()
     df_nona['tries'] = df_nona['tries'].astype(int)
-    fig = px.histogram(df_nona, 'tries', custom_data= ['question'], labels={'tries': "# of Tries"})
+    fig = px.histogram(df_nona, 'tries', hover_data= ['question'], labels={'tries': "# of Tries"}, range_x=[-0.6,3.6], category_orders={'tries': [0,1,2,3,4]})
+    fig.update_xaxes(type='category')
+    solara.FigurePlotly(fig)
     # solara.DataFrame(df.dropna())
     
     with Collapsable(header='Show Question Table'):
