@@ -1,9 +1,9 @@
 
 
 import pandas as pd
-from nested_dataframe import flatten
-from State import State, StateList
-from Query import QueryCosmicDSApi
+from .nested_dataframe import flatten
+from .State import State, StateList
+from .Query import QueryCosmicDSApi
 
 HUBBLE_ROUTE_PATH = "hubbles_law"
 
@@ -12,6 +12,8 @@ from math import nan
 class Roster():
     
     def __init__(self, class_id = None):
+        
+        self.refresh = False
         
         self.class_id = class_id
         self.query = QueryCosmicDSApi(class_id = class_id, story=HUBBLE_ROUTE_PATH)

@@ -6,7 +6,7 @@ API_URL = "https://api.cosmicds.cfa.harvard.edu"
 HUBBLE_ROUTE_PATH = "hubbles_law"
 
 
-from State import State, StateList
+from .State import State, StateList
     
 class QueryCosmicDSApi():
     
@@ -154,4 +154,10 @@ class QueryCosmicDSApi():
         req = self.get(url)
         return req.json()
 
-
+    def get_question(self, question_tag):
+        story = self.story or story
+        endpoint = f'/question/{question_tag}'
+        url = '/'.join([self.url_head, endpoint])
+        self.question_url = url
+        req = self.get(url)
+        return req.json()

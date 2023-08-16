@@ -19,11 +19,12 @@ To run the dashboard
 
 ```
 cd educator_dashboard
-solara run pages
+pip install -e .
+solara run educator_dashboard.pages
 ```
 
 
-To edit the CSS edit the file `educator_dashboard/assets/custom.css`. You need to refresh the page to see the changes. Sometimes a reset is need to change components that are already on the page.
+To edit the CSS edit the file `educator_dashboard/assets/custom.css`. You need to force refresh the page to see the changes. If you make changes to components you need to restart the server.
 
 
 List of custom components
