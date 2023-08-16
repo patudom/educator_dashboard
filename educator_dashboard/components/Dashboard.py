@@ -49,12 +49,12 @@ def Dashboard(df, data, roster):
     solara.Markdown(f"**Currently selected student**: {student_id}")
     
     with solara.Card():
-        with solara.lab.Tabs():
+        with solara.lab.Tabs(vertical=True, align='right'):
             
-            with solara.lab.Tab("Student Question Summary"):
+            with solara.lab.Tab("Summary"):
                 StudentQuestionsSummary(roster, student_id)
                 
-            with solara.lab.Tab("Individual Student Questions"):
+            with solara.lab.Tab("Individual Qs"):
                 IndividualStudentResponses(roster, student_id)
         
             with solara.lab.Tab("Student Data", style={"transition": "none"}):
