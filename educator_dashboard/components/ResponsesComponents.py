@@ -170,12 +170,13 @@ def StudentQuestionsSummary(roster, sid = None):
     # we need to replace the tag with the short version of the question
     questions = roster.value.questions()
     # questions have a '.' because we flattened a nested json file
-    qtags = [c for c in questions.columns if '.' in c]
+    qtags = [c for c in questions.columns if '.tries' in c]
+    
     qkeys = roster.value.question_keys()
     
     replacements = dict(zip(qtags, map(lambda x: qkeys.get(x.split('.')[1])['shorthand'] , qtags)))
     replacements.update({'student_id': 'Student ID'})
-    questions = questions.rename(columns = replacements)
+    questions = questions[['student_id'] + qtags].rename(columns = replacements)
     
     with solara.Columns([1,1]):
         with solara.Column():
