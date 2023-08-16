@@ -7,40 +7,52 @@ from .TableFromRows import TableFromRows
 from .ProgressRow import ProgressRow
 
 @solara.component
-def StudentProgressRow(student_id = None, 
-                    student_name = None, 
-                    total_points = None, 
-                    number_of_stages = None,
-                    current_stage = None,
-                    current_stage_progress = None,
-                    on_student_id = None
+def StudentProgressRow(progress,
+                    on_selected_id = None,
+                    selected_id = None
                     ):
     """
-    The student progress should show
-    student_id  student_name total_points progress_bar
+    progress should be a dictionary with the following keys:
+    student_id, student_name, total_points, number_of_stages, current_stage, current_stage_progress
+
     """
+    
+    
+    student_id = progress['student_id']
+    
+    if student_id is None:
+        selected = solara.use_reactive(False)
+    elif selected_id is None:
+        selected_id = solara.use_reactive(None)
+    else:
+        selected = solara.use_reactive(str(selected_id.value) == str(int(student_id)))
 
-
-    student = {
-        'id': student_id,
-        'name': student_name,
-        'total_points': total_points,
+    student_data = {
+        'ID': progress['student_id'],
+        'Name': progress['student_name'],
+        'Total Points': progress['total_points'],
     }
     
     def on_row_click(event):
-            print(event, student_id)
-            on_student_id(student_id)
+            selected.set(event)
+
+            if on_selected_id is None:
+                selected_id.set(int(student_id) if event else None)
+            else:
+                on_selected_id(int(student_id) if event else None)
+
     
-    ProgressRow(column_data=student, 
+    ProgressRow(column_data=student_data, 
+                selected = selected.value, #str(selected_id.value) == str(student_id),
                 on_selected=on_row_click,
-                progress_bar=MultiStepProgressBar(steps=number_of_stages, 
-                                                currentStep=current_stage, 
-                                                currentStepProgress=current_stage_progress, 
+                progress_bar=MultiStepProgressBar(steps=progress['number_of_stages'], 
+                                                currentStep=progress['current_stage'], 
+                                                currentStepProgress=progress['current_stage_progress'], 
                                                 height='0.5em', gap="5px"))
  
 
 @solara.component
-def StudentProgressTable(progress_data, on_student_id =None):
+def StudentProgressTable(progress_data, student_id = None, on_student_id = None, headers = None):
     """
     progress_data should be either a dataframe or a dictionary
     this will work with reactive or non-reactive data
@@ -63,29 +75,41 @@ def StudentProgressTable(progress_data, on_student_id =None):
     if isinstance(data, dict):
         data = DataFrame(data)
     
-    def on_student_id_wrapper(student_id):
-        on_student_id(int(student_id))
-    
-    rows = []
-    for i in range(len(data)):
-        max_stage_progress = data['progress'][i].split('%')[0]
-        if max_stage_progress.isnumeric():
-            max_stage_progress = int(max_stage_progress)
+
+    def on_student_id_wrapper(value):
+        setfunc = on_student_id or student_id.set
+        
+        if value is None:
+            setfunc(None)
         else:
-            max_stage_progress = 100
-        rows.append(
-            StudentProgressRow(
-                            student_id = str(data['student_id'][i]), 
-                            student_name = data['username'][i],
-                            total_points = str(data['total_score'][i]), 
-                            number_of_stages = 6, 
-                            current_stage = int(data['max_stage_index'][i]), 
-                            current_stage_progress = max_stage_progress,
-                            on_student_id = on_student_id_wrapper
-                            ) 
-        )
+            setfunc(int(value))
+
     
     with solara.Card():
-        TableFromRows(headers=['Student ID', 'Student Name', 'Total Points', 'Progress'], 
-                      rows=rows,
-                      )
+        if headers is None:
+            headers = ['Student ID', 'Student Name', 'Total Points', 'Progress']
+        with TableFromRows(headers=headers):
+            for i in range(len(data)):
+                max_stage_progress = data['progress'][i].split('%')[0]
+                if max_stage_progress.isnumeric():
+                    max_stage_progress = int(max_stage_progress)
+                else:
+                    max_stage_progress = 100
+                
+                # set up dictionary with progress
+                student_progress = {
+                    'student_id': str(data['student_id'][i]),
+                    'student_name': data['username'][i],
+                    'total_points': str(data['total_score'][i]),
+                    'number_of_stages': 6,
+                    'current_stage': int(data['max_stage_index'][i]),
+                    'current_stage_progress': max_stage_progress,
+                }
+
+                StudentProgressRow(progress = student_progress,
+                                    selected_id = student_id,
+                                    on_selected_id = on_student_id_wrapper,
+                                    ) 
+
+    
+    

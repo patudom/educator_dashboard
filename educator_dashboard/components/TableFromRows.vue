@@ -9,7 +9,7 @@
         </tr>
       </thead>
       <tbody>
-        <jupyter-widget v-for="row in rows" :key="row" :widget="row"></jupyter-widget>
+        <jupyter-widget v-for="child in children" :key="child" :widget="child"></jupyter-widget>
       </tbody>
     </table>
   </div>
@@ -21,7 +21,8 @@ export default {
   name: "ProgressTable",
   props: {
     headers: Array,
-    rows: Array,
+    select_key: String,
+    selected: Object
   }
 };
 </script>
