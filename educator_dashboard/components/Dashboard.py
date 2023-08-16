@@ -14,6 +14,14 @@ from .ResponsesComponents import IndividualStudentResponses
 from .DataComponent import DataSummary
 from .DataComponent import StudentData
 
+import inspect
+def print_function_name(func):
+    def wrapper(*args, **kwargs):
+        calling_function_name = inspect.stack()[1][3]
+        print(f"Calling  {func.__name__} from {calling_function_name}")
+        return func(*args, **kwargs)
+    return wrapper
+
 @solara.component
 def initStudentID(student_id, roster):
     if roster.value is not None:
@@ -29,6 +37,8 @@ def initStudentID(student_id, roster):
 def Dashboard(df, data, roster): 
     
     student_id = solara.use_reactive(None)
+    old_set = student_id.set
+    student_id.set = print_function_name(old_set)
     
     # a non-displaying component to 
     # make sure the student_id is valid

@@ -18,10 +18,12 @@ def QuestionSummary(df = None, sid = None):
     """
     Show response summary for entire class
     """
+    solara.Markdown(""">The question summary shows the number of attempts for each multiple choice question and response for each free response question. 
+                        A **0** means the question was skipped. A &lt;NA&gt; means the question was not seen by the student (some questions are optional).""")
     if isinstance(df, solara.Reactive):
-        solara.DataFrame(df.value)
+        solara.DataFrame(df.value, scrollable=True)
     else:
-        solara.DataFrame(df)
+        solara.DataFrame(df, scrollable=True)
 
 
 @solara.component
@@ -124,7 +126,28 @@ def StudentQuestion(dataframe = None):
         with solara.Column():
             FreeResponseQuestionSingleStudent(fr_questions)
         
-        
+
+@solara.component
+def IndividualStudentResponsePanel(questions, qtags = None, sid = None):
+    
+    if sid.value is None:
+        solara.Markdown('**Select a student to see their responses**')
+        return
+    
+    
+    # squeeze dataframe to a series
+    row = questions[questions['student_id'] == sid.value].squeeze()
+    
+    # # drop student id and rename series to value
+    df = row.drop('student_id').rename('value').to_frame()
+    
+    # # add full N.tag.?(triest|score|choice) tag as a column
+    if qtags is not None:
+        df['tag'] = qtags
+    
+    # solara.DataFrame(df)
+    StudentQuestion(df)
+
 @solara.component
 def IndividualStudentResponses(roster, sid=None):
     """
@@ -143,23 +166,19 @@ def IndividualStudentResponses(roster, sid=None):
     replacements = dict(zip(qtags, short_qs))
     questions = questions.rename(columns = replacements)
     
-    sids = questions['student_id'].to_list()
-    with solara.lab.Tabs(
-            value = 0 if (sid.value is None or sid.value not in sids) else sids.index(sid.value), 
-            on_value = lambda x: sid.set(sids[x])
-            ):
-        for i, row in questions.iterrows(): 
-            with solara.lab.Tab(str(row['student_id'])):
-                
-                solara.Markdown(f"**Student {row['student_id']}**")
-                
-                # drop student id and rename series to value
-                df = row.drop('student_id').rename('value').to_frame()
-                
-                # add full N.tag.?(triest|score|choice) tag as a column
-                df['tag'] = qtags
-                
-                StudentQuestion(df)
+    sids = [int(s) for s in questions['student_id'].to_list()]
+
+    
+    
+    # with solara.lab.Tabs(
+    #         value = 0 if (sid.value is None or sid.value not in sids) else sids.index(sid.value), 
+    #         on_value = lambda x: sid.set(sids[x])
+    #         ):
+    #     for i, row in questions.iterrows(): 
+            
+            # with solara.lab.Tab(str(row['student_id'])):
+    
+    IndividualStudentResponsePanel(questions, qtags = qtags, sid = sid)
 
 
 @solara.component
