@@ -8,7 +8,7 @@
     <td v-for="key in Object.keys(column_data)" :key="key" :class="`progress-table-td progress-table-${key}`">
       {{ column_data[key] }}
     </td>
-    <td> {{ selected }} </td>
+    <!-- <td> {{ selected }} </td> -->
     <td
       class="progress-table-td progress-table-progress-bar"
       >
