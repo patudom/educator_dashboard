@@ -14,6 +14,8 @@ from .ResponsesComponents import IndividualStudentResponses
 from .DataComponent import DataSummary
 from .DataComponent import StudentData
 
+from solara.alias import rv
+
 import inspect
 def print_function_name(func):
     def wrapper(*args, **kwargs):
@@ -51,7 +53,7 @@ def Dashboard(df, data, roster):
     cell_actions = [solara.CellAction(name=None, icon="mdi-account-details",on_click=on_cell_click)]
 
     # TableDisplay(df.value,items_per_page=len(df.value)//3,cell_actions = cell_actions)
-    
+
 
     StudentProgressTable(df, student_id = student_id)
     
@@ -63,18 +65,28 @@ def Dashboard(df, data, roster):
         except:
             student_id.set(None)
     
-    solara.Select(label = 'Select Student', value = student_id, values = roster.value.student_ids, on_value = safe_set)
-    
+   
+    rv.Select(label = 'Select Student', 
+            v_model = student_id.value, 
+            on_v_model=safe_set,
+            items = roster.value.student_ids, 
+            rounded=True,
+            outlined=True,
+            dense=True,
+            class_="mx-a student-select",
+        )
+
+        
     with solara.Card():
         with solara.lab.Tabs(vertical=True, align='right'):
             
-            with solara.lab.Tab("Summary"):
+            with solara.lab.Tab(label="Summary", icon_name="mdi-text-box-outline"):
                 StudentQuestionsSummary(roster, student_id)
                 
-            with solara.lab.Tab("Individual Qs"):
+            with solara.lab.Tab(label="Individual Qs", icon_name="mdi-file-question-outline"):
                 IndividualStudentResponses(roster, student_id)
         
-            with solara.lab.Tab("Student Data", style={"transition": "none"}):
+            with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
                     
                 with solara.Columns([1,1]):
                     with solara.Column():
