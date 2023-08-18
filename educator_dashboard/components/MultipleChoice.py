@@ -1,6 +1,10 @@
 import solara
 
 from pandas import DataFrame
+from ..database.Query import QueryCosmicDSApi as Query
+import plotly.express as px
+from .Collapsable import Collapsable
+
    
 @solara.component
 def MultipleChoiceQuestionSingleStudent(mc_questions):
