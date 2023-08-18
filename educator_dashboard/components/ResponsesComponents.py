@@ -122,11 +122,11 @@ def StudentQuestion(dataframe = None):
     
     
     # multiple choice questions
-    with solara.Columns([1,1]):
-        with solara.Column():
+    with solara.lab.Tabs():
+        with solara.lab.Tab("Multiple Choice"):
             MultipleChoiceQuestionSingleStudent(mc_questions)
             
-        with solara.Column():
+        with solara.lab.Tab("Free Response"):
             FreeResponseQuestionSingleStudent(fr_questions)
         
 
