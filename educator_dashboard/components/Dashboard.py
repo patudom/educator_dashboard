@@ -78,7 +78,7 @@ def Dashboard(df, data, roster):
 
         
     with solara.Card():
-        with solara.lab.Tabs(vertical=True, align='right'):
+        with solara.lab.Tabs(vertical=True, align='right', dark=True):
             
             with solara.lab.Tab(label="Summary", icon_name="mdi-text-box-outline"):
                 StudentQuestionsSummary(roster, student_id)
