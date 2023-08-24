@@ -9,6 +9,25 @@ HUBBLE_ROUTE_PATH = "hubbles_law"
 
 import astropy.units as u
 from math import nan
+
+class Student():
+    
+    student_id = None
+    class_id = None
+    story_state = {}
+    stage_state = {}
+    _data = None
+    _mc_questions = {}
+    _fr_questions = {}
+    
+    
+    def __init__(self, student_id = None):
+        self.student_id = student_id
+        
+    @property
+    def data(self):
+        return self._data
+
 class Roster():
     
     def __init__(self, class_id = None):
@@ -28,7 +47,16 @@ class Roster():
         self.data = None
         self.class_summary = None
         self.grab_data()
-        
+    
+    def __eq__(self, other):
+        if other.short_report() is None:
+            return False
+        return self.short_report() == other.short_report()
+    
+    @staticmethod
+    def flatten_dict(d):
+        return flatten(d)
+    
     def grab_data(self):
         print('Getting roster')
         self.roster = self.query.get_roster()
@@ -79,7 +107,7 @@ class Roster():
     @staticmethod
     def list_of_dicts_to_dict_of_lists(list_of_dicts, fill_val = None):
         keys = list_of_dicts[0].keys()
-        dict_of_lists = {k: [o[k] if k in o.keys() else fill_val for o in list_of_dicts] for k in keys}
+        dict_of_lists = {k: [o[k] if (hasattr(o,'keys') and (k in o.keys())) else fill_val for o in list_of_dicts] for k in keys}
         return dict_of_lists
     
     def l2d(self, list_of_dicts, fill_val = None):
@@ -149,10 +177,11 @@ class Roster():
     def measurements(self, refresh = False):
         if len(self.roster) > 0:
             if self.data is None or refresh:
-                out = self.get_class_data(refresh = refresh)
-            else: 
-                out = self.data
-            return pd.DataFrame(out)
+                self.data = self.get_class_data(refresh = refresh)
+            
+            return pd.DataFrame(self.data)
+        else:
+            return pd.DataFrame()
     
     
     def multiple_choice_questions(self):
@@ -165,6 +194,7 @@ class Roster():
             return out
         else:
             return {'student_id': self.student_ids}
+        
     
     def free_response_questions(self):
         if (self._fr_questions) is not None and (not self._refresh):
@@ -189,6 +219,7 @@ class Roster():
         self._questions = pd.merge(df_mc, df_fr, how='left', on='student_id')
         return self._questions
     
+    
     def get_questions_text(self):
         return self.query.get_questions()
     
@@ -202,16 +233,18 @@ class Roster():
         questions = self.get_questions_text()
         for k in keys:
             if testing:
-                q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
+                q = {'text': 'Fake Long '+k, 'shorttext': 'Fake Short '+k}
             else:
                 q = questions[k]
             
             if q is not None:
+                nice_tag = ' '.join(k.replace('_', ' ').replace('-', ' ').split())
+                nice_tag = nice_tag[0].upper() + nice_tag[1:]
+                
                 short = q['shorthand']
                 if short == '':
-                    short = ' '.join(k.replace('_', ' ').replace('-', ' ').split())
-                    short = short[0].upper() + short[1:]
-                self._question_keys[k] = {'text':q['text'], 'shorthand':short}
+                    short = nice_tag
+                self._question_keys[k] = {'text':q['text'], 'shorttext':short, 'nicetag': nice_tag}
                 
         return self._question_keys
                 
