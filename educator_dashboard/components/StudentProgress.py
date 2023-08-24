@@ -45,11 +45,11 @@ def StudentProgressRow(progress,
     ProgressRow(column_data=student_data, 
                 selected = selected.value, #str(selected_id.value) == str(student_id),
                 on_selected=on_row_click,
-                progress_bar=MultiStepProgressBar(steps=progress['number_of_stages'], 
-                                                currentStep=progress['current_stage'], 
-                                                currentStepProgress=progress['current_stage_progress'], 
-                                                height='0.5em', gap="5px"))
- 
+                steps=progress['number_of_stages'], 
+                currentStep=progress['current_stage'], 
+                currentStepProgress=progress['current_stage_progress'], 
+                height='100%', gap="5px")
+
 
 @solara.component
 def StudentProgressTable(progress_data, student_id = None, on_student_id = None, headers = None):
@@ -87,7 +87,7 @@ def StudentProgressTable(progress_data, student_id = None, on_student_id = None,
     
     with solara.Card():
         if headers is None:
-            headers = ['Student ID', 'Student Name', 'Total Points', 'Progress']
+            headers = ['Student ID', 'Student Name', 'Total Points' ] + [f'Stage {i}' for i in range(1,7)]
         with TableFromRows(headers=headers):
             for i in range(len(data)):
                 max_stage_progress = data['progress'][i].split('%')[0]
