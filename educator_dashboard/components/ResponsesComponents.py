@@ -8,12 +8,6 @@ from pandas import DataFrame
 from .FreeResponse import FreeResponseQuestionSingleStudent, FreeResponseSummary
 from .MultipleChoice import MultipleChoiceQuestionSingleStudent, MultipleChoiceSummary
 
-with solara.Card():
-        with solara.Column():
-            pass
-        with solara.Column():
-            pass
-        
 
 
 @solara.component
