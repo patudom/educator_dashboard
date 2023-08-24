@@ -1,11 +1,49 @@
 import solara
 
-from pandas import DataFrame
+from pandas import DataFrame, Series
 from ..database.Query import QueryCosmicDSApi as Query
 import plotly.express as px
 from .Collapsable import Collapsable
 
-   
+@solara.component
+def MCSummaryPart(stage_qs):
+    
+    quest = solara.use_reactive(None)
+    
+    solara.Select(label = "Question", values = list(stage_qs.keys()), value = quest)
+    if quest.value is not None:
+            solara.Markdown(f"**Question {quest}**")
+            
+            df = DataFrame(stage_qs[quest.value]).dropna()
+            df['tries'] = df['tries'].astype(int)
+            fig = px.histogram(df, 'tries',  labels={'tries': "# of Tries"}, range_x=[-0.6,3.6], category_orders={'tries': [0,1,2,3,4]})
+            fig.update_xaxes(type='category')
+            solara.FigurePlotly(fig)
+    
+
+@solara.component
+def MultipleChoiceSummary(roster):
+    
+    
+    mc_responses = roster.value.multiple_choice_questions()
+    
+    # mc_responses is a dict that looks like {'1': [{q1: {tries:0, choice: 0, score: 0}...}..]}
+    keys = list(sorted(mc_responses.keys()))
+    
+    stages = list(filter(lambda s: s.isdigit(),sorted(keys)))
+    
+    with solara.lab.Tabs():
+        for stage in stages:
+            with solara.lab.Tab(f"Stage {stage}"):
+                if mc_responses[stage] is None:
+                    continue
+                
+                solara.Markdown(f"### Stage {stage} ")
+                
+                stage_qs = roster.value.l2d(mc_responses[stage],fill_val={}) # {q1: {tries:0, choice: 0, score: 0}...}
+                MCSummaryPart(stage_qs)
+
+
 @solara.component
 def MultipleChoiceQuestionSingleStudent(mc_questions):
     dquest, set_dquest = solara.use_state(None)

@@ -4,35 +4,20 @@ import solara
 from solara.alias import rv
 from pandas import DataFrame
 
-# from solara.components.dataframe import HistogramCard
-from ..database.Query import QueryCosmicDSApi as Query
 
-from .Collapsable import Collapsable
+from .FreeResponse import FreeResponseQuestionSingleStudent, FreeResponseSummary
+from .MultipleChoice import MultipleChoiceQuestionSingleStudent, MultipleChoiceSummary
 
-from .FreeResponse import FreeResponseQuestionSingleStudent
-from .MultipleChoice import MultipleChoiceQuestionSingleStudent
+with solara.Card():
+        with solara.Column():
+            pass
+        with solara.Column():
+            pass
+        
 
-import re
-
-# import solara.express as px
-import plotly.express as px
-
-@solara.component
-def QuestionSummary(df = None, sid = None):
-    """
-    Show response summary for entire class
-    """
-    solara.Markdown(""">The question summary shows the number of attempts for each multiple choice question and response for each free response question. 
-                        A **0** means the question was skipped. A &lt;NA&gt; means the question was not seen by the student (some questions are optional).""")
-    if isinstance(df, solara.Reactive):
-        solara.DataFrame(df.value, scrollable=True)
-    else:
-        solara.DataFrame(df, scrollable=True)
-
- 
 
 @solara.component
-def StudentQuestion(dataframe = None):
+def StudentQuestion(dataframe = None, roster=None, sid = None):
     """
     Show the responses for a single student
     """
@@ -48,9 +33,7 @@ def StudentQuestion(dataframe = None):
     
     
     mc_questions = table[table.tag.apply(lambda x: len(str(x).split('.'))==3)]
-    fr_questions = table[table.tag.apply(lambda x: len(str(x).split('.'))==2)]
-    
-    fr_questions = fr_questions.rename(columns={'value': 'Answer', 'question': 'Question'})
+
     
     
     
@@ -60,7 +43,7 @@ def StudentQuestion(dataframe = None):
             MultipleChoiceQuestionSingleStudent(mc_questions)
             
         with solara.lab.Tab("Free Response"):
-            FreeResponseQuestionSingleStudent(fr_questions)
+            FreeResponseQuestionSingleStudent(roster, sid = sid)
         
 
 @solara.component
@@ -78,8 +61,7 @@ def IndividualStudentResponsePanel(questions, qtags = None, sid = None):
     df = row.drop('student_id').rename('value').to_frame()
     
     # # add full N.tag.?(triest|score|choice) tag as a column
-    if qtags is not None:
-        df['tag'] = qtags
+    df['tag'] = qtags
     
     # solara.DataFrame(df)
     StudentQuestion(df)
@@ -98,23 +80,29 @@ def IndividualStudentResponses(roster, sid=None):
     questions = roster.value.questions()
     qtags = [c for c in questions.columns if '.' in c]
     qkeys = roster.value.question_keys()
-    short_qs =  list(map(lambda x: qkeys.get(x.split('.')[1])['shorthand'] , qtags))
+    short_qs =  list(map(lambda x: qkeys.get(x.split('.')[1])['shorttext'] , qtags))
     replacements = dict(zip(qtags, short_qs))
-    questions = questions.rename(columns = replacements)
+    # questions = questions.rename(columns = replacements)
     
     sids = [int(s) for s in questions['student_id'].to_list()]
-
     
-    
-    # with solara.lab.Tabs(
-    #         value = 0 if (sid.value is None or sid.value not in sids) else sids.index(sid.value), 
-    #         on_value = lambda x: sid.set(sids[x])
-    #         ):
-    #     for i, row in questions.iterrows(): 
-            
-            # with solara.lab.Tab(str(row['student_id'])):
-    
-    IndividualStudentResponsePanel(questions, qtags = qtags, sid = sid)
+    with solara.Card():
+        if sid.value is None:
+            solara.Markdown('**Select a student to see their responses**')
+            return
+        
+        
+        # squeeze dataframe to a series
+        row = questions[questions['student_id'] == sid.value].squeeze()
+        
+        # # drop student id and rename series to value
+        df = row.drop('student_id').rename('value').to_frame()
+        
+        # # add full N.tag.?(triest|score|choice) tag as a column
+        df['tag'] = qtags
+        
+        # solara.DataFrame(df)
+        StudentQuestion(df, roster, sid)
 
 
 @solara.component
@@ -122,18 +110,12 @@ def StudentQuestionsSummary(roster, sid = None):
     if roster.value is None:
         return
     
-    # we need to replace the tag with the short version of the question
-    questions = roster.value.questions()
-    # questions have a '.' because we flattened a nested json file
-    qtags = [c for c in questions.columns if '.tries' in c]
     
-    qkeys = roster.value.question_keys()
-    
-    replacements = dict(zip(qtags, map(lambda x: qkeys.get(x.split('.')[1])['shorthand'] , qtags)))
-    replacements.update({'student_id': 'Student ID'})
-    questions = questions[['student_id'] + qtags].rename(columns = replacements)
-    
-    with solara.Columns([1,1]):
-        with solara.Column():
-            QuestionSummary(questions, sid = sid)
-           
+    with solara.Card():
+        with solara.lab.Tabs():
+            with solara.lab.Tab("Multiple Choice"):
+                MultipleChoiceSummary(roster)
+                
+            with solara.lab.Tab("Free Response"):
+                FreeResponseSummary(roster)
+
