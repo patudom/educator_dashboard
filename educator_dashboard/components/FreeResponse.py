@@ -2,6 +2,15 @@ import solara
 
 from ..database.Query import QueryCosmicDSApi as Query
 
+@solara.component_vue('FreeResponseQuestion.vue')
+def FreeResponseQuestion(question='', shortquestion='', responses=[], names = []):
+    """
+    free_response = {
+        'question': '',
+        'shortquestion': '',
+        'responses': ['','','']
+    }
+    """
 
 
 @solara.component
