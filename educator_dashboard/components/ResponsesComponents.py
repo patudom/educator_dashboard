@@ -3,6 +3,8 @@ import solara
 from .FreeResponse import FreeResponseQuestionSingleStudent, FreeResponseSummary
 from .MultipleChoice import MultipleChoiceQuestionSingleStudent, MultipleChoiceSummary
 
+## TODO: persitantly hightlight selected row in question summary
+## TODO: split summary into stages like the inidividual student responses
 
 @solara.component
 def IndividualStudentResponses(roster, sid=None):
@@ -17,7 +19,12 @@ def IndividualStudentResponses(roster, sid=None):
     with solara.Card():
         if sid.value is None:
             solara.Markdown('**Select a student to see their responses**')
+            
+            solara.Select(label = 'Select Student', values = roster.value.student_ids, value=sid)
+            
             return
+        
+        solara.Markdown(f"**Current Student**: {sid}")
         
         # multiple choice questions
         with solara.lab.Tabs():
