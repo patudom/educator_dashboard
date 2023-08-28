@@ -6,6 +6,8 @@ from ..database.Query import QueryCosmicDSApi as Query
 import plotly.express as px
 from .Collapsable import Collapsable
 
+from numpy import hstack
+
 
 @solara.component
 def MultipleChoiceSummary(roster):
@@ -37,6 +39,8 @@ def MultipleChoiceSummary(roster):
     summary_stats['Average # of Tries'] = avg_tries.round(2)
     
     
+    
+    
     def cell_action(column, row_index):
         selected_question.set(summary_stats['key'].iloc[row_index])
     
@@ -46,6 +50,21 @@ def MultipleChoiceSummary(roster):
         
         # column with a table of questions with average #of tries
         with solara.Column():
+            
+            tries_1d = hstack(tries)
+            # drop None values
+            tries_1d = Series(tries_1d).dropna()
+            solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(tries_1d[tries_1d>0].mean().round(2)))
+            # histogram
+            fig = px.histogram(hstack(tries).astype(str), 
+                               labels={'value': "# of Tries"}, 
+                               category_orders={'value': ['None','0','1','2','3','4']},
+                               )
+            fig.update_xaxes(type='category')
+            fig.update_layout(
+                title=dict(text = "# of Tries for all questions & students", font=dict(size=15), automargin=True, yref='paper')
+            )
+            solara.FigurePlotly(fig)
             
             solara.DataFrame(summary_stats[['Stage', 'Question', 'Completed by', 'Average # of Tries']], 
                              items_per_page=len(summary_stats),
