@@ -1,18 +1,20 @@
 <template>
     <div class="free-response-question">
-        <div class="short-question">
+        <div v-if="!hideShortQuestion" class="short-question">
           {{ shortquestion }}
         </div>
-        <div class="question">
+
+        <div v-if="!hideQuestion" class="question">
           {{ question }}
         </div>
-        <div class="response-row" v-for="(response, index) in responseList">
+
+        <div  v-if="!hideResponses" class="response-row" v-for="(response, index) in responseList">
           <div class="name-item" v-if="names != null" >
             {{ getName(index) }}
           </div>
-          <div class="response-item">
-          {{ response }}
-          </div>
+            <div class="response-item">
+            {{ response }}
+            </div>
         </div>
       </div>
 </template>
@@ -42,7 +44,23 @@ export default {
     names: {
       type: Array[String],
       default: null
-    }
+    },
+
+    hideShortQuestion: {
+      type: Boolean,
+      default: false
+    },
+
+    hideQuestion: {
+      type: Boolean,
+      default: false
+    },
+
+    hideResponses: {
+      type: Boolean,
+      default: false
+    },
+    
   },
 
   computed: {
@@ -86,9 +104,9 @@ export default {
 
 .free-response-question {
   display: grid;
-  grid-template-columns: auto auto;
-  grid-template-rows: auto;
-  grid-gap: 10px;
+  /* grid-template-columns: auto auto;
+  grid-template-rows: auto; */
+  /* grid-gap: 10px; */
   background-color: rgba(2, 2, 2, 0.127);
 }
 
@@ -97,19 +115,14 @@ export default {
 }
 .short-question {
   display: inline-block;
-  grid-row: 1;
-  grid-column: 1;
   background-color: lightgreen;
   
 }
 .question {
-  grid-column: 2;
-  grid-row: 1;
   background-color: lightblue;
 }
 
 .response-row {
-  grid-column: 1 / 3;
   background-color: rgb(227, 240, 128);
 }
 

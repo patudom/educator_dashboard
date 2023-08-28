@@ -8,8 +8,12 @@ from .Collapsable import Collapsable
 
 from ..database.Query import QueryCosmicDSApi as Query
 
+## discriminate between blank answers from not reached vs not done
+## free question row
+
 @solara.component_vue('FreeResponseQuestion.vue')
-def FreeResponseQuestion(question='', shortquestion='', responses=[], names = []):
+def FreeResponseQuestion(question='', shortquestion='', responses=[], names = [],
+                         hideShortQuestion = False, hideQuestion = False, hideResponses = False):
     """
     free_response = {
         'question': '',
@@ -20,7 +24,9 @@ def FreeResponseQuestion(question='', shortquestion='', responses=[], names = []
 
 
 @solara.component
-def FreeResponseQuestionResponseSummary(question_responses, question_text, names = None):
+def FreeResponseQuestionResponseSummary(question_responses, question_text, names = None,
+                                        hideShortQuestion = False, hideQuestion = False, hideResponses = False
+                                        ):
     """
     question_responses = {'key': ['response1', 'response2',...]}
     question_text = {'key': {'text': 'question text', 
@@ -57,7 +63,13 @@ def FreeResponseQuestionResponseSummary(question_responses, question_text, names
                     with rv.ExpansionPanelHeader():
                         solara.Markdown(f"**{shortquestion}**")
                     with rv.ExpansionPanelContent():
-                        FreeResponseQuestion(question = question, shortquestion = shortquestion, responses = responses, names = names)
+                        FreeResponseQuestion(question = question, 
+                                             shortquestion = shortquestion, 
+                                             responses = responses, 
+                                             names = names,
+                                             hideShortQuestion = hideShortQuestion, 
+                                             hideQuestion = hideQuestion, 
+                                             hideResponses = hideResponses)
 
 
 @solara.component
@@ -65,31 +77,20 @@ def FreeResponseSummary(roster):
     
     if not isinstance(roster, solara.Reactive):
         roster = solara.use_reactive(roster)
-    
-    df = roster.value.questions()
-    # solara.DataFrame(df)
-    
+        
     fr_questions = roster.value.free_response_questions()
     
     question_text = roster.value.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text'}}
     
     stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
     
-    # with solara.lab.Tabs(grow=True, vertical=True):
-
-    #     with solara.lab.Tab("Show All Responses"):
-    #         # make dataframe just adds the student id as the first row
-    #         fr_df = roster.value.make_dataframe(df[list(filter(lambda x: len(str(x).split('.'))==2, df.columns))], include_student_id = True,  include_class_id = False, include_username = False)
-    #         solara.DataFrame(fr_df)
-        
-        # with solara.lab.Tab("Show By Question"):
     with solara.lab.Tabs(vertical=True):
         for stage in stages:
             with solara.lab.Tab(f"Stage {stage}"):
                 
                 question_responses = roster.value.l2d(fr_questions[stage]) # {'key': ['repsonse1', 'response2',...]}
                 
-                FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.value.student_ids)
+                FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.value.student_ids, hideShortQuestion=True)
             
         
 
@@ -117,7 +118,7 @@ def FreeResponseQuestionSingleStudent(roster, sid = None):
         if len(fr_questions) == 0:
             solara.Markdown("Student has not answered any free response questions yet.")
         for k, v in fr_questions.items():
-            solara.Markdown(f"## Stage {k}")
+            solara.Markdown(f"### Stage {k}")
             for qkey, qval in v.items():
                 question = question_text[qkey]['text']
                 shortquestion = question_text[qkey]['shorttext']
@@ -125,5 +126,7 @@ def FreeResponseQuestionSingleStudent(roster, sid = None):
                 FreeResponseQuestion(question = question, 
                                     shortquestion = shortquestion, 
                                     responses = responses, 
-                                    names = [sid.value])
+                                    names = [sid.value],
+                                    hideShortQuestion = True,
+                                    )
         

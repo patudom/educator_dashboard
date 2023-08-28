@@ -9,27 +9,22 @@ from .Collapsable import Collapsable
 from numpy import hstack
 
 
-@solara.component
-def MultipleChoiceSummary(roster):
+def MultipleChoiceStageSummary(roster, stage = None):
     
     selected_question = solara.use_reactive('')
     
     mc_responses = roster.value.multiple_choice_questions()
-    
-    # mc_responses is a dict that looks like {'1': [{q1: {tries:0, choice: 0, score: 0}...}..]}
-    stages = list(filter(lambda s: s.isdigit(),sorted(list(sorted(mc_responses.keys())))))
-    
+        
+
     flat_mc_responses = {}
-    
-    for stage in stages:
-        q = roster.value.l2d(mc_responses[stage],fill_val={})
-        for k, v in q.items():
-            flat_mc_responses[k] = roster.value.l2d(v)
-            flat_mc_responses[k]['Stage'] = stage
-            flat_mc_responses[k]['Question'] = roster.value.question_keys()[k]['shorttext']
-            flat_mc_responses[k]['key'] = k
-            flat_mc_responses[k]['student_id'] = roster.value.student_ids
-    
+    q = roster.value.l2d(mc_responses[stage],fill_val={})
+    for k, v in q.items():
+        flat_mc_responses[k] = roster.value.l2d(v)
+        flat_mc_responses[k]['Stage'] = stage
+        flat_mc_responses[k]['Question'] = roster.value.question_keys()[k]['shorttext']
+        flat_mc_responses[k]['key'] = k
+        flat_mc_responses[k]['student_id'] = roster.value.student_ids
+
     summary_stats = DataFrame(flat_mc_responses).T
     tries = summary_stats['tries']
     # N = tries.aggregate(len)
@@ -38,53 +33,56 @@ def MultipleChoiceSummary(roster):
     summary_stats['Completed by'] = attempts
     summary_stats['Average # of Tries'] = avg_tries.round(2)
     
-    
-    
-    
     def cell_action(column, row_index):
         selected_question.set(summary_stats['key'].iloc[row_index])
     
 
     # solara.Select(label = "Question", values = list(stage_qs.keys()), value = quest)
-    with solara.Columns([1,1]):
-        
-        # column with a table of questions with average #of tries
-        with solara.Column():
+    with solara.Card():
+        solara.Markdown(f"### Stage {stage}")
+        with solara.Columns([1,1]):
             
-            tries_1d = hstack(tries)
-            # drop None values
-            tries_1d = Series(tries_1d).dropna()
-            solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(tries_1d[tries_1d>0].mean().round(2)))
-            # histogram
-            fig = px.histogram(hstack(tries).astype(str), 
-                               labels={'value': "# of Tries"}, 
-                               category_orders={'value': ['None','0','1','2','3','4']},
-                               )
-            fig.update_xaxes(type='category')
-            fig.update_layout(
-                title=dict(text = "# of Tries for all questions & students", font=dict(size=15), automargin=True, yref='paper')
-            )
-            solara.FigurePlotly(fig)
+            # column with a table of questions with average #of tries
+            with solara.Column():
+                
+                tries_1d = hstack(tries)
+                # drop None values
+                tries_1d = Series(tries_1d).dropna()
+                solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(tries_1d[tries_1d>0].mean().round(2)))
+                
+                solara.DataFrame(summary_stats[['Stage', 'Question', 'Completed by', 'Average # of Tries']], 
+                                items_per_page=len(summary_stats),
+                                cell_actions=[solara.CellAction(name='Show Question Stats', icon='mdi-table-eye', on_click=cell_action)]
+                                )
             
-            solara.DataFrame(summary_stats[['Stage', 'Question', 'Completed by', 'Average # of Tries']], 
-                             items_per_page=len(summary_stats),
-                             cell_actions=[solara.CellAction(name='Show Question Stats', icon='mdi-table-eye', on_click=cell_action)]
-                             )
+            # a column for a particular question showing all student responses
+            with solara.Column():
+                if (selected_question.value is not None) and (selected_question.value != '') and (selected_question.value in flat_mc_responses.keys()):
+                    
+                    solara.Markdown(f"""***Question:***
+                                {roster.value.question_keys()[selected_question.value]['text']}
+                                """)
+                    
+                    df = DataFrame(flat_mc_responses[selected_question.value])
+                    fig = px.histogram(df, 'tries',  labels={'tries': "# of Tries"}, range_x=[-0.6,3.6], category_orders={'tries': [0,1,2,3,4]})
+                    fig.update_xaxes(type='category')
+                    solara.FigurePlotly(fig)
+                    
+                    with Collapsable(header='Show Table'):
+                        solara.DataFrame(df[['student_id', 'tries']])
+                    
+@solara.component
+def MultipleChoiceSummary(roster):
         
-        # a column for a particular question showing all student responses
-        with solara.Column():
-            if (selected_question.value is not None) and (selected_question.value != ''):
-                
-                solara.Markdown(f"""***Question:***
-                            {roster.value.question_keys()[selected_question.value]['text']}
-                            """)
-                
-                df = DataFrame(flat_mc_responses[selected_question.value])
-                fig = px.histogram(df, 'tries',  labels={'tries': "# of Tries"}, range_x=[-0.6,3.6], category_orders={'tries': [0,1,2,3,4]})
-                fig.update_xaxes(type='category')
-                solara.FigurePlotly(fig)
-                solara.DataFrame(df[['student_id', 'tries']])
+    mc_responses = roster.value.multiple_choice_questions()
     
+    # mc_responses is a dict that looks like {'1': [{q1: {tries:0, choice: 0, score: 0}...}..]}
+    stages = list(filter(lambda s: s.isdigit(),sorted(list(sorted(mc_responses.keys())))))
+    
+    for stage in stages:
+        MultipleChoiceStageSummary(roster, stage = stage)
+    
+        
     
 @solara.component
 def MultipleChoiceQuestionSingleStudent(roster, sid = None):
@@ -132,21 +130,19 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None):
         total = len(df)
         points = sum(df.score.dropna().astype(int))
         total_points = 10 * total
+        def isgood(i):
+            return (i is not None) and (i != 0)
+        avg_tries = df.tries.aggregate(lambda x: sum([i for i in x if isgood(i)])/len([i for i in x if isgood(i)]))
         
         with solara.Card():
             with solara.Columns([1,1]):
                 with solara.Column():
                     solara.Markdown("""
-                                    ## Stage {} </br>
-                                    Student completed {} out of {} multiple choice questions </br> Multiple Choice Score: {}/{}
-                                    """.format(stage, completed, total, points, total_points))    
-
-                    df_nona = df.dropna()
-                    df_nona['tries'] = df_nona['tries'].astype(int)
-                    fig = px.histogram(df_nona, 'tries', hover_data= ['question'], labels={'tries': "# of Tries"}, range_x=[-0.6,3.6], category_orders={'tries': [0,1,2,3,4]})
-                    fig.update_xaxes(type='category')
-                    solara.FigurePlotly(fig)
-                    # solara.DataFrame(df.dropna())
+                                    ### Stage {}
+                                    - Completed {} out of {} multiple choice questions
+                                    - Multiple Choice Score: {}/{}
+                                    - Took on average {:0.2f} tries to complete the multiple choice questions
+                                    """.format(stage, completed, total, points, total_points, avg_tries))    
                     
                 with solara.Column():
                     if dquest is not None:
