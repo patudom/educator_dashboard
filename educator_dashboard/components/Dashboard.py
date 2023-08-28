@@ -58,25 +58,6 @@ def Dashboard(df, data, roster):
     ClassProgress(df, roster)
     StudentProgressTable(df, student_id = student_id)
     
-    
-    # solara.Markdown(f"**Currently selected student**: {student_id}")
-    def safe_set(x):
-        try:
-            student_id.set(int(x))
-        except:
-            student_id.set(None)
-    
-   
-    rv.Select(label = 'Select Student', 
-            v_model = student_id.value, 
-            on_v_model=safe_set,
-            items = roster.value.student_ids, 
-            rounded=True,
-            outlined=True,
-            dense=True,
-            class_="mx-a student-select",
-        )
-
         
     with solara.Card():
         with solara.lab.Tabs(vertical=True, align='right', dark=True):
