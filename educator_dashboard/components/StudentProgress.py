@@ -100,7 +100,7 @@ def StudentProgressTable(progress_data, student_id = None, on_student_id = None,
                 student_progress = {
                     'student_id': str(data['student_id'][i]),
                     'student_name': data['username'][i],
-                    'total_points': f"{data['total_score'][i]} / {data['out_of_possible'][i]}",
+                    'total_points': f"{data['total_score'][i]}/{data['out_of_possible'][i]}",
                     'number_of_stages': 6,
                     'current_stage': int(data['max_stage_index'][i]),
                     'current_stage_progress': max_stage_progress,

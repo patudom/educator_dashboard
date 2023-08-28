@@ -114,7 +114,8 @@ def FreeResponseQuestionSingleStudent(roster, sid = None):
     question_text = roster.value.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text', nicetag: 'nicetag'}}
     
     with solara.Card():
-        solara.Markdown('Hello')
+        if len(fr_questions) == 0:
+            solara.Markdown("Student has not answered any free response questions yet.")
         for k, v in fr_questions.items():
             solara.Markdown(f"## Stage {k}")
             for qkey, qval in v.items():

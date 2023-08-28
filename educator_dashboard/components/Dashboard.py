@@ -83,7 +83,7 @@ def Dashboard(df, data, roster):
             with solara.lab.Tab(label="Summary", icon_name="mdi-text-box-outline"):
                 StudentQuestionsSummary(roster, student_id)
                 
-            with solara.lab.Tab(label="Individual Qs", icon_name="mdi-file-question-outline"):
+            with solara.lab.Tab(label="Per Student", icon_name="mdi-file-question-outline"):
                 IndividualStudentResponses(roster, student_id)
         
             with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
