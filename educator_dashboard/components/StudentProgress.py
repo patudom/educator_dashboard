@@ -87,7 +87,7 @@ def StudentProgressTable(progress_data, student_id = None, on_student_id = None,
     
     with solara.Card():
         if headers is None:
-            headers = ['Student ID', 'Student Name', 'Total Points' ] + [f'Stage {i}' for i in range(1,7)]
+            headers = ['Student ID', 'Student Name', 'Total Points (so far)' ] + [f'Stage {i}' for i in range(1,7)]
         with TableFromRows(headers=headers):
             for i in range(len(data)):
                 max_stage_progress = data['progress'][i].split('%')[0]
@@ -100,7 +100,7 @@ def StudentProgressTable(progress_data, student_id = None, on_student_id = None,
                 student_progress = {
                     'student_id': str(data['student_id'][i]),
                     'student_name': data['username'][i],
-                    'total_points': str(data['total_score'][i]),
+                    'total_points': f"{data['total_score'][i]} / {data['out_of_possible'][i]}",
                     'number_of_stages': 6,
                     'current_stage': int(data['max_stage_index'][i]),
                     'current_stage_progress': max_stage_progress,
