@@ -4,6 +4,7 @@ from solara.alias import rv
 
 from pandas import DataFrame
 
+from .Collapsable import Collapsable
 
 from ..database.Query import QueryCosmicDSApi as Query
 
@@ -34,24 +35,29 @@ def FreeResponseQuestionResponseSummary(question_responses, question_text, names
     selected_question, set_selected_question = solara.use_state(None)
     
     inv = {v['shorttext']:k for k,v in question_text.items()}
-    def set_quest2(val):
-        set_selected_question(inv[val])
+    # def set_quest2(val):
+    #     set_selected_question(inv[val])
     
     
-    values = [question_text[k]['shorttext'] for k,v in question_responses.items()]    
-    solara.Select(label = "Question", values = values, value = selected_question, on_value = set_quest2)
+    # values = [question_text[k]['shorttext'] for k,v in question_responses.items()]    
+    # solara.Select(label = "Question", values = values, value = selected_question, on_value = set_quest2)
     
-    # for k in stage_qs.keys():
-    #     set_selected_question(k)
-    if selected_question is not None:
-        question = question_text[selected_question]['text']
-        shortquestion = question_text[selected_question]['shorttext']
-        try:
-            responses = question_responses[selected_question]
-        except:
-            responses = []
-        
-        FreeResponseQuestion(question = question, shortquestion = shortquestion, responses = responses, names = names)
+    with rv.ExpansionPanels():
+        for selected_question in question_responses.keys():
+            # set_selected_question(k)
+            if selected_question is not None:
+                question = question_text[selected_question]['text']
+                shortquestion = question_text[selected_question]['shorttext']
+                try:
+                    responses = question_responses[selected_question]
+                except:
+                    responses = []
+                
+                with rv.ExpansionPanel():
+                    with rv.ExpansionPanelHeader():
+                        solara.Markdown(f"**{shortquestion}**")
+                    with rv.ExpansionPanelContent():
+                        FreeResponseQuestion(question = question, shortquestion = shortquestion, responses = responses, names = names)
 
 
 @solara.component
@@ -69,23 +75,21 @@ def FreeResponseSummary(roster):
     
     stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
     
-    with solara.lab.Tabs(grow=True):
+    # with solara.lab.Tabs(grow=True, vertical=True):
 
-        with solara.lab.Tab("Show All Responses"):
-            # make dataframe just adds the student id as the first row
-            fr_df = roster.value.make_dataframe(df[list(filter(lambda x: len(str(x).split('.'))==2, df.columns))], include_student_id = True,  include_class_id = False, include_username = False)
-            solara.DataFrame(fr_df)
+    #     with solara.lab.Tab("Show All Responses"):
+    #         # make dataframe just adds the student id as the first row
+    #         fr_df = roster.value.make_dataframe(df[list(filter(lambda x: len(str(x).split('.'))==2, df.columns))], include_student_id = True,  include_class_id = False, include_username = False)
+    #         solara.DataFrame(fr_df)
         
-        with solara.lab.Tab("Show By Question"):
-            with solara.lab.Tabs():
-                for stage in stages:
-                    with solara.lab.Tab(f"Stage {stage}"):
-                        
-                        solara.Markdown(f"## Stage {stage}")
-                        
-                        question_responses = roster.value.l2d(fr_questions[stage]) # {'key': ['repsonse1', 'response2',...]}
-                        
-                        FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.value.student_ids)
+        # with solara.lab.Tab("Show By Question"):
+    with solara.lab.Tabs(vertical=True):
+        for stage in stages:
+            with solara.lab.Tab(f"Stage {stage}"):
+                
+                question_responses = roster.value.l2d(fr_questions[stage]) # {'key': ['repsonse1', 'response2',...]}
+                
+                FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.value.student_ids)
             
         
 
