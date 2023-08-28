@@ -46,16 +46,16 @@ export default {
 .fixed_header {
   overflow-y: auto;
   width: 100%;
-  height: 300px;
+  height: 400px;
 }
 
 
 .fixed_header thead th {
   position: sticky;
   top: 0;
-  z-index: 9999;
   background-color: #f2f2f2;
   color: black;
+  z-index: 10;
 }
 
 
@@ -65,11 +65,12 @@ export default {
 }
 
 #table-from-rows tbody > tr {
-  /* border: 1px solid #d7d7d7; */
+  border-bottom: 1px solid #d7d7d7;
 }
 
 #table-from-rows td, th {
   padding-block: 0.5em;
+  text-align: center;
 }
 
 /* every other row */
