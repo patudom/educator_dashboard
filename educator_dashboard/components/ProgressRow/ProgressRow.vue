@@ -5,6 +5,11 @@
     @click="() => selected = !selected"
     >
     
+    <!-- add radio button showing sleected state -->
+    <td class="progress-table-td progress-table-select">
+      <input type="radio"  :checked="selected" />
+    </td>
+    
     <td v-for="key in Object.keys(column_data)" :key="key" :class="`progress-table-td progress-table-${key}`">
       {{ column_data[key] }}
     </td>
@@ -118,6 +123,11 @@ export default {
 </script>
 
 <style>
+
+.progress-table-row {
+  cursor: auto;
+}
+
 /* left align cells */
 /* add borders */
 .progress-table-td {
@@ -127,7 +137,7 @@ export default {
 }
 
 .progress-table-row-selected {
-  background-color: #d7d7d7;
+  background-color: #d7d7d7 !important;
 }
 
 .progress-table-progress {
@@ -140,7 +150,8 @@ export default {
   position: relative;
   padding-inline: 0;
   padding-block: 0;
-  width: 15ch;
+  width: 95%;
+  min-width: 15ch;
   height: inherit;
   border-radius: 999999px;  /* max out for rounded corners */
   overflow: hidden;
