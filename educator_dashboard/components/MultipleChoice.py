@@ -8,40 +8,6 @@ from .Collapsable import Collapsable
 
 
 @solara.component
-def MCSummaryPart(stage_qs):
-    """
-    stage_qs is a dictionary of questions and tries
-     = {q1: {tries:0, choice: 0, score: 0}...}
-    """
-    
-    quest = solara.use_reactive(None)
-    
-    # solara.Select(label = "Question", values = list(stage_qs.keys()), value = quest)
-    with solara.Columns([1,1]):
-        
-        # column with a table of questions with average #of tries
-        with solara.Column():
-            pass
-        
-        # a column for a particular question showing all student responses
-        with solara.Column():
-            pass
-        
-    for q in stage_qs.keys():
-        quest.set(q)
-        solara.Markdown(f"**Question {quest}**")
-        
-        df = DataFrame(stage_qs[quest.value]).dropna()
-        df['tries'] = df['tries'].astype(int)
-        # fig = px.histogram(df, 'tries',  labels={'tries': "# of Tries"}, range_x=[-0.6,3.6], category_orders={'tries': [0,1,2,3,4]})
-        # fig.update_xaxes(type='category')
-        # solara.FigurePlotly(fig)
-    
-# @solara.component
-# def MCSummaryTable(questions, tries):
-    
-
-@solara.component
 def MultipleChoiceSummary(roster):
     
     selected_question = solara.use_reactive('')
