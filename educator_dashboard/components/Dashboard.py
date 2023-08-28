@@ -8,6 +8,7 @@ from pandas import DataFrame
 import plotly.express as px
 import plotly.graph_objects as go
 
+from .ClassProgress import ClassProgress
 from .StudentProgress import StudentProgressTable
 from .ResponsesComponents import StudentQuestionsSummary
 from .ResponsesComponents import IndividualStudentResponses
@@ -54,7 +55,7 @@ def Dashboard(df, data, roster):
 
     # TableDisplay(df.value,items_per_page=len(df.value)//3,cell_actions = cell_actions)
 
-
+    ClassProgress(df, roster)
     StudentProgressTable(df, student_id = student_id)
     
     
