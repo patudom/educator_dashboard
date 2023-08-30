@@ -106,7 +106,12 @@ class Roster():
 
     @staticmethod
     def list_of_dicts_to_dict_of_lists(list_of_dicts, fill_val = None):
-        keys = list_of_dicts[0].keys()
+        # keys = list_of_dicts[0].keys()
+        keys = []
+        for d in list_of_dicts:
+            if isinstance(d, dict):
+                keys.extend([k for k in d.keys() if (k not in keys) and (k is not None)])
+        
         dict_of_lists = {k: [o[k] if (hasattr(o,'keys') and (k in o.keys())) else fill_val for o in list_of_dicts] for k in keys}
         return dict_of_lists
     
@@ -233,7 +238,9 @@ class Roster():
         questions = self.get_questions_text()
         for k in keys:
             if testing:
-                q = {'text': 'Fake Long '+k, 'shorttext': 'Fake Short '+k}
+                q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
+            elif (k not in questions.keys()):
+                q = {'text': 'Not in Question Database', 'shorthand': ''}
             else:
                 q = questions[k]
             
