@@ -217,13 +217,16 @@ class Roster():
         if (self._questions is not None) and (not self._refresh):
             return self._questions
         
-        fr = self.free_response_questions()
-        mc = self.multiple_choice_questions()
-        df_fr = flatten(self.make_dataframe(fr, include_class_id=False, include_username=False))
-        df_mc = flatten(self.make_dataframe(mc, include_class_id=False, include_username=False)).astype('Int64')
-        self._questions = pd.merge(df_mc, df_fr, how='left', on='student_id')
+        if len(self.roster) > 0:
+            fr = self.free_response_questions()
+            mc = self.multiple_choice_questions()
+            df_fr = flatten(self.make_dataframe(fr, include_class_id=False, include_username=False))
+            df_mc = flatten(self.make_dataframe(mc, include_class_id=False, include_username=False)).astype('Int64')
+            self._questions = pd.merge(df_mc, df_fr, how='left', on='student_id')
+        else:
+            self._questions = pd.DataFrame({'student_id':self.student_ids})
         return self._questions
-    
+        
     
     def get_questions_text(self):
         return self.query.get_questions()

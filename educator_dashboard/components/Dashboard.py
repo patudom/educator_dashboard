@@ -42,7 +42,6 @@ def Dashboard(roster):
     
     if len(roster.value.roster) == 0:
         solara.Markdown(f"There are no students in the class {roster.value.class_id}")
-        return
     
     student_id = solara.use_reactive(None)
     old_set = student_id.set
