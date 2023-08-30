@@ -2,6 +2,9 @@ import solara
 
 from .FreeResponse import FreeResponseQuestionSingleStudent, FreeResponseSummary
 from .MultipleChoice import MultipleChoiceQuestionSingleStudent, MultipleChoiceSummary
+from .DataComponent import StudentDataSummary
+
+from pandas import DataFrame
 
 ## TODO: persitantly hightlight selected row in question summary
 ## TODO: split summary into stages like the inidividual student responses
@@ -13,14 +16,16 @@ def IndividualStudentResponses(roster, sid=None):
     sid is the currently selected student
     """
     
-    if roster.value is None:
-        return
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+        if roster is None:
+            return
     
     with solara.Card():
         if sid.value is None:
             solara.Markdown('**Select a student to see their responses**')
             
-            solara.Select(label = 'Select Student', values = roster.value.student_ids, value=sid)
+            solara.Select(label = 'Select Student', values = roster.student_ids, value=sid)
             
             return
         
@@ -33,12 +38,18 @@ def IndividualStudentResponses(roster, sid=None):
                 
             with solara.lab.Tab("Free Response"):
                 FreeResponseQuestionSingleStudent(roster, sid = sid)
+            
+            with solara.lab.Tab("Data"):
+                StudentDataSummary(roster, student_id = sid.value, allow_sid_set=False)
 
 
 @solara.component
 def StudentQuestionsSummary(roster, sid = None):
-    if roster.value is None:
-        return
+    
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+        if roster is None:
+            return
     
     
     with solara.Card():
@@ -48,4 +59,6 @@ def StudentQuestionsSummary(roster, sid = None):
                 
             with solara.lab.Tab("Free Response"):
                 FreeResponseSummary(roster)
-
+            
+            with solara.lab.Tab("Data"):
+                StudentDataSummary(roster, student_id = sid)

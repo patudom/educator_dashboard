@@ -14,19 +14,24 @@ from numpy import hstack
 
 def MultipleChoiceStageSummary(roster, stage = None):
     
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+        if roster is None:
+            return
+    
     selected_question = solara.use_reactive('')
     
-    mc_responses = roster.value.multiple_choice_questions()
+    mc_responses = roster.multiple_choice_questions()
         
 
     flat_mc_responses = {}
-    q = roster.value.l2d(mc_responses[stage],fill_val={})
+    q = roster.l2d(mc_responses[stage],fill_val={})
     for k, v in q.items():
-        flat_mc_responses[k] = roster.value.l2d(v)
+        flat_mc_responses[k] = roster.l2d(v)
         # flat_mc_responses[k]['Stage'] = stage
-        flat_mc_responses[k]['Question'] = roster.value.question_keys()[k]['shorttext']
+        flat_mc_responses[k]['Question'] = roster.question_keys()[k]['shorttext']
         flat_mc_responses[k]['key'] = k
-        flat_mc_responses[k]['student_id'] = roster.value.student_ids
+        flat_mc_responses[k]['student_id'] = roster.student_ids
 
     summary_stats = DataFrame(flat_mc_responses).T
     tries = summary_stats['tries']
@@ -87,7 +92,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
                 if (selected_question.value is not None) and (selected_question.value != '') and (selected_question.value in flat_mc_responses.keys()):
                     
                     solara.Markdown(f"""***Question:***
-                                {roster.value.question_keys()[selected_question.value]['text']}
+                                {roster.question_keys()[selected_question.value]['text']}
                                 """)
                     
                     df = DataFrame(flat_mc_responses[selected_question.value])
@@ -100,8 +105,13 @@ def MultipleChoiceStageSummary(roster, stage = None):
                     
 @solara.component
 def MultipleChoiceSummary(roster):
+    
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+        if roster is None:
+            return
         
-    mc_responses = roster.value.multiple_choice_questions()
+    mc_responses = roster.multiple_choice_questions()
     
     # mc_responses is a dict that looks like {'1': [{q1: {tries:0, choice: 0, score: 0}...}..]}
     stages = list(filter(lambda s: s.isdigit(),sorted(list(sorted(mc_responses.keys())))))
@@ -171,9 +181,14 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None):
 
     if sid.value is None:
         return
+    
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+        if roster is None:
+            return
  
-    idx = roster.value.student_ids.index(sid.value)
-    mc_questions = roster.value.roster[idx]['story_state']['mc_scoring']
+    idx = roster.student_ids.index(sid.value)
+    mc_questions = roster.roster[idx]['story_state']['mc_scoring']
     
     
     dflist = []
@@ -183,7 +198,7 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None):
         df = DataFrame(v).T
         df['stage'] = stage
         df['key'] = df.index
-        df['question'] = [roster.value.question_keys()[k]['shorttext'] for k in df.key]
+        df['question'] = [roster.question_keys()[k]['shorttext'] for k in df.key]
         dflist.append(df)
         
         # which columns do you want to see and what should the displayed name be?

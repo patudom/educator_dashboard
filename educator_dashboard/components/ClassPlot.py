@@ -13,7 +13,8 @@ def ClassPlot(dataframe,
             xy_label = {"x":{'label': 'Distance', 'units': 'Mpc'}, "y":{'label': 'Velocity', 'units': 'km/s'}},
             on_click = None,
             select_on = None,
-            selected = solara.reactive(None)
+            selected = solara.reactive(None),
+            allow_click = True
               ):
     
     
@@ -52,6 +53,8 @@ def ClassPlot(dataframe,
     fig.update_traces(hovertemplate=hovertemplate) 
     
     def click_action(points):
+        if not allow_click:
+            return
         selected_index = points['points']['point_indexes'][0]
         selected.set(dataframe.iloc[selected_index][select_on])
         if on_click is not None:

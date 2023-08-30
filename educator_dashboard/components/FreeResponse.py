@@ -75,12 +75,14 @@ def FreeResponseQuestionResponseSummary(question_responses, question_text, names
 @solara.component
 def FreeResponseSummary(roster):
     
-    if not isinstance(roster, solara.Reactive):
-        roster = solara.use_reactive(roster)
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+        if roster is None:
+            return
         
-    fr_questions = roster.value.free_response_questions()
+    fr_questions = roster.free_response_questions()
     
-    question_text = roster.value.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text'}}
+    question_text = roster.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text'}}
     
     stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
     
@@ -88,9 +90,9 @@ def FreeResponseSummary(roster):
         for stage in stages:
             with solara.lab.Tab(f"Stage {stage}"):
                 
-                question_responses = roster.value.l2d(fr_questions[stage]) # {'key': ['repsonse1', 'response2',...]}
+                question_responses = roster.l2d(fr_questions[stage]) # {'key': ['repsonse1', 'response2',...]}
                 
-                FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.value.student_ids, hideShortQuestion=True)
+                FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.student_ids, hideShortQuestion=True)
             
         
 
@@ -99,20 +101,23 @@ def FreeResponseQuestionSingleStudent(roster, sid = None):
     
     if sid is None:
         return 
+        
     
     if not isinstance(sid, solara.Reactive):
         sid = solara.use_reactive(sid)
     
-    if not isinstance(roster, solara.Reactive):
-        roster = solara.use_reactive(roster)
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+        if roster is None:
+            return
     
     # grab index for student    
-    idx = roster.value.student_ids.index(sid.value)
+    idx = roster.student_ids.index(sid.value)
     
     
-    fr_questions = roster.value.roster[idx]['story_state']['responses']   
+    fr_questions = roster.roster[idx]['story_state']['responses']   
 
-    question_text = roster.value.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text', nicetag: 'nicetag'}}
+    question_text = roster.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text', nicetag: 'nicetag'}}
     
     with solara.Card():
         if len(fr_questions) == 0:

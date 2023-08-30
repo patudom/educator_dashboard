@@ -17,15 +17,13 @@ from pandas import DataFrame
 @solara.component
 def Page():
     
-    class_id = solara.use_reactive(195) # add class id here
+    class_id = solara.use_reactive(188) # add class id here
     roster = solara.use_reactive(cast(Roster, None))
-    df = solara.use_reactive(DataFrame())
-    data = solara.use_reactive(DataFrame())
     first_run = solara.use_reactive(True)
 
-    SetClass(class_id, df, data, roster, first_run)
+    SetClass(class_id, roster, first_run)
     
-    Dashboard(df, data, roster) 
+    Dashboard(roster) 
     # solara.DataFrame(df.value)
 
 
