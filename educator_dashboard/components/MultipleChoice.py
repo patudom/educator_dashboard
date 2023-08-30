@@ -11,7 +11,7 @@ from .TableComponents import DataTable
 
 from numpy import hstack
 
-
+@solara.component
 def MultipleChoiceStageSummary(roster, stage = None):
     
     if isinstance(roster, solara.Reactive):
