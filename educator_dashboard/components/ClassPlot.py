@@ -24,7 +24,8 @@ def ClassPlot(dataframe,
         select_on = "student_id"
     
     if dataframe is None:
-        return
+        solara.Markdown("No data")
+        return 
     
     config = {
             'remove': [
@@ -40,6 +41,7 @@ def ClassPlot(dataframe,
     
     if x_col not in dataframe.columns:
         print(f"ClassPlot: {x_col} not in dataframe")
+        solara.Markdown(f"**{x_col}** not in dataframe")
         return
     
     fig = px.scatter(dataframe, x=x_col, y=y_col, custom_data = label_col)

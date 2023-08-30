@@ -68,6 +68,7 @@ def StudentProgressTable(roster = None, progress_data = None, student_id = None,
     
     if roster is None:
         if progress_data is None:
+            solara.Markdown("This class does not exist")
             return
         else:
             progress_data = solara.use_reactive(progress_data)

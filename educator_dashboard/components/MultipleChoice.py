@@ -46,7 +46,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
     
 
     # solara.Select(label = "Question", values = list(stage_qs.keys()), value = quest)
-    with solara.Card():
+    with solara.Card() as main:
         solara.Markdown(f"### Stage {stage}")
         with solara.Columns([1,1]):
             
@@ -102,7 +102,9 @@ def MultipleChoiceStageSummary(roster, stage = None):
                     
                     with Collapsable(header='Show Table'):
                         DataTable(df = df[['student_id', 'tries']], class_ = "mc-question-summary-table")
-                    
+    return main
+
+                
 @solara.component
 def MultipleChoiceSummary(roster):
     
@@ -123,6 +125,7 @@ def MultipleChoiceSummary(roster):
 def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
     
     if df is None:
+        solara.Markdown("There are no completed multiple choice questions for this stage")
         return
     
     if isinstance(df, solara.Reactive):

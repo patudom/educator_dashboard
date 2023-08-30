@@ -240,6 +240,7 @@ class Roster():
             if testing:
                 q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
             elif (k not in questions.keys()):
+                print(f'{k} not in question database')
                 q = {'text': 'Not in Question Database', 'shorthand': ''}
             else:
                 q = questions[k]
