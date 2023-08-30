@@ -46,9 +46,11 @@ def vDataTableWrapper(df = None, headers = None, items = None, on_row_click = la
 
 
 
-# Make a new component that creates a simple v-data-table which has a row click event and 
-# keeps the selected row highlighted
 
+# ideally there would be a way to attach a method to the ipyvuetify object to select and highlight
+# a row, but I don't know how to do that. So instead we have to create a new class that uses
+# a basic v-data-table component with a method in it and then attach our row click callback to the
+# click:row event
 class _DataTableHighlight(v.VuetifyTemplate):
     template_file = os.path.realpath(os.path.join(os.path.dirname(__file__), "DataTable.vue"))
     headers = List(Dict()).tag(sync=True)
@@ -68,7 +70,7 @@ class _DataTableHighlight(v.VuetifyTemplate):
 @solara.component
 def DataTableHighlight(headers = None, items = None, itemKey = None, singleSelect = True, on_click = lambda *args: None):
 
-
+    # we need to put it in a CellAction otherwise we get an error that the function `on_click` is not json serializable
     cell_actions = [solara.CellAction(name=None, icon="mdi-account-details",on_click=on_click)]
 
     
