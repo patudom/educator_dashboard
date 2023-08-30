@@ -79,8 +79,8 @@ export default {
   },
 
   mounted() {
-    console.log("ProgressRow mounted");
-    console.log(`steps: ${this.steps} currentStep: ${this.currentStep} currentStepProgress: ${this.currentStepProgress}`)
+    // console.log("ProgressRow mounted");
+    // console.log(`steps: ${this.steps} currentStep: ${this.currentStep} currentStepProgress: ${this.currentStepProgress}`)
 
   },
 

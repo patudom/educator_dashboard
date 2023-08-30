@@ -52,7 +52,7 @@ def StudentProgressRow(progress,
 
 
 @solara.component
-def StudentProgressTable(progress_data, student_id = None, on_student_id = None, headers = None):
+def StudentProgressTable(roster = None, progress_data = None, student_id = None, on_student_id = None, headers = None):
     """
     progress_data should be either a dataframe or a dictionary
     this will work with reactive or non-reactive data
@@ -65,6 +65,15 @@ def StudentProgressTable(progress_data, student_id = None, on_student_id = None,
     where progress is the progress of the max stage
     
     """
+    
+    if roster is None:
+        if progress_data is None:
+            return
+        else:
+            progress_data = solara.use_reactive(progress_data)
+    else:
+        r = roster.value if isinstance(roster, solara.Reactive) else roster
+        progress_data = solara.use_reactive(r.short_report())
     
     if progress_data.value is None:
         return

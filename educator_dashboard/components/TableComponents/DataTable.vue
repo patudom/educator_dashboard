@@ -70,7 +70,7 @@ export default {
 
 
   methods: {
-    rowClick(item, row) {
+    rowClick(item, row, event) {
       console.log('rowClick', item, row)
 
       row.select(this.highlight & this.deselect & !(this.selected === item))

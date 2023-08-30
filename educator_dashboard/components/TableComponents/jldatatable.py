@@ -37,8 +37,8 @@ def vDataTableWrapper(df = None, headers = None, items = None, on_row_click = la
         **kwargs
     )
     
-    def on_click_row(*args):
-        on_row_click(args[-1])
+    def on_click_row(el, event, data_inthe_row ):
+        on_row_click(data_inthe_row)
     
     rv.use_event(table,'click:row', on_click_row)
     
@@ -62,6 +62,7 @@ class _DataTableHighlight(v.VuetifyTemplate):
     selected = Any(default = None).tag(sync=True)
     highlight = Bool(default_value=True).tag(sync=True)
     deselect = Bool(default_value=True).tag(sync=True)
+    
     
     def vue_on_click(self,data):
         self.callbacks[0].on_click(data)
