@@ -17,7 +17,7 @@ from pandas import DataFrame
 @solara.component
 def Page():
     
-    class_id = solara.use_reactive(188) # add class id here
+    class_id = solara.use_reactive(195) # add class id here
     roster = solara.use_reactive(cast(Roster, None))
     first_run = solara.use_reactive(True)
 
