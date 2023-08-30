@@ -111,7 +111,7 @@ def FreeResponseQuestionSingleStudent(roster, sid = None):
     
     
     fr_questions = roster.value.roster[idx]['story_state']['responses']   
-    print(fr_questions)     
+
     question_text = roster.value.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text', nicetag: 'nicetag'}}
     
     with solara.Card():
