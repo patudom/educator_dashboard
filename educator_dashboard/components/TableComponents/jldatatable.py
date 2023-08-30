@@ -89,7 +89,7 @@ def DataTableHighlight(headers = None, items = None, itemKey = None, singleSelec
 
 
 @solara.component
-def DataTableWithRowClick(headers = None, items = None, df = None, item_key = None, on_row_click = lambda *args: None, class_ = None, **kwargs):
+def DataTableWithRowClick(headers = None, items = None, df = None, item_key = None, on_row_click = lambda *args: None, class_ = None, show_index = False, **kwargs):
     """
     on_row_click takes 1 arguments: the row that was clicked
     
@@ -99,10 +99,13 @@ def DataTableWithRowClick(headers = None, items = None, df = None, item_key = No
         headers = headers or [{'text': h, 'value': h} for h in df.columns]
         items = items or df.astype(str).to_dict('records')
     
-    headers = [{'text': '#', 'value': 'id'}] + headers
-    items = [{**item, 'id': str(i+1)} for i, item in enumerate(items)]
     
-    item_key = item_key or 'id'
+    
+    if show_index:
+        headers = [{'text': '#', 'value': 'id'}] + headers
+        items = [{**item, 'id': str(i+1)} for i, item in enumerate(items)]
+        
+    item_key = item_key or ('id' if show_index else df.columns[0])
     
     def on_click(data):
         # print(data)
