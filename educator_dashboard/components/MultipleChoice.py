@@ -108,7 +108,59 @@ def MultipleChoiceSummary(roster):
     
     for stage in stages:
         MultipleChoiceStageSummary(roster, stage = stage)
+
+@solara.component
+def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
     
+    if df is None:
+        return
+    
+    if isinstance(df, solara.Reactive):
+        df = df.value
+    
+    dquest, set_dquest = solara.use_state('')
+   
+    
+    def row_action(row):
+        key = row['key']
+        stage = row['stage']
+        
+        qjson = Query.get_question(key)
+        if qjson is not None:
+            q = qjson['question']['text']
+            set_dquest(q)
+        
+
+    
+    # which columns do you want to see and what should the displayed name be?
+    headers = headers or [{'text': k, 'value': k} for k in df.columns]
+
+
+    completed = sum(df.score.notna())
+    total = len(df)
+    points = sum(df.score.dropna().astype(int))
+    total_points = 10 * total
+    def isgood(i):
+        return (i is not None) and (i != 0)
+    avg_tries = df.tries.aggregate(lambda x: sum([i for i in x if isgood(i)])/len([i for i in x if isgood(i)]))
+    
+    with solara.Card():
+        with solara.Columns([1,1]):
+            with solara.Column():
+                solara.Markdown("""
+                                ### Stage {}
+                                - Completed {} out of {} multiple choice questions
+                                - Multiple Choice Score: {}/{}
+                                - Took on average {:0.2f} tries to complete the multiple choice questions
+                                """.format(stage, completed, total, points, total_points, avg_tries))    
+                
+            with solara.Column():
+                if dquest is not None:
+                    solara.Markdown(f"**Question**: {dquest}")
+                
+                DataTable(df = df, headers = headers, on_row_click=row_action)
+            
+
         
     
 @solara.component
@@ -119,60 +171,27 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None):
 
     if sid.value is None:
         return
-    
-    dquest, set_dquest = solara.use_state(None)
-    
+ 
     idx = roster.value.student_ids.index(sid.value)
     mc_questions = roster.value.roster[idx]['story_state']['mc_scoring']
-    # {stage: {q1: {tries:0, choice: 0, score: 0}..., }
     
-    
-    
-    def mc_cell_action(column, row_index):
-        tag = mc_questions['tag'].iloc[row_index]
-        # take everything after first period, there may be more than 1
-        if '.' in tag:
-            tag = tag.split('.')[1]
-        qjson = Query.get_question(tag)
-        if qjson is not None:
-            q = qjson['question']['text']
-            set_dquest(q)
-        
-    mc_cell_actions = [solara.CellAction('Show Question', icon='mdi-help-box', on_click=mc_cell_action)]
     
     dflist = []
     for stage, v in mc_questions.items():
+
+        
         df = DataFrame(v).T
         df['stage'] = stage
         df['key'] = df.index
         df['question'] = [roster.value.question_keys()[k]['shorttext'] for k in df.key]
         dflist.append(df)
-
-        # mc_df = concat(dflist,axis=0)
-        mc_df = df
-        df = mc_df[['key', 'question','stage', 'tries','score']]
-
-
-        completed = sum(df.score.notna())
-        total = len(df)
-        points = sum(df.score.dropna().astype(int))
-        total_points = 10 * total
-        def isgood(i):
-            return (i is not None) and (i != 0)
-        avg_tries = df.tries.aggregate(lambda x: sum([i for i in x if isgood(i)])/len([i for i in x if isgood(i)]))
         
-        with solara.Card():
-            with solara.Columns([1,1]):
-                with solara.Column():
-                    solara.Markdown("""
-                                    ### Stage {}
-                                    - Completed {} out of {} multiple choice questions
-                                    - Multiple Choice Score: {}/{}
-                                    - Took on average {:0.2f} tries to complete the multiple choice questions
-                                    """.format(stage, completed, total, points, total_points, avg_tries))    
-                    
-                with solara.Column():
-                    if dquest is not None:
-                        solara.Markdown(f"**Question**: {dquest}")
-                    solara.DataFrame(df, items_per_page=len(df), cell_actions=mc_cell_actions)
+        # which columns do you want to see and what should the displayed name be?
+        headers = [
+            {'text': 'Question', 'value': 'question'},
+            {'text': 'Tries', 'value': 'tries'},
+            {'text': 'Score', 'value': 'score'},
+        ]
+
+        MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage)
             
