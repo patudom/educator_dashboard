@@ -5,7 +5,7 @@
     <table>
       <thead>
         <tr>
-          <th v-for="header in headers" :key="header">{{ header }}</th>
+          <th v-for="header in headers" :key="header" v-html="header"></th>
         </tr>
       </thead>
       <tbody>
@@ -61,7 +61,7 @@ export default {
 
 
 #table-from-rows tr:hover {
-  background-color: #d7d7d7;
+  background-color: #ededed;
 }
 
 #table-from-rows tbody > tr {

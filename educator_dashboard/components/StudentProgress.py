@@ -52,7 +52,7 @@ def StudentProgressRow(progress,
 
 
 @solara.component
-def StudentProgressTable(roster = None, progress_data = None, student_id = None, on_student_id = None, headers = None):
+def StudentProgressTable(roster = None, progress_data = None, student_id = None, on_student_id = None, headers = None, stage_labels = []):
     """
     progress_data should be either a dataframe or a dictionary
     this will work with reactive or non-reactive data
@@ -97,7 +97,7 @@ def StudentProgressTable(roster = None, progress_data = None, student_id = None,
     
     with solara.Card():
         if headers is None:
-            headers = ['', 'Student ID', 'Student Name', 'Points/available' ] + [f'Stage {i}' for i in range(1,7)]
+            headers = ['', 'Student ID', 'Student Name', 'Points/available' ] + stage_labels
         with TableFromRows(headers=headers):
             for i in range(len(data)):
                 max_stage_progress = data['progress'][i].split('%')[0]

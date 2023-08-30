@@ -53,7 +53,14 @@ def Dashboard(roster):
     
 
     # ClassProgress(df, roster)
-    StudentProgressTable(roster, student_id = student_id)
+    labels = ['Stage 1: </br> Velocities', 
+              'Stage 2: </br> Ang size Intro', 
+              'Stage 3: </br> Angular Size',
+              'Stage 4: </br> Find H0',
+              'Stage 5: </br> Uncertainty',
+              'Stage 6: </br> Professional Data'
+              ]
+    StudentProgressTable(roster, student_id = student_id, stage_labels = labels)
     
         
     with solara.Card():
@@ -62,7 +69,7 @@ def Dashboard(roster):
             with solara.lab.Tab(label="Summary", icon_name="mdi-text-box-outline"):
                 StudentQuestionsSummary(roster, student_id)
                 
-            with solara.lab.Tab(label="Per Student", icon_name="mdi-file-question-outline"):
+            with solara.lab.Tab(label="Per Student" if student_id.value is None else f"For Student {student_id.value}", icon_name="mdi-file-question-outline"):
                 IndividualStudentResponses(roster, student_id)
         
             with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
