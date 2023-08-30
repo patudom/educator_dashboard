@@ -1,10 +1,13 @@
 import solara
-from solara.alias import rv
+
+import reacton.ipyvuetify as rv
 
 from pandas import DataFrame, Series, concat
 from ..database.Query import QueryCosmicDSApi as Query
 import plotly.express as px
 from .Collapsable import Collapsable
+
+from .TableComponents import DataTable
 
 from numpy import hstack
 
@@ -20,7 +23,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
     q = roster.value.l2d(mc_responses[stage],fill_val={})
     for k, v in q.items():
         flat_mc_responses[k] = roster.value.l2d(v)
-        flat_mc_responses[k]['Stage'] = stage
+        # flat_mc_responses[k]['Stage'] = stage
         flat_mc_responses[k]['Question'] = roster.value.question_keys()[k]['shorttext']
         flat_mc_responses[k]['key'] = k
         flat_mc_responses[k]['student_id'] = roster.value.student_ids
@@ -50,10 +53,34 @@ def MultipleChoiceStageSummary(roster, stage = None):
                 tries_1d = Series(tries_1d).dropna()
                 solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(tries_1d[tries_1d>0].mean().round(2)))
                 
-                solara.DataFrame(summary_stats[['Stage', 'Question', 'Completed by', 'Average # of Tries']], 
-                                items_per_page=len(summary_stats),
-                                cell_actions=[solara.CellAction(name='Show Question Stats', icon='mdi-table-eye', on_click=cell_action)]
-                                )
+
+                keys = ['Question', 'Completed by', 'Average # of Tries']
+                
+                
+                data_keys = ['Question', 'Completed by', 'Average # of Tries', 'key']
+                data_values = {k: summary_stats[k].astype(str) for k in data_keys}
+                # https://www.phind.com/search?cache=qn70q6onf78gz5b035fmmosx
+                data_values = [dict(zip(data_values.keys(), values)) for values in zip(*data_values.values())]
+
+                # headers appropriate for vuetify headers prop
+                headers = [{'text': k, 'value': k} for k in keys]
+                
+                
+                def on_change(v):
+                    if v is None:
+                        selected_question.set(None)
+                        return
+                    
+                    q = v['key']
+                    selected_question.set(q)
+                    
+                
+                
+                DataTable(
+                    headers=headers,
+                    items=data_values,
+                    on_row_click=on_change,
+                )
             
             # a column for a particular question showing all student responses
             with solara.Column():
@@ -69,7 +96,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
                     solara.FigurePlotly(fig)
                     
                     with Collapsable(header='Show Table'):
-                        solara.DataFrame(df[['student_id', 'tries']])
+                        DataTable(df = df[['student_id', 'tries']], class_ = "mc-question-summary-table")
                     
 @solara.component
 def MultipleChoiceSummary(roster):
