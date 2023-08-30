@@ -85,6 +85,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
                     headers=headers,
                     items=data_values,
                     on_row_click=on_change,
+                    show_index=True,
                 )
             
             # a column for a particular question showing all student responses
@@ -155,7 +156,15 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
     total_points = 10 * total
     def isgood(i):
         return (i is not None) and (i != 0)
-    avg_tries = df.tries.aggregate(lambda x: sum([i for i in x if isgood(i)])/len([i for i in x if isgood(i)]))
+    
+    def avg(x):
+        top = sum([i for i in x if isgood(i)])
+        bot = len([i for i in x if isgood(i)])
+        if bot == 0:
+            return '--'
+        return top/bot
+    
+    avg_tries = df.tries.aggregate(avg)
     
     with solara.Card():
         with solara.Columns([1,1]):
@@ -171,7 +180,7 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
                 if dquest is not None:
                     solara.Markdown(f"**Question**: {dquest}")
                 
-                DataTable(df = df, headers = headers, on_row_click=row_action)
+                DataTable(df = df, headers = headers, on_row_click=row_action, show_index=True)
             
 
         
