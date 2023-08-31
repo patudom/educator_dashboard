@@ -36,7 +36,6 @@ class Roster():
         self._fr_questions = None
         self._questions = None
         self._question_keys = None
-        self._data = None
         self._report = None
         self._short_report = None
         
@@ -45,6 +44,7 @@ class Roster():
         self.class_id = class_id
         self.query = QueryCosmicDSApi(class_id = class_id, story=HUBBLE_ROUTE_PATH)
         self.data = None
+        self.student_data = {}
         self.class_summary = None
         self.grab_data()
     
@@ -118,10 +118,19 @@ class Roster():
     def l2d(self, list_of_dicts, fill_val = None):
         return self.list_of_dicts_to_dict_of_lists(list_of_dicts, fill_val)
     
-    def get_class_data(self, refresh = False):
+    def get_class_data(self, refresh = False, df = False):
         if self.data is None or self._refresh or refresh:
             self.data = self.query.get_class_data(class_id = self.class_id)
+        if df:
+            return pd.DataFrame(self.data)
         return self.data
+    
+    def get_student_data(self, student_id, refresh = False, df = False):
+        if (student_id not in self.student_data.keys()) or self._refresh or refresh:
+            self.student_data[student_id] = self.query.get_student_data(student_id)['measurements']
+        if df:
+            return pd.DataFrame(self.student_data[student_id])
+        return self.student_data[student_id]
 
     def get_class_summary(self, refresh = False):
         if self.class_summary is None or self._refresh or refresh:
