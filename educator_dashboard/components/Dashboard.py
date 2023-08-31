@@ -72,5 +72,5 @@ def Dashboard(roster):
             with solara.lab.Tab(label="Per Student" if student_id.value is None else f"For Student {student_id.value}", icon_name="mdi-file-question-outline"):
                 IndividualStudentResponses(roster, student_id)
         
-            with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
-                StudentDataSummary(roster, student_id = student_id)
+            # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
+            #     StudentDataSummary(roster, student_id = student_id)
