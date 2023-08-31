@@ -44,7 +44,9 @@ def ClassPlot(dataframe,
         solara.Markdown(f"**{x_col}** not in dataframe")
         return
     
-    fig = px.scatter(dataframe, x=x_col, y=y_col, custom_data = label_col)
+    labels =  {x_col: "{label} ({units})".format(**xy_label['x']),  
+               y_col: "{label} ({units})".format(**xy_label['y'])}
+    fig = px.scatter(dataframe, x=x_col, y=y_col, custom_data = label_col, labels = labels)
     fig.update_layout(modebar = config)
 
 
