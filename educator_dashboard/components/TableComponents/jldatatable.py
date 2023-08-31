@@ -62,6 +62,7 @@ class _DataTableHighlight(v.VuetifyTemplate):
     selected = Any(default = None).tag(sync=True)
     highlight = Bool(default_value=True).tag(sync=True)
     deselect = Bool(default_value=True).tag(sync=True)
+    classes = List(Unicode(default_value=""),default_value=[]).tag(sync=True)
     
     
     def vue_on_click(self,data):
@@ -69,18 +70,20 @@ class _DataTableHighlight(v.VuetifyTemplate):
     
 
 @solara.component
-def DataTableHighlight(headers = None, items = None, itemKey = None, singleSelect = True, on_click = lambda *args: None):
+def DataTableHighlight(headers = None, items = None, itemKey = None, singleSelect = True, on_click = lambda *args: None, class_ = None):
 
     # we need to put it in a CellAction otherwise we get an error that the function `on_click` is not json serializable
     cell_actions = [solara.CellAction(name=None, icon="mdi-account-details",on_click=on_click)]
 
+    classes = [] if class_ is None else [class_]
     
     el = _DataTableHighlight.element(
         headers=headers,
         items=items,
         itemKey=itemKey,
         singleSelect=singleSelect,
-        callbacks = cell_actions) 
+        callbacks = cell_actions,
+        classes = classes) 
     
     return el
     
@@ -100,12 +103,12 @@ def DataTableWithRowClick(headers = None, items = None, df = None, item_key = No
         items = items or df.astype(str).to_dict('records')
     
     
+    items = [{**item, 'id': str(i+1)} for i, item in enumerate(items)]
     
     if show_index:
         headers = [{'text': '#', 'value': 'id'}] + headers
-        items = [{**item, 'id': str(i+1)} for i, item in enumerate(items)]
         
-    item_key = item_key or ('id' if show_index else df.columns[0])
+    item_key = item_key or 'id'
     
     def on_click(data):
         # print(data)
@@ -114,7 +117,9 @@ def DataTableWithRowClick(headers = None, items = None, df = None, item_key = No
     table = DataTableHighlight(headers=headers, 
                                items=items, 
                                itemKey=item_key, 
-                               on_click=on_click)
+                               on_click=on_click,
+                               class_ = class_,
+                               )
     
 
     return table
