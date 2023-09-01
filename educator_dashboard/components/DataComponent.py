@@ -2,6 +2,11 @@ import solara
 from .ClassPlot import ClassPlot
 from .TableDisplay import TableDisplay
 from pandas import DataFrame
+import plotly.express as px
+
+from numpy import around
+from math import ceil, floor
+
 
 
 @solara.component
@@ -48,6 +53,19 @@ def get_slope(x, y):
 def slope2age(h0):
     return 977.79222 / h0 # age of universe in Gyr
 
+
+@solara.component
+def AgeHoHistogram(data, age_col = 'age', h0_col = 'h0', which = 'age'):
+    
+    xmin, xmax = floor(data[age_col].min()), ceil(data[age_col].max())
+    categories = list(range(xmin, xmax+1))
+    fig = px.histogram(data_frame = data, x = which, labels={age_col:'Age of Universe (Gyr)'}, category_orders={age_col: categories})
+    fig.update_xaxes(type='category')
+    fig.update_layout(showlegend=False, title_text='Class Age Distribution')
+    # show ticks every 1
+    # fig.update_xaxes(dtick=1)
+
+    solara.FigurePlotly(fig)
 @solara.component
 def StudentData(dataframe = None, id_col = 'student_id',  sid = None, cols_to_display = None, on_sid = None, allow_id_set = True):
     """
