@@ -41,11 +41,10 @@ def MultipleChoiceStageSummary(roster, stage = None):
     summary_stats['Completed by'] = attempts
     summary_stats['Average # of Tries'] = avg_tries.round(2)
     
-    def cell_action(column, row_index):
-        selected_question.set(summary_stats['key'].iloc[row_index])
+    tries_1d = hstack(tries)
+    tries_1d = Series(tries_1d).dropna()
     
-
-    # solara.Select(label = "Question", values = list(stage_qs.keys()), value = quest)
+    
     with solara.Card() as main:
         solara.Markdown(f"### Stage {stage}")
         with solara.Columns([1,1]):
@@ -53,33 +52,22 @@ def MultipleChoiceStageSummary(roster, stage = None):
             # column with a table of questions with average #of tries
             with solara.Column():
                 
-                tries_1d = hstack(tries)
-                # drop None values
-                tries_1d = Series(tries_1d).dropna()
                 solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(tries_1d[tries_1d>0].mean().round(2)))
-                
 
                 keys = ['Question', 'Completed by', 'Average # of Tries']
-                
-                
-                data_keys = ['Question', 'Completed by', 'Average # of Tries', 'key']
-                data_values = {k: summary_stats[k].astype(str) for k in data_keys}
-                # https://www.phind.com/search?cache=qn70q6onf78gz5b035fmmosx
-                data_values = [dict(zip(data_values.keys(), values)) for values in zip(*data_values.values())]
-
                 # headers appropriate for vuetify headers prop
                 headers = [{'text': k, 'value': k} for k in keys]
                 
                 
-                def on_change(v):
-                    if v is None:
-                        selected_question.set(None)
-                        return
-                    
-                    q = v['key']
-                    selected_question.set(q)
-                    
+                data_keys = ['Question', 'Completed by', 'Average # of Tries', 'key']
                 
+                # https://www.phind.com/search?cache=qn70q6onf78gz5b035fmmosx
+                data_values = {k: summary_stats[k].astype(str) for k in data_keys}
+                data_values = [dict(zip(data_values.keys(), values)) for values in zip(*data_values.values())]
+
+
+                def on_change(v):                    
+                    selected_question.set(v if v is None else v['key'])
                 
                 DataTable(
                     headers=headers,
