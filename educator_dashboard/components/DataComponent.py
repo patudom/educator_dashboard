@@ -136,6 +136,9 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
             StudentMeasurementTable(roster, sid, headers = cols_to_display)
     else:
         dataframe = roster.get_class_data(df = True)
+        if len(dataframe) == 0:
+            solara.Markdown("There is no data for this class")
+            return
         sids = dataframe[id_col].unique()
         h0 = [get_slope(dataframe[dataframe[id_col] == sid]['est_dist_value'], dataframe[dataframe[id_col] == sid]['velocity_value']) for sid in sids]
         age = [slope2age(h) for h in h0]

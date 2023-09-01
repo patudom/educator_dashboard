@@ -120,7 +120,9 @@ class Roster():
     
     def get_class_data(self, refresh = False, df = False):
         if self.data is None or self._refresh or refresh:
-            self.data = self.query.get_class_data(class_id = self.class_id)
+            res = self.query.get_class_data(class_id = self.class_id)
+            self.data = res if res is not None else {'student_id':[]}
+            
         if df:
             return pd.DataFrame(self.data)
         return self.data
