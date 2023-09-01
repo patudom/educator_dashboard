@@ -69,8 +69,26 @@ def AgeHoHistogram(data, age_col = 'age', h0_col = 'h0', which = 'age'):
     # fig.update_xaxes(dtick=1)
 
     solara.FigurePlotly(fig)
+    
 @solara.component
-def StudentData(dataframe = None, id_col = 'student_id',  sid = None, cols_to_display = None, on_sid = None, allow_id_set = True):
+def StudentMeasurementTable(roster = None, sid = None, headers = None, show_class = False, show_index = False):
+    
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+    if roster is None:
+        return
+    
+    if isinstance(sid, solara.Reactive):
+        sid = sid.value
+        
+    if sid in roster.student_ids:
+        dataframe = DataFrame(roster.get_student_data(sid))
+    elif (sid is None) and show_class:
+        dataframe = DataFrame(roster.get_class_data(df = True))
+    else:
+        solara.Markdown('Provided invalid student id')
+        return
+       
     """
     Display a single student's data
     """
@@ -108,7 +126,9 @@ def StudentData(dataframe = None, id_col = 'student_id',  sid = None, cols_to_di
                 age = slope2age(h0)
                 solara.Markdown(f"**Hubble Constant**: {h0:.1f} km/s/Mpc")
                 solara.Markdown(f"**Age of Universe**: {age:.1f} Gyr")
-                
+                    
+            
+            StudentMeasurementTable(roster, sid, headers = cols_to_display)
         
         if cols_to_display is None:
             cols_to_display = single_student_df.columns
