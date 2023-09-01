@@ -39,11 +39,10 @@ def DataSummary(data = None, student_id = None, on_student_id = None, allow_clic
     
     if allow_click:
         with solara.Column(gap="0px"):
-            solara.Markdown(f"Click on a point to show all data for that student", style={'font-size': 'small'})
-            ClassPlot(data, on_click=on_plot_click, select_on = 'student_id', selected = student_id, allow_click=allow_click)
+            ClassPlot(data, on_click=on_plot_click, select_on = 'student_id', selected = student_id, allow_click=True)
     else:
         with solara.Column():
-            ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = allow_click)
+            ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = False)
     
 
 from math import nan
