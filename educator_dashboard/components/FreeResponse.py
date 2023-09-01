@@ -86,13 +86,21 @@ def FreeResponseSummary(roster):
     
     stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
     
-    with solara.lab.Tabs(vertical=True):
-        for stage in stages:
-            with solara.lab.Tab(f"Stage {stage}"):
-                
+
+    with solara.Columns([3, 1]):
+        with solara.Column():
+            for stage in stages:     
                 question_responses = roster.l2d(fr_questions[stage]) # {'key': ['repsonse1', 'response2',...]}
-                
-                FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.student_ids, hideShortQuestion=True)
+                with rv.Container(id=f"fr-summary-stage-{stage}"):
+                    solara.Markdown(f"## Stage {stage}")
+                    FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.student_ids, hideShortQuestion=True)
+        with solara.Column():
+            with rv.NavigationDrawer(permanent=True, right=True, clipped=True):
+                with rv.List():
+                    for stage in stages:
+                        with rv.ListItem(link=True, href=f"#fr-summary-stage-{stage}"):
+                            with rv.ListItemTitle():
+                                solara.Markdown(f"Stage {stage}")
             
         
 
