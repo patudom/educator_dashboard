@@ -154,20 +154,23 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
     
     avg_tries = df.tries.aggregate(avg)
     
-    with solara.Card():
-        with solara.Columns([1,1]):
-            with solara.Column():
-                solara.Markdown("""
-                                ### Stage {}
-                                - Completed {} out of {} multiple choice questions
-                                - Multiple Choice Score: {}/{}
-                                - Took on average {:0.2f} tries to complete the multiple choice questions
-                                """.format(stage, completed, total, points, total_points, avg_tries))    
-                
+
+    with solara.Row():
+        solara.Markdown("""
+                        ### Stage {}
+                        - Completed {} out of {} multiple choice questions
+                        - Multiple Choice Score: {}/{}
+                        - Took on average {:0.2f} tries to complete the multiple choice questions
+                        """.format(stage, completed, total, points, total_points, avg_tries))    
+        
+    with solara.Row():
+        with solara.Columns([1,2]):
             with solara.Column():
                 if dquest is not None:
                     solara.Markdown(f"**Question**: {dquest}")
-                
+                else:
+                    solara.Markdown(f"**Select a question form table** ")
+            with solara.Column():
                 DataTable(df = df, headers = headers, on_row_click=row_action, show_index=True)
             
 
@@ -207,6 +210,6 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None):
             {'text': 'Tries', 'value': 'tries'},
             {'text': 'Score', 'value': 'score'},
         ]
-
-        MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage)
+        with solara.Card():
+            MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage)
             
