@@ -7,6 +7,7 @@ import plotly.express as px
 from numpy import around
 from math import ceil, floor
 
+from .TableComponents import DataTable
 
 
 @solara.component
@@ -89,39 +90,43 @@ def StudentMeasurementTable(roster = None, sid = None, headers = None, show_clas
         solara.Markdown('Provided invalid student id')
         return
        
+
+    if isinstance(headers, list):
+        if isinstance(headers[0], dict) and {'text','value'}.issubset(headers[0].keys()):
+            print('Good heaaders')
+        elif isinstance(headers[0], str):
+            headers = [{'text': h, 'value': h} for h in headers]
+        else:
+            print('StudentMeasurementTable: headers is a list but not of the form [{"text": "header", "value": "col_name"}, ...]')
+            print('defaulting to displaying all columns  with their column names')
+            headers = [{'text': h, 'value': h} for h in dataframe.columns]
+    elif isinstance(headers, dict):
+        headers = [{'text': v, 'value': k} for k,v in headers.items()]
+    else:
+        headers = [{'text': h, 'value': h} for h in dataframe.columns]
+    
+    
+    DataTable(df = dataframe, headers = headers, class_ = "student-measurement-table", show_index=show_index)
+
+@solara.component
+def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_display = None, on_sid = None, allow_id_set = True):
     """
     Display a single student's data
     """
     
     print('Displaying single students data')
     
-    if sid.value is None:
-        print("StudentData: no sid")
-        return
-    
-    if dataframe.value is None:
-        print("StudentData: no dataframe")
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+    if roster is None:
         return
 
-    single_student_df = dataframe.value[dataframe.value[id_col] == sid.value]
-    
-    def on_value(value):
-        print("StudentData: on_value: setting sid", value)
-        sid.set(int(value))
-        if on_sid is not None:
-            on_sid(int(value))
-    
-    with solara.Column(gap="0px"):
-        with solara.Columns([1,1]):
-            with solara.Column():
-                # if allow_id_set:
-                #     # val = str(sid.value)
-                #     solara.InputText(label="Student ID",  value = str(sid), on_value=on_value)
-                # else:
-                #     solara.Markdown(f"**Student {sid}**")
-            # with solara.Column():
-                #hubble's constant
-                # age of universe
+
+    if sid is not None and sid.value is not None:
+        
+        with solara.Column(gap="0px"):
+            with solara.Column(gap="0px"):
+                single_student_df = roster.get_student_data(sid.value, df = True)
                 h0 = get_slope(single_student_df['est_dist_value'], single_student_df['velocity_value'])
                 age = slope2age(h0)
                 solara.Markdown(f"**Hubble Constant**: {h0:.1f} km/s/Mpc")
@@ -156,6 +161,14 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
             DataSummary(roster, student_id, allow_click=allow_sid_set)
         
         with solara.Column():
-            cols = ['student_id', 'galaxy_id','velocity_value', 'est_dist_value', 'obs_wave_value', 'ang_size_value']
-            StudentData(dataframe = dataframe, id_col="student_id", sid = student_id, cols_to_display = cols, allow_id_set = allow_sid_set)
+            
+            headers = [
+                {'value': 'student_id', 'text': 'Student ID'},
+                {'value': 'galaxy_id', 'text': 'Galaxy ID'},
+                {'value': 'velocity_value', 'text': 'Velocity <br/> (km/s)'},
+                {'value': 'est_dist_value', 'text': 'Distance <br/> (Mpc)'},
+                {'value': 'obs_wave_value', 'text': 'Observed Wavelength <br/> (Angstrom)'},
+                {'value': 'ang_size_value', 'text': 'Angular Size <br/> (arcsecond)'}
+            ]
+            StudentData(roster, id_col="student_id", sid = student_id, cols_to_display = headers, allow_id_set = allow_sid_set)
                             
