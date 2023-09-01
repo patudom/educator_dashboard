@@ -129,10 +129,15 @@ def StudentMeasurementTable(roster = None, sid = None, headers = None, show_clas
                     
             
             StudentMeasurementTable(roster, sid, headers = cols_to_display)
+    else:
+        dataframe = roster.get_class_data(df = True)
+        sids = dataframe[id_col].unique()
+        h0 = [get_slope(dataframe[dataframe[id_col] == sid]['est_dist_value'], dataframe[dataframe[id_col] == sid]['velocity_value']) for sid in sids]
+        age = [slope2age(h) for h in h0]
         
-        if cols_to_display is None:
-            cols_to_display = single_student_df.columns
-        TableDisplay(single_student_df[cols_to_display])
+        data = DataFrame({'sids': [str(s) for s in sids], 'h0': around(h0,0).astype(int), 'age': around(age,0).astype(int)})
+        
+        AgeHoHistogram(data)
 
 
 @solara.component
