@@ -12,9 +12,6 @@ from .ClassProgress import ClassProgress
 from .StudentProgress import StudentProgressTable
 from .ResponsesComponents import StudentQuestionsSummary
 from .ResponsesComponents import IndividualStudentResponses
-from .DataComponent import DataSummary
-from .DataComponent import StudentData
-from .DataComponent import StudentDataSummary
 
 from solara.alias import rv
 
@@ -40,6 +37,9 @@ def initStudentID(student_id, roster):
 @solara.component
 def Dashboard(roster): 
     
+    if roster.value is None:
+        return
+    
     if len(roster.value.roster) == 0:
         solara.Markdown(f"There are no students in the class {roster.value.class_id}")
     
@@ -60,10 +60,13 @@ def Dashboard(roster):
               'Stage 5: </br> Uncertainty',
               'Stage 6: </br> Professional Data'
               ]
-    StudentProgressTable(roster, student_id = student_id, stage_labels = labels)
     
+    with solara.GridFixed(columns=1, row_gap='0px', justify_items='stretch', align_items='start'):
+        ClassProgress(roster)
+        StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
         
-    with solara.Card():
+            
+
         with solara.lab.Tabs(vertical=True, align='right', dark=True):
             
             with solara.lab.Tab(label="Summary", icon_name="mdi-text-box-outline"):
