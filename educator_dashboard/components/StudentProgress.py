@@ -52,7 +52,14 @@ def StudentProgressRow(progress,
 
 
 @solara.component
-def StudentProgressTable(roster = None, progress_data = None, student_id = None, on_student_id = None, headers = None, stage_labels = []):
+def StudentProgressTable(roster = None, 
+                         progress_data = None, 
+                         student_id = None, 
+                         on_student_id = None, 
+                         headers = None, 
+                         stage_labels = [],
+                         height = '100%'
+                         ):
     """
     progress_data should be either a dataframe or a dictionary
     this will work with reactive or non-reactive data

@@ -1,7 +1,11 @@
 <!-- A table for student progress -->
 <!-- uses a ProgressRow component for each student  -->
 <template>
-  <div id="table-from-rows" class="fixed_header">
+  <div 
+    id="table-from-rows" 
+    :class="['fixed_header_table_wrapper', class_]"
+    :style="cssProps"
+    >
     <table>
       <thead>
         <tr>
@@ -22,8 +26,20 @@ export default {
   props: {
     headers: Array,
     select_key: String,
-    selected: Object
+    selected: Object,
+    table_height: String,
+    class_: String,
+  },
+
+  computed: {
+    cssProps() {
+      return { 
+        '--table-height': this.table_height,
+        }
+
+    }
   }
+  
 };
 </script>
 
@@ -43,19 +59,19 @@ export default {
 }
 
 
-.fixed_header {
+.fixed_header_table_wrapper {
   overflow-y: auto;
   width: 100%;
-  height: 400px;
+  height: var(--table-height);
 }
 
 
-.fixed_header thead th {
+.fixed_header_table_wrapper > table > thead {
   position: sticky;
   top: 0;
   background-color: #f2f2f2;
   color: black;
-  z-index: 10;
+  z-index: 2;
 }
 
 
