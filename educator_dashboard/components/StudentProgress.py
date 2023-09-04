@@ -95,31 +95,31 @@ def StudentProgressTable(roster = None, progress_data = None, student_id = None,
             setfunc(int(value))
 
     
-    with solara.Card():
-        if headers is None:
-            headers = ['', 'Student ID', 'Student Name', 'Points/available' ] + stage_labels
-        with TableFromRows(headers=headers):
-            for i in range(len(data)):
-                max_stage_progress = data['progress'][i].split('%')[0]
-                if max_stage_progress.isnumeric():
-                    max_stage_progress = int(max_stage_progress)
-                else:
-                    max_stage_progress = 100
-                
-                # set up dictionary with progress
-                student_progress = {
-                    'student_id': str(data['student_id'][i]),
-                    'student_name': data['username'][i],
-                    'total_points': f"{data['total_score'][i]}/{data['out_of_possible'][i]}",
-                    'number_of_stages': 6,
-                    'current_stage': int(data['max_stage_index'][i]),
-                    'current_stage_progress': max_stage_progress,
-                }
 
-                StudentProgressRow(progress = student_progress,
-                                    selected_id = student_id,
-                                    on_selected_id = on_student_id_wrapper,
-                                    ) 
+    if headers is None:
+        headers = ['', 'Student ID', 'Student Name', 'Points/available' ] + stage_labels
+    with TableFromRows(headers=headers, table_height=height):
+        for i in range(len(data)):
+            max_stage_progress = data['progress'][i].split('%')[0]
+            if max_stage_progress.isnumeric():
+                max_stage_progress = int(max_stage_progress)
+            else:
+                max_stage_progress = 100
+            
+            # set up dictionary with progress
+            student_progress = {
+                'student_id': str(data['student_id'][i]),
+                'student_name': data['username'][i],
+                'total_points': f"{data['total_score'][i]}/{data['out_of_possible'][i]}",
+                'number_of_stages': 6,
+                'current_stage': int(data['max_stage_index'][i]),
+                'current_stage_progress': max_stage_progress,
+            }
+
+            StudentProgressRow(progress = student_progress,
+                                selected_id = student_id,
+                                on_selected_id = on_student_id_wrapper,
+                                ) 
 
     
     
