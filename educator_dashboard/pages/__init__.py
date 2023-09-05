@@ -17,6 +17,13 @@ from pandas import DataFrame
 @solara.component
 def Page():
     
+    # for testing use 
+    # - 195 (a full current class)
+    # - 192 (an empty class)
+    # - 188 (real spring beta class)
+    # - 185 (testing spring beta class)
+    # - 172 (old outdated class - should show stuff but probably incorrect)
+    # - 170 (outdated class - should show nothing)
     class_id = solara.use_reactive(195) # add class id here
     roster = solara.use_reactive(cast(Roster, None))
     first_run = solara.use_reactive(True)
