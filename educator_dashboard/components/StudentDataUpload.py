@@ -15,13 +15,14 @@ def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
     with solara.Columns([1, 1]):
         with solara.Column():
             TableUpload(file_info, upload_complete = file_uploaded)
-            SetColumns(table, out = name_dataframe)
         with solara.Column(gap="5px"):
-            if file_info.value is not None:
-                solara.Checkbox(label = "Does the file have a header row? (Un)Check if the displayed table looks incorrect",
-                        value=has_header,
-                    )
-                TableDisplay(file_info, has_header, on_table = table.set)
+            solara.Checkbox(label = "Does the file have a header row? (Un)Check if the displayed table looks incorrect",
+                    value=has_header,
+                )
+            TableDisplay(file_info, has_header, on_table = table.set)
+    
+    with solara.Div(style="border-top: 1px solid black; padding-top: 2rem"):
+        SetColumns(table, out = name_dataframe)
         
         
     
