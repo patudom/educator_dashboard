@@ -333,10 +333,10 @@ class Roster():
             tot_perc.append(state.percent_completion)
         return self.l2d(how_far)['string'], tot_perc
     
-    def report(self):
+    def report(self, refresh = False):
         "refreshing data"
         
-        if self._report is not None and not self._refresh:
+        if self._report is not None and not self._refresh and not refresh:
             return self._report
         
         if self._refresh:
@@ -388,8 +388,8 @@ class Roster():
         
         return df
     
-    def short_report(self):
-        if self._short_report is not None and not self._refresh:
+    def short_report(self, refresh = False):
+        if self._short_report is not None and not self._refresh and not refresh:
             return self._short_report
         
         if self._refresh:
