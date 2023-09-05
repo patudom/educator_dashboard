@@ -289,7 +289,7 @@ class Roster():
                     # use random string
                     student['student']['name'] = 'Student '+str(student['student_id'])
                 else:
-                    student['student']['name'] = student_names[student['student_id']]
+                    student['student']['name'] = student_names.get(student['student_id'], 'Student '+str(student['student_id']))
     
     @property
     def responses(self):
@@ -306,7 +306,7 @@ class Roster():
             students = self.l2d([student['student'] for student in self.roster])
             return self.make_dataframe(students)
         else:
-            return pd.DataFrame({'student_id':[], 'username':[], 'class_id':[], 'name': []})
+            return pd.DataFrame({'student_id':[], 'username':[], 'class_id':[]})
     
     @property
     def out_of(self):
