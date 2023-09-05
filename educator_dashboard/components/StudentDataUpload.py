@@ -2,6 +2,10 @@ import solara
 
 from .FileUpload import TableUpload, SetColumns, TableDisplay
 
+import reacton.ipyvuetify as rv
+
+import copy
+
 @solara.component
 def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
     
@@ -25,5 +29,37 @@ def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
         SetColumns(table, fixed_table = name_dataframe)
         
         
+
+
+@solara.component
+def StudentNameUpload(roster = None, student_names = None, on_update = None):
     
+
+    roster = solara.use_reactive(roster)
+    student_names = solara.use_reactive(student_names)
     
+
+    dialog = rv.Dialog(
+        v_slots = [{
+            'name': 'activator',
+            'variable': 'x',
+            'children': rv.Btn(v_on='x.on', color='primary', dark=True, children=['Upload Student Names File'])
+            
+        }]
+    )
+    
+    with dialog:
+        StudentDataUploadInterface(student_names)
+        
+    # need a copy in order to update
+    r = copy.copy(roster.value)
+    if student_names.value is not None:
+        
+        student_names_dict = {row['student_id']: row['name'] for _, row in student_names.value.iterrows()}
+        roster.value.set_student_names(student_names_dict)
+        roster.value.short_report(refresh = True)
+        if on_update is not None:
+            on_update(copy.copy(roster.value))
+        else:
+            roster.set(copy.copy(roster.value))
+        student_names.set(None)
