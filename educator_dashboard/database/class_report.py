@@ -278,6 +278,18 @@ class Roster():
             return [student['student_id'] for student in self.roster]
         else:
             return []
+        
+    def set_student_names(self, student_names = None):
+        """
+        student_names is a dictionary of student_id: name
+        """
+        if len(self.roster) > 0:
+            for student in self.roster:
+                if student_names is None:
+                    # use random string
+                    student['student']['name'] = 'Student '+str(student['student_id'])
+                else:
+                    student['student']['name'] = student_names[student['student_id']]
     
     @property
     def responses(self):
@@ -294,7 +306,7 @@ class Roster():
             students = self.l2d([student['student'] for student in self.roster])
             return self.make_dataframe(students)
         else:
-            return pd.DataFrame({'student_id':[], 'username':[], 'class_id':[]})
+            return pd.DataFrame({'student_id':[], 'username':[], 'class_id':[], 'name': []})
     
     @property
     def out_of(self):
@@ -350,6 +362,8 @@ class Roster():
         df['student_id'] = roster.student_id['student_id']
         # add a string column containing roster.students['username']
         df['username'] = roster.students['username'].values
+        if 'name' in roster.students.columns:
+            df['name'] = roster.students['name'].values
         df['class_id'] = roster.class_id
         completion_string, completion_percent = roster.fraction_completed()
         df['progress'] = completion_string
@@ -395,6 +409,8 @@ class Roster():
 
         # add a string column containing roster.students['username']
         df['username'] = roster.students['username'].values
+        if 'name' in roster.students.columns:
+            df['name'] = roster.students['name'].values
         df['class_id'] = roster.class_id
         completion_string, completion_percent = roster.fraction_completed()
         df['progress'] = completion_string
