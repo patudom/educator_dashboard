@@ -23,10 +23,7 @@ def IndividualStudentResponses(roster, sid=None):
     
 
     if sid.value is None:
-        solara.Markdown('**Select a student to see their responses**')
-        
-        solara.Select(label = 'Select Student', values = roster.student_ids, value=sid)
-        
+        solara.Markdown('**Select a student from the table above to see their responses**')
         return
     
     solara.Markdown(f"**Current Student**: {sid}")
