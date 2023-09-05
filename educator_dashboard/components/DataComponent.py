@@ -61,7 +61,10 @@ def slope2age(h0):
 @solara.component
 def AgeHoHistogram(data, age_col = 'age', h0_col = 'h0', which = 'age'):
     
-    xmin, xmax = floor(data[age_col].min()), ceil(data[age_col].max())
+    col_data = data[age_col]; 
+    print(col_data)
+    col_data = col_data[col_data>0]; 
+    xmin, xmax = floor(col_data.min()), ceil(col_data.max())
     categories = list(range(xmin, xmax+1))
     fig = px.histogram(data_frame = data, x = which, labels={age_col:'Age of Universe (Gyr)'}, category_orders={age_col: categories})
     fig.update_xaxes(type='category')
