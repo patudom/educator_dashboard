@@ -85,6 +85,8 @@ def SetColumns(table, out = None):
     if table.value is not None:
 
         cols = list(table.value.columns.to_numpy().astype(str))
+        cols = [c.strip() for c in cols]
+        table.value.columns = cols
         student_id_column = solara.use_reactive('student_id')
         name_column = solara.use_reactive('name')
     
