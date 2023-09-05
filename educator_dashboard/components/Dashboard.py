@@ -34,7 +34,7 @@ def initStudentID(student_id, roster):
     student_id.set(None)
     return 
         
-        
+
 @solara.component
 def ShowReport(roster):
     if len(roster.value.roster) == 0:
@@ -68,6 +68,7 @@ def Dashboard(roster, student_names = None):
     # make sure the student_id is valid
     initStudentID(student_id, roster)
     
+    StudentNameUpload(roster, student_names)
 
     # ClassProgress(df, roster)
     labels = ['Stage 1: </br> Velocities', 
@@ -78,12 +79,8 @@ def Dashboard(roster, student_names = None):
               'Stage 6: </br> Professional Data'
               ]
     
-    
-    StudentNameUpload(roster, student_names)
-    
     with solara.GridFixed(columns=1, row_gap='0px', justify_items='stretch', align_items='start'):
         ClassProgress(roster)
-        # ShowReport(roster)
         StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
         
             
