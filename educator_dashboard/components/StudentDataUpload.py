@@ -10,10 +10,11 @@ def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
     has_header = solara.use_reactive(False)
     table = solara.use_reactive(None)
     
+    file_uploaded = solara.use_reactive(False)
 
     with solara.Columns([1, 1]):
         with solara.Column():
-            TableUpload(file_info)
+            TableUpload(file_info, upload_complete = file_uploaded)
             SetColumns(table, out = name_dataframe)
         with solara.Column(gap="5px"):
             if file_info.value is not None:

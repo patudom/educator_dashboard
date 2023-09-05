@@ -6,23 +6,39 @@ import pandas as pd
 
 
 @solara.component
-def TableUpload(file_info = None):
+def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
+    
+    if upload_complete is None:
+        return
+    
+    valid_file, set_valid_file = solara.use_state(False)
     
     def on_file(file: FileInfo):
         filename = file['name']
         
-        if filename.endswith('.csv') or filename.endswith('.xlsx') or filename.endswith('.xls'):
+        if filename.endswith('.csv') or (allow_excel and (filename.endswith('.xlsx') or filename.endswith('.xls'))):
             file_info.set(file)
+            upload_complete.set(True)
+            set_valid_file(True)
         else:
             solara.Markdown(f"File type {filename.split('.')[-1]} not supported. Please upload a .csv or .xlsx file")
             return
 
-            
-    solara.FileDrop(
-        label="Drag and drop a file (CSV or Excel) containing a student_id and name column. Names should NOT include commas (,) if using a CSV file",
-        on_file=on_file,
-        lazy=False, # puts data in the [data] part of FileInfo
-    )
+    if not upload_complete.value:
+        solara.FileDrop(
+            label="Drag and drop a file (CSV or Excel) containing a student_id and name column. Names should NOT include commas (,) if using a CSV file",
+            on_file=on_file,
+            lazy=False, # puts data in the [data] part of FileInfo
+        )
+    else:
+        def on_click():
+            file_info.set(None)
+            upload_complete.set(False)
+        if valid_file:
+            solara.Markdown("File uploaded successfully")
+            solara.Button(icon_name = 'mdi-file-upload', label = "Upload another file", on_click = on_click)
+        else:
+            solara.Markdown("File upload failed. Please try again using a CSV file. ")
 
 
 @solara.component
