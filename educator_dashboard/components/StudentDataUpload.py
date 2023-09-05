@@ -22,7 +22,7 @@ def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
             TableDisplay(file_info, has_header, on_table = table.set)
     
     with solara.Div(style="border-top: 1px solid black; padding-top: 2rem"):
-        SetColumns(table, out = name_dataframe)
+        SetColumns(table, fixed_table = name_dataframe)
         
         
     

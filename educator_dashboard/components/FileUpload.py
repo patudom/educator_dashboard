@@ -80,7 +80,8 @@ def TableDisplay(file_info, has_header = False, on_table = None):
     solara.DataFrame(table.head(5))
 
 @solara.component
-def SetColumns(table, out = None):
+def SetColumns(table, fixed_table = None):
+    
     
     if table.value is not None:
 
@@ -103,5 +104,5 @@ def SetColumns(table, out = None):
         if student_id_column.value in cols and name_column.value in cols:
             df = table.value[[student_id_column.value, name_column.value]]
             df.columns = ['student_id', 'name']
-            out.set(df)
+            fixed_table.set(df)
 
