@@ -116,7 +116,7 @@ def StudentProgressTable(roster = None,
             # set up dictionary with progress
             student_progress = {
                 'student_id': str(data['student_id'][i]),
-                'student_name': data['username'][i],
+                'student_name': data['name'][i] if 'name' in data.columns else data['username'][i],
                 'total_points': f"{data['total_score'][i]}/{data['out_of_possible'][i]}",
                 'number_of_stages': 6,
                 'current_stage': int(data['max_stage_index'][i]),
