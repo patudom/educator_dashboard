@@ -83,7 +83,7 @@ def Dashboard(roster, student_names = None):
     
     with solara.GridFixed(columns=1, row_gap='0px', justify_items='stretch', align_items='start'):
         ClassProgress(roster)
-        ShowReport(roster)
+        # ShowReport(roster)
         StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
         
             
