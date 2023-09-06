@@ -1,11 +1,31 @@
 import solara
 import plotly.express as px
 
-from math import ceil, floor
+from pandas import DataFrame
+
+from collections import Counter
+
+def matching_cols(df, val, col, count = None):
+    """
+    Return a dictionary of columns and values for a given value of a column
+    """
+ 
+    out = {c:df[c][df[col]==val].to_list() for c in df.columns}
+    out.update({'count':count or len(out[col])})
+    out.update({col:val})
+    return out
+
+def aggregrate(dataframe, col):
+    vals = Counter(dataframe[col])
+    return {v:matching_cols(dataframe, v, col, count)  for v,count in vals.items()}
+
 
 @solara.component
 def AgeHoHistogram(data, age_col = 'age', h0_col = 'h0', which = 'age'):
     
+    # manual aggregation. instead use pandas groupby and agg
+    # df_agg = DataFrame(aggregrate(data, which)).T
+    # df_agg.sids = df_agg.sids.apply(lambda x:'<br>' + '<br>'.join(x))
     def sids_agg(sids):
         return '<br>'+ '<br>'.join(sids)
 
