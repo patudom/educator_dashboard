@@ -6,8 +6,10 @@ from math import ceil, floor
 @solara.component
 def AgeHoHistogram(data, age_col = 'age', h0_col = 'h0', which = 'age'):
     
+    def sids_agg(sids):
+        return '<br>'+ '<br>'.join(sids)
 
-    df_agg = data.groupby('age', as_index=False).agg(count=('age','size'), sids = ('sids', list))
+    df_agg = data.groupby('age', as_index=False).agg(count=('age','size'), sids = ('sids', sids_agg))
 
     labels = {'age':'Age of Universe (Gyr)', 'sids':'Student ID'}
 
