@@ -26,8 +26,6 @@ def IndividualStudentResponses(roster, sid=None):
         solara.Markdown('**Select a student from the table above to see their responses**')
         return
     
-    solara.Markdown(f"**Current Student**: {sid}")
-    
     # multiple choice questions
     with solara.lab.Tabs():
         with solara.lab.Tab("Multiple Choice"):
