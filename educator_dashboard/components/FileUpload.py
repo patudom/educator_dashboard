@@ -27,6 +27,23 @@ def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
         
         upload_complete.set(True)
     
+    def on_click():
+        file_info.set(None)
+        upload_complete.set(False)
+        set_msg("")
+    
+    with solara.Div():
+        solara.Markdown("Upload a CSV (comma-separated value) file containing student names and IDs. Include a header row with column names 'student_id' and 'name'.")
+        if not upload_complete.value:
+            solara.FileDrop(
+                on_file=on_file,
+                lazy=False, # puts data in the [data] part of FileInfo
+            )
+        if upload_complete.value and valid_file:
+            solara.Success(msg, dense=True, outlined=True, icon='mdi-file-check')
+        elif upload_complete.value and not valid_file:
+            solara.Error(msg, dense=True, outlined=True, icon='mdi-file-alert')
+        
     
     
     
