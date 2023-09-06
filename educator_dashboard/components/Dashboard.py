@@ -60,6 +60,7 @@ def Dashboard(roster):
     
     with solara.GridFixed(columns=1, row_gap='0px', justify_items='stretch', align_items='start'):
         with solara.Card():
+            solara.Markdown (f"## Class Progress")
             ClassProgress(roster)
             StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
 
