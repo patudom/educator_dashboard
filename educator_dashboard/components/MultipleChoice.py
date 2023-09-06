@@ -45,7 +45,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
     tries_1d = Series(tries_1d).dropna()
     
     
-    with solara.Card() as main:
+    with solara.GridFixed(columns=1, row_gap='2rem', justify_items='stretch', align_items='start') as main:
         solara.Markdown(f"### Stage {stage}")
         with solara.Columns([1,1]):
             
@@ -91,6 +91,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
                     
                     with Collapsable(header='Show Table'):
                         DataTable(df = df[['student_id', 'tries']], class_ = "mc-question-summary-table")
+        rv.Divider()
     return main
 
                 
@@ -169,7 +170,7 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
                 if dquest is not None:
                     solara.Markdown(f"**Question**: {dquest}")
                 else:
-                    solara.Markdown(f"**Select a question form table** ")
+                    solara.Markdown(f"**Select a question from table** ")
             with solara.Column():
                 DataTable(df = df, headers = headers, on_row_click=row_action, show_index=True)
             
