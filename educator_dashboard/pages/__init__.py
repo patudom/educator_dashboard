@@ -16,6 +16,8 @@ from pandas import DataFrame
 
 @solara.component
 def Page():
+    solara.Title("CosmicDS Dashboard")
+
     
     # for testing use 
     # - 195 (a full current class)
@@ -28,16 +30,17 @@ def Page():
     roster = solara.use_reactive(cast(Roster, None))
     first_run = solara.use_reactive(True)
     
-    story_name = "Hubble Data Story"
+    story_name = "HubbleDS"
     
-    with solara.Card():
-        #center on page
-        solara.Markdown(f"# {story_name.title()} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
+    with solara.Columns([1, 10, 2]):
+        solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
+
+        solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
 
         SetClass(class_id, roster, first_run)
-        
-        Dashboard(roster) 
-        # solara.DataFrame(df.value)
+    
+    Dashboard(roster) 
+    # solara.DataFrame(df.value)
 
 
 # The following line is required only when running the code in a Jupyter notebook:
