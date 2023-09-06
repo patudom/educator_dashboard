@@ -45,7 +45,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
     tries_1d = Series(tries_1d).dropna()
     
     
-    with solara.GridFixed(columns=1, row_gap='2rem', justify_items='stretch', align_items='start') as main:
+    with solara.GridFixed(columns=1, justify_items='stretch', align_items='start') as main:
         solara.Markdown(f"### Stage {stage}")
         with solara.Columns([1,1]):
             
@@ -79,7 +79,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
             # a column for a particular question showing all student responses
             with solara.Column():
                 if (selected_question.value is not None) and (selected_question.value != '') and (selected_question.value in flat_mc_responses.keys()):
-                    
+                    # Add numeral index after Question
                     solara.Markdown(f"""***Question:***
                                 {roster.question_keys()[selected_question.value]['text']}
                                 """)
