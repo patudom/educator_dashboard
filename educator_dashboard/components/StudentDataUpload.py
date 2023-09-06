@@ -11,7 +11,7 @@ def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
     
     
     file_info = solara.use_reactive(None)
-    has_header = solara.use_reactive(False)
+    has_header = solara.use_reactive(True)
     table = solara.use_reactive(None)
     
     file_uploaded = solara.use_reactive(False)
@@ -29,10 +29,10 @@ def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
                         )
             TableDisplay(file_info, has_header, on_table = table.set)
     
-    with solara.Div(style="border-top: 1px solid black; padding-top: 2rem"):
+    with solara.Div():
         SetColumns(table, fixed_table = name_dataframe)
         
-        
+
 
 
 @solara.component
@@ -41,19 +41,26 @@ def StudentNameUpload(roster = None, student_names = None, on_update = None):
 
     roster = solara.use_reactive(roster)
     student_names = solara.use_reactive(student_names)
+    student_names_set = solara.use_reactive(False)
     
-
+    dialog_open = solara.use_reactive(False)
+        
     dialog = rv.Dialog(
+        v_model = dialog_open.value,
         v_slots = [{
             'name': 'activator',
-            'variable': 'x',
-            'children': rv.Btn(v_on='x.on', color='primary', dark=True, children=['Upload Student Names File'])
-            
+            'children': solara.Button(label = "Upload Student Name File", on_click = lambda: dialog_open.set(True), color='primary')
         }]
     )
     
+    
     with dialog:
-        StudentDataUploadInterface(student_names)
+        with solara.Card():
+            StudentDataUploadInterface(student_names)
+            if student_names_set.value:
+                solara.Success("Successfully updated student names!", dense=True, outlined=True)
+            with solara.CardActions():
+                solara.Button(icon_name="mdi-close-circle",label = "Close", on_click = lambda: dialog_open.set(False), text=True, outlined=True)
         
     # need a copy in order to update
     r = copy.copy(roster.value)
@@ -66,4 +73,5 @@ def StudentNameUpload(roster = None, student_names = None, on_update = None):
             on_update(copy.copy(roster.value))
         else:
             roster.set(copy.copy(roster.value))
+        student_names_set.set(True)
         student_names.set(None)
