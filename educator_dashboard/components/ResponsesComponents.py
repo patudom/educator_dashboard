@@ -53,6 +53,8 @@ def StudentQuestionsSummary(roster, sid = None):
     body {
         padding-inline: 5% 
     }
+
+    /* This disables the plotly tools */
     .modebar{
       display: none !important;
     }   
