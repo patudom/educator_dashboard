@@ -20,9 +20,13 @@ def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
         with solara.Column():
             TableUpload(file_info, upload_complete = file_uploaded)
         with solara.Column(gap="5px"):
-            solara.Checkbox(label = "Does the file have a header row? (Un)Check if the displayed table looks incorrect",
-                    value=has_header,
-                )
+            rv.Checkbox(v_model = has_header.value, 
+                        on_v_model = has_header.set,
+                        v_slots=[{
+                            'name': 'label',
+                            'children': [solara.Markdown('Does the file have a header row? <br> (Un/check if unsure. First row will be used as header if checked.)')]
+                        }]
+                        )
             TableDisplay(file_info, has_header, on_table = table.set)
     
     with solara.Div(style="border-top: 1px solid black; padding-top: 2rem"):
