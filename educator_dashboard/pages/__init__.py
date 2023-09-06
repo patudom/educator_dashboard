@@ -17,16 +17,27 @@ from pandas import DataFrame
 @solara.component
 def Page():
     
+    # for testing use 
+    # - 195 (a full current class)
+    # - 192 (an empty class)
+    # - 188 (real spring beta class)
+    # - 185 (testing spring beta class)
+    # - 172 (old outdated class - should show stuff but probably incorrect)
+    # - 170 (outdated class - should show nothing)
     class_id = solara.use_reactive(195) # add class id here
     roster = solara.use_reactive(cast(Roster, None))
-    df = solara.use_reactive(DataFrame())
-    data = solara.use_reactive(DataFrame())
     first_run = solara.use_reactive(True)
-
-    SetClass(class_id, df, data, roster, first_run)
     
-    Dashboard(df, data, roster) 
-    # solara.DataFrame(df.value)
+    story_name = "Hubble Data Story"
+    
+    with solara.Card():
+        #center on page
+        solara.Markdown(f"# {story_name.title()} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
+
+        SetClass(class_id, roster, first_run)
+        
+        Dashboard(roster) 
+        # solara.DataFrame(df.value)
 
 
 # The following line is required only when running the code in a Jupyter notebook:

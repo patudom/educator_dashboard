@@ -8,11 +8,20 @@ from pandas import DataFrame
 import plotly.express as px
 import plotly.graph_objects as go
 
+from .ClassProgress import ClassProgress
 from .StudentProgress import StudentProgressTable
 from .ResponsesComponents import StudentQuestionsSummary
 from .ResponsesComponents import IndividualStudentResponses
-from .DataComponent import DataSummary
-from .DataComponent import StudentData
+
+from solara.alias import rv
+
+import inspect
+def print_function_name(func):
+    def wrapper(*args, **kwargs):
+        calling_function_name = inspect.stack()[1][3]
+        print(f"Calling  {func.__name__} from {calling_function_name}")
+        return func(*args, **kwargs)
+    return wrapper
 
 @solara.component
 def initStudentID(student_id, roster):
@@ -26,44 +35,45 @@ def initStudentID(student_id, roster):
         
 
 @solara.component
-def Dashboard(df, data, roster): 
+def Dashboard(roster): 
+    
+    if roster.value is None:
+        return
+    
+    if len(roster.value.roster) == 0:
+        solara.Markdown(f"There are no students in the class {roster.value.class_id}")
     
     student_id = solara.use_reactive(None)
+    old_set = student_id.set
+    student_id.set = print_function_name(old_set)
     
     # a non-displaying component to 
     # make sure the student_id is valid
     initStudentID(student_id, roster)
     
 
-    def on_cell_click(column, row_index):   
-        student_id.set(df.value.iloc[row_index].student_id)
-
-    cell_actions = [solara.CellAction(name=None, icon="mdi-account-details",on_click=on_cell_click)]
-
-    # TableDisplay(df.value,items_per_page=len(df.value)//3,cell_actions = cell_actions)
+    # ClassProgress(df, roster)
+    labels = ['Stage 1: </br> Velocities', 
+              'Stage 2: </br> Ang size Intro', 
+              'Stage 3: </br> Angular Size',
+              'Stage 4: </br> Find H0',
+              'Stage 5: </br> Uncertainty',
+              'Stage 6: </br> Professional Data'
+              ]
     
-
-    StudentProgressTable(df, on_student_id=student_id.set)
-    
-    
-    solara.Markdown(f"**Currently selected student**: {student_id}")
-    
-    with solara.Card():
-        with solara.lab.Tabs():
+    with solara.GridFixed(columns=1, row_gap='0px', justify_items='stretch', align_items='start'):
+        ClassProgress(roster)
+        StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
+        
             
-            with solara.lab.Tab("Student Question Summary"):
+
+        with solara.lab.Tabs(vertical=True, align='right', dark=True):
+            
+            with solara.lab.Tab(label="Summary", icon_name="mdi-text-box-outline"):
                 StudentQuestionsSummary(roster, student_id)
                 
-            with solara.lab.Tab("Individual Student Questions"):
+            with solara.lab.Tab(label="Per Student" if student_id.value is None else f"For Student {student_id.value}", icon_name="mdi-file-question-outline"):
                 IndividualStudentResponses(roster, student_id)
         
-            with solara.lab.Tab("Student Data", style={"transition": "none"}):
-                    
-                with solara.Columns([1,1]):
-                    with solara.Column():
-                        DataSummary(data, student_id)
-                    
-                    with solara.Column():
-                        cols = ['student_id', 'galaxy_id','velocity_value', 'est_dist_value', 'obs_wave_value', 'ang_size_value']
-                        StudentData(dataframe = data, id_col="student_id", sid = student_id, cols_to_display = cols)
-                            
+            # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
+            #     StudentDataSummary(roster, student_id = student_id)

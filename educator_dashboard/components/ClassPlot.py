@@ -13,7 +13,8 @@ def ClassPlot(dataframe,
             xy_label = {"x":{'label': 'Distance', 'units': 'Mpc'}, "y":{'label': 'Velocity', 'units': 'km/s'}},
             on_click = None,
             select_on = None,
-            selected = solara.reactive(None)
+            selected = solara.reactive(None),
+            allow_click = True
               ):
     
     
@@ -23,7 +24,8 @@ def ClassPlot(dataframe,
         select_on = "student_id"
     
     if dataframe is None:
-        return
+        solara.Markdown("No data")
+        return 
     
     config = {
             'remove': [
@@ -39,9 +41,12 @@ def ClassPlot(dataframe,
     
     if x_col not in dataframe.columns:
         print(f"ClassPlot: {x_col} not in dataframe")
+        solara.Markdown(f"**{x_col}** not in dataframe")
         return
     
-    fig = px.scatter(dataframe, x=x_col, y=y_col, custom_data = label_col)
+    labels =  {x_col: "{label} ({units})".format(**xy_label['x']),  
+               y_col: "{label} ({units})".format(**xy_label['y'])}
+    fig = px.scatter(dataframe, x=x_col, y=y_col, custom_data = label_col, labels = labels)
     fig.update_layout(modebar = config)
 
 
@@ -52,6 +57,8 @@ def ClassPlot(dataframe,
     fig.update_traces(hovertemplate=hovertemplate) 
     
     def click_action(points):
+        if not allow_click:
+            return
         selected_index = points['points']['point_indexes'][0]
         selected.set(dataframe.iloc[selected_index][select_on])
         if on_click is not None:

@@ -2,7 +2,12 @@ import solara
 
    
 @solara.component_vue('TableFromRows.vue', vuetify=True)
-def TableFromRows(headers = None, rows = None): 
+def TableFromRows(children = [], 
+                  headers = None, 
+                  select_key = None, 
+                  selected = None, 
+                  table_height = '30vh',
+                  class_ = ''): 
     """
     build a table from a sequence of rows
     the rows should be solara components which

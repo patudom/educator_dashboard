@@ -1,4 +1,8 @@
-div {
+
+.student-select {
+    width: 400px;
 }
 
-
+.mc-question-summary-table td:first-child {
+    background-color: aqua;
+}

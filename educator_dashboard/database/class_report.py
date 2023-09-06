@@ -9,6 +9,25 @@ HUBBLE_ROUTE_PATH = "hubbles_law"
 
 import astropy.units as u
 from math import nan
+
+class Student():
+    
+    student_id = None
+    class_id = None
+    story_state = {}
+    stage_state = {}
+    _data = None
+    _mc_questions = {}
+    _fr_questions = {}
+    
+    
+    def __init__(self, student_id = None):
+        self.student_id = student_id
+        
+    @property
+    def data(self):
+        return self._data
+
 class Roster():
     
     def __init__(self, class_id = None):
@@ -17,7 +36,6 @@ class Roster():
         self._fr_questions = None
         self._questions = None
         self._question_keys = None
-        self._data = None
         self._report = None
         self._short_report = None
         
@@ -26,9 +44,19 @@ class Roster():
         self.class_id = class_id
         self.query = QueryCosmicDSApi(class_id = class_id, story=HUBBLE_ROUTE_PATH)
         self.data = None
+        self.student_data = {}
         self.class_summary = None
         self.grab_data()
-        
+    
+    def __eq__(self, other):
+        if other.short_report() is None:
+            return False
+        return self.short_report() == other.short_report()
+    
+    @staticmethod
+    def flatten_dict(d):
+        return flatten(d)
+    
     def grab_data(self):
         print('Getting roster')
         self.roster = self.query.get_roster()
@@ -78,17 +106,33 @@ class Roster():
 
     @staticmethod
     def list_of_dicts_to_dict_of_lists(list_of_dicts, fill_val = None):
-        keys = list_of_dicts[0].keys()
-        dict_of_lists = {k: [o[k] if k in o.keys() else fill_val for o in list_of_dicts] for k in keys}
+        # keys = list_of_dicts[0].keys()
+        keys = []
+        for d in list_of_dicts:
+            if isinstance(d, dict):
+                keys.extend([k for k in d.keys() if (k not in keys) and (k is not None)])
+        
+        dict_of_lists = {k: [o[k] if (hasattr(o,'keys') and (k in o.keys())) else fill_val for o in list_of_dicts] for k in keys}
         return dict_of_lists
     
     def l2d(self, list_of_dicts, fill_val = None):
         return self.list_of_dicts_to_dict_of_lists(list_of_dicts, fill_val)
     
-    def get_class_data(self, refresh = False):
+    def get_class_data(self, refresh = False, df = False):
         if self.data is None or self._refresh or refresh:
-            self.data = self.query.get_class_data(class_id = self.class_id)
+            res = self.query.get_class_data(class_id = self.class_id)
+            self.data = res if res is not None else {'student_id':[]}
+            
+        if df:
+            return pd.DataFrame(self.data)
         return self.data
+    
+    def get_student_data(self, student_id, refresh = False, df = False):
+        if (student_id not in self.student_data.keys()) or self._refresh or refresh:
+            self.student_data[student_id] = self.query.get_student_data(student_id)['measurements']
+        if df:
+            return pd.DataFrame(self.student_data[student_id])
+        return self.student_data[student_id]
 
     def get_class_summary(self, refresh = False):
         if self.class_summary is None or self._refresh or refresh:
@@ -149,10 +193,11 @@ class Roster():
     def measurements(self, refresh = False):
         if len(self.roster) > 0:
             if self.data is None or refresh:
-                out = self.get_class_data(refresh = refresh)
-            else: 
-                out = self.data
-            return pd.DataFrame(out)
+                self.data = self.get_class_data(refresh = refresh)
+            
+            return pd.DataFrame(self.data)
+        else:
+            return pd.DataFrame()
     
     
     def multiple_choice_questions(self):
@@ -165,6 +210,7 @@ class Roster():
             return out
         else:
             return {'student_id': self.student_ids}
+        
     
     def free_response_questions(self):
         if (self._fr_questions) is not None and (not self._refresh):
@@ -182,12 +228,16 @@ class Roster():
         if (self._questions is not None) and (not self._refresh):
             return self._questions
         
-        fr = self.free_response_questions()
-        mc = self.multiple_choice_questions()
-        df_fr = flatten(self.make_dataframe(fr, include_class_id=False, include_username=False))
-        df_mc = flatten(self.make_dataframe(mc, include_class_id=False, include_username=False))
-        self._questions = pd.merge(df_mc, df_fr, how='left', on='student_id')
+        if len(self.roster) > 0:
+            fr = self.free_response_questions()
+            mc = self.multiple_choice_questions()
+            df_fr = flatten(self.make_dataframe(fr, include_class_id=False, include_username=False))
+            df_mc = flatten(self.make_dataframe(mc, include_class_id=False, include_username=False)).astype('Int64')
+            self._questions = pd.merge(df_mc, df_fr, how='left', on='student_id')
+        else:
+            self._questions = pd.DataFrame({'student_id':self.student_ids})
         return self._questions
+        
     
     def get_questions_text(self):
         return self.query.get_questions()
@@ -203,15 +253,20 @@ class Roster():
         for k in keys:
             if testing:
                 q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
+            elif (k not in questions.keys()):
+                print(f'{k} not in question database')
+                q = {'text': 'Not in Question Database', 'shorthand': ''}
             else:
                 q = questions[k]
             
             if q is not None:
+                nice_tag = ' '.join(k.replace('_', ' ').replace('-', ' ').split())
+                nice_tag = nice_tag[0].upper() + nice_tag[1:]
+                
                 short = q['shorthand']
                 if short == '':
-                    short = ' '.join(k.replace('_', ' ').replace('-', ' ').split())
-                    short = short[0].upper() + short[1:]
-                self._question_keys[k] = {'text':q['text'], 'shorthand':short}
+                    short = nice_tag
+                self._question_keys[k] = {'text':q['text'], 'shorttext':short, 'nicetag': nice_tag}
                 
         return self._question_keys
                 
