@@ -8,13 +8,11 @@ import pandas as pd
 @solara.component
 def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
     
-    valid_file, set_valid_file = solara.use_state(False)
+    valid_file, set_valid_file = solara.use_state(True)
     msg, set_msg = solara.use_state("")
     
     def on_file(file: FileInfo):
         filename = file['name']
-        
-        upload_complete.set(True)
         
         isCSV = filename.endswith('.csv')
         isExcel = filename.endswith('.xlsx') or filename.endswith('.xls')
@@ -25,24 +23,9 @@ def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
             set_msg(f"Successfully uploaded {filename}!")
         else:
             set_valid_file(False)
-            set_msg(f"Upload of {filename} failed. Please upload a v CSV file.")
-    
-
-    solara.FileDrop(
-        label="Drag and drop a file (CSV or Excel) containing a student_id and name column. Names should NOT include commas (,) if using a CSV file",
-        on_file=on_file,
-        lazy=False, # puts data in the [data] part of FileInfo
-    )
-
-    
-    def on_click():
-        file_info.set(None)
-        upload_complete.set(False)
-        set_msg("replacing")
-
-    solara.Markdown(msg)
-    if upload_complete.value:
-        solara.Markdown("Drag in a new file to replace with previous file")
+            set_msg(f"Upload of {filename} failed. Please upload a CSV file.")
+        
+        upload_complete.set(True)
     
     
     
