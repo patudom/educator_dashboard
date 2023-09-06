@@ -6,12 +6,13 @@ from math import ceil, floor
 @solara.component
 def AgeHoHistogram(data, age_col = 'age', h0_col = 'h0', which = 'age'):
     
-    col_data = data[age_col]; 
-    col_data = col_data[col_data>0]; 
-    xmin, xmax = floor(col_data.min()), ceil(col_data.max())
-    categories = list(range(xmin, xmax+1))
-    fig = px.histogram(data_frame = data, x = which, labels={age_col:'Age of Universe (Gyr)'}, category_orders={age_col: categories})
-    fig.update_xaxes(type='category')
+
+    df_agg = data.groupby('age', as_index=False).agg(count=('age','size'), sids = ('sids', list))
+
+    labels = {'age':'Age of Universe (Gyr)', 'sids':'Student ID'}
+
+    fig = px.bar(data_frame = df_agg, x = 'age', y='count', hover_data='sids', labels = labels)
+
     fig.update_layout(showlegend=False, title_text='Class Age Distribution')
     # show only integers on y-axis
     fig.update_yaxes(tick0=0, dtick=1)
