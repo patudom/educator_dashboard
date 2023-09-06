@@ -44,6 +44,8 @@ def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
         elif upload_complete.value and not valid_file:
             solara.Error(msg, dense=True, outlined=True, icon='mdi-file-alert')
         
+        solara.Button("Clear", on_click=on_click, disabled=not upload_complete.value)
+
     
     
     
