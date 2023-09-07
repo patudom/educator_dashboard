@@ -53,6 +53,10 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
 
 from numpy import nan
 def get_slope(x, y):
+    if x is None:
+        return nan
+    if y is None:
+        return nan
     # slope through origin
     return nan if (sum(x**2) == 0) else (sum(x*y)/sum(x**2))
 def slope2age(h0):
