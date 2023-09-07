@@ -51,12 +51,17 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
             ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = False)
     
 
-from numpy import nan
+from numpy import nan, array
 def get_slope(x, y):
     if x is None:
         return nan
     if y is None:
         return nan
+    # drop None values
+    pairs = [(xi,yi) for xi,yi in zip(x,y) if (xi is not None) and (yi is not None)]
+    if len(pairs) == 0:
+        return nan
+    x, y = array(pairs).T
     # slope through origin
     return nan if (sum(x**2) == 0) else (sum(x*y)/sum(x**2))
 def slope2age(h0):
