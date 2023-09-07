@@ -51,7 +51,7 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
             ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = False)
     
 
-from math import nan
+from numpy import nan
 def get_slope(x, y):
     # slope through origin
     return nan if (sum(x**2) == 0) else (sum(x*y)/sum(x**2))
@@ -117,7 +117,7 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
         with solara.Column(gap="0px"):
             with solara.Column(gap="0px"):
                 single_student_df = roster.get_student_data(sid.value, df = True)
-                h0 = get_slope(single_student_df['est_dist_value'], single_student_df['velocity_value'])
+                h0 = get_slope(single_student_df['est_dist_value'].to_numpy(), single_student_df['velocity_value'].to_numpy())
                 age = slope2age(h0)
                 solara.Markdown(f"**Hubble Constant**: {h0:.1f} km/s/Mpc")
                 solara.Markdown(f"**Age of Universe**: {age:.1f} Gyr")
@@ -130,10 +130,12 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
             solara.Markdown("There is no data for this class")
             return
         sids = dataframe[id_col].unique()
-        h0 = [get_slope(dataframe[dataframe[id_col] == sid]['est_dist_value'], dataframe[dataframe[id_col] == sid]['velocity_value']) for sid in sids]
+        h0 = [get_slope(dataframe[dataframe[id_col] == sid]['est_dist_value'].to_numpy(), dataframe[dataframe[id_col] == sid]['velocity_value'].to_numpy()) for sid in sids]
         age = [slope2age(h) for h in h0]
-        
-        data = DataFrame({'sids': [str(s) for s in sids], 'h0': around(h0,0).astype(int), 'age': around(age,0).astype(int)})
+        data = DataFrame({'sids': [str(s) for s in sids], 'h0': h0, 'age': age})
+        data.dropna(inplace=True, axis=0) # remove rows with nan
+        data['h0'] = data['h0'].apply(lambda x: around(x,0)).astype(int) 
+        data['age'] = data['age'].apply(lambda x: around(x,0)).astype(int)
         
         AgeHoHistogram(data)
 
