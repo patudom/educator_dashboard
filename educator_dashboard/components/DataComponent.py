@@ -53,9 +53,7 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
 
 from numpy import nan, array
 def get_slope(x, y):
-    if x is None:
-        return nan
-    if y is None:
+    if (x is None) or (y is None):
         return nan
     # drop None values
     pairs = [(xi,yi) for xi,yi in zip(x,y) if (xi is not None) and (yi is not None)]
@@ -142,9 +140,8 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
         h0 = [get_slope(dataframe[dataframe[id_col] == sid]['est_dist_value'].to_numpy(), dataframe[dataframe[id_col] == sid]['velocity_value'].to_numpy()) for sid in sids]
         age = [slope2age(h) for h in h0]
         data = DataFrame({'sids': [str(s) for s in sids], 'h0': h0, 'age': age})
-        data.dropna(inplace=True, axis=0) # remove rows with nan
-        data['h0'] = data['h0'].apply(lambda x: around(x,0)).astype(int) 
-        data['age'] = data['age'].apply(lambda x: around(x,0)).astype(int)
+        data['h0'] = data['h0'].apply(lambda x: around(x,0))
+        data['age'] = data['age'].apply(lambda x: around(x,0))
         
         AgeHoHistogram(data)
 

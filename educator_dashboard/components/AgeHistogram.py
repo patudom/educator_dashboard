@@ -5,6 +5,7 @@ from pandas import DataFrame
 
 from collections import Counter
 
+from numpy import nanmin, nanmax, isnan
 def matching_cols(df, val, col, count = None):
     """
     Return a dictionary of columns and values for a given value of a column
@@ -31,7 +32,7 @@ def AgeHoHistogram(data, age_col = 'age', h0_col = 'h0', which = 'age'):
 
     df_agg = data.groupby('age', as_index=False).agg(count=('age','size'), sids = ('sids', sids_agg))
 
-    labels = {'age':'Age of Universe (Gyr)', 'sids':'Student ID'}
+    xmin, xmax = nanmin(df_agg[which]), nanmax(df_agg[which])
 
     fig = px.bar(data_frame = df_agg, x = 'age', y='count', hover_data='sids', labels = labels)
 
@@ -39,6 +40,6 @@ def AgeHoHistogram(data, age_col = 'age', h0_col = 'h0', which = 'age'):
     # show only integers on y-axis
     fig.update_yaxes(tick0=0, dtick=1)
     # show ticks every 1
-    # fig.update_xaxes(dtick=1)
+    fig.update_xaxes(range=[xmin-1.5, xmax+1.5])
 
     solara.FigurePlotly(fig)
