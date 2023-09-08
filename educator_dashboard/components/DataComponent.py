@@ -1,14 +1,16 @@
 import solara
+import reacton.ipyvuetify as rv
 from .ClassPlot import ClassPlot
 from .TableDisplay import TableDisplay
 from pandas import DataFrame
 import plotly.express as px
 
-from numpy import around
+from numpy import around, isnan
 from math import ceil, floor
 
 from .TableComponents import DataTable
 from .AgeHistogram import AgeHoHistogram
+from .BetterTooltip import Tooltip
 
 
 @solara.component
@@ -142,6 +144,19 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
         data = DataFrame({'sids': [str(s) for s in sids], 'h0': h0, 'age': age})
         data['h0'] = data['h0'].apply(lambda x: around(x,0))
         data['age'] = data['age'].apply(lambda x: around(x,0))
+        
+        # print out number of students with good data
+        num_good = len(data[~isnan(data['h0'])])
+        num_total = len(data)
+        n_students = len(roster.student_ids)
+        line1 = f"**Number of students**: {n_students} "
+        line2 = f"**Number of students with measurements**: {num_total}"
+        line3 = f"**Number of students with good measurements**: {num_good}"
+        
+        with Tooltip(tooltip = solara.Markdown('<br>'.join([line1,line2,line3])), 
+                     color = 'white',
+                     top=True):
+            solara.Text(f"{num_good}/{num_total} have good data")
         
         AgeHoHistogram(data)
 
