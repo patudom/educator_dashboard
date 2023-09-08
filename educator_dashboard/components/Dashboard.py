@@ -56,9 +56,6 @@ def Dashboard(roster, student_names = None):
     if roster.value is None:
         return
     
-    if len(roster.value.roster) == 0:
-        solara.Markdown(f"There are no students in the class {roster.value.class_id}")
-    
     student_id = solara.use_reactive(None)
     student_names = solara.use_reactive(student_names)
     old_set = student_id.set
@@ -80,18 +77,20 @@ def Dashboard(roster, student_names = None):
               ]
     
     with solara.GridFixed(columns=1, row_gap='0px', justify_items='stretch', align_items='start'):
-        ClassProgress(roster)
-        StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
-        
-            
+        with solara.Card():
+            solara.Markdown (f"## Class Progress")
+            ClassProgress(roster)
+            StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
 
-        with solara.lab.Tabs(vertical=True, align='right', dark=True):
-            
-            with solara.lab.Tab(label="Summary", icon_name="mdi-text-box-outline"):
-                StudentQuestionsSummary(roster, student_id)
+        with solara.Card():
+            solara.Markdown(f"##Student Responses and Data")
+            with solara.lab.Tabs(vertical=True, align='right', dark=True):
                 
-            with solara.lab.Tab(label="Per Student" if student_id.value is None else f"For Student {student_id.value}", icon_name="mdi-file-question-outline"):
-                IndividualStudentResponses(roster, student_id)
-        
-            # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
-            #     StudentDataSummary(roster, student_id = student_id)
+                with solara.lab.Tab(label="Class Summary", icon_name="mdi-text-box-outline"):
+                    StudentQuestionsSummary(roster, student_id)
+                    
+                with solara.lab.Tab(label="Student Responses" if student_id.value is None else f"Student {student_id.value}"):
+                    IndividualStudentResponses(roster, student_id)
+            
+                # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
+                #     StudentDataSummary(roster, student_id = student_id)
