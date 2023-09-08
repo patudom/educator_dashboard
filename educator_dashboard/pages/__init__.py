@@ -28,6 +28,7 @@ def Page():
     # - 170 (outdated class - should show nothing)
     class_id = solara.use_reactive(195) # add class id here
     roster = solara.use_reactive(cast(Roster, None))
+    student_names = solara.use_reactive(None)
     first_run = solara.use_reactive(True)
     
     story_name = "HubbleDS"
@@ -38,8 +39,8 @@ def Page():
         solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
 
         SetClass(class_id, roster, first_run)
-    
-    Dashboard(roster) 
+        
+    Dashboard(roster, student_names=student_names) 
     # solara.DataFrame(df.value)
 
 

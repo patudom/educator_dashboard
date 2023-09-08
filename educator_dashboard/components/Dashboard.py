@@ -12,6 +12,7 @@ from .ClassProgress import ClassProgress
 from .StudentProgress import StudentProgressTable
 from .ResponsesComponents import StudentQuestionsSummary
 from .ResponsesComponents import IndividualStudentResponses
+from .StudentDataUpload import StudentNameUpload
 
 from solara.alias import rv
 
@@ -35,12 +36,28 @@ def initStudentID(student_id, roster):
         
 
 @solara.component
-def Dashboard(roster): 
+def ShowReport(roster):
+    if len(roster.value.roster) == 0:
+        return
+    dialog = rv.Dialog(
+        v_slots = [{
+            'name': 'activator',
+            'variable': 'x',
+            'children': rv.Btn(v_on='x.on', color='primary', dark=True, children=['Show Table'])
+            
+        }]
+    )
+    with dialog:
+        solara.DataFrame(roster.value.short_report())
+
+@solara.component
+def Dashboard(roster, student_names = None): 
     
     if roster.value is None:
         return
     
     student_id = solara.use_reactive(None)
+    student_names = solara.use_reactive(student_names)
     old_set = student_id.set
     student_id.set = print_function_name(old_set)
     
@@ -48,6 +65,7 @@ def Dashboard(roster):
     # make sure the student_id is valid
     initStudentID(student_id, roster)
     
+    StudentNameUpload(roster, student_names)
 
     # ClassProgress(df, roster)
     labels = ['Stage 1: </br> Velocities', 

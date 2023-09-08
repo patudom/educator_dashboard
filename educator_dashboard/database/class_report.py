@@ -278,6 +278,18 @@ class Roster():
             return [student['student_id'] for student in self.roster]
         else:
             return []
+        
+    def set_student_names(self, student_names = None):
+        """
+        student_names is a dictionary of student_id: name
+        """
+        if len(self.roster) > 0:
+            for student in self.roster:
+                if student_names is None:
+                    # use random string
+                    student['student']['name'] = 'Student '+str(student['student_id'])
+                else:
+                    student['student']['name'] = student_names.get(student['student_id'], 'Student '+str(student['student_id']))
     
     @property
     def responses(self):
@@ -321,10 +333,10 @@ class Roster():
             tot_perc.append(state.percent_completion)
         return self.l2d(how_far)['string'], tot_perc
     
-    def report(self):
+    def report(self, refresh = False):
         "refreshing data"
         
-        if self._report is not None and not self._refresh:
+        if self._report is not None and not self._refresh and not refresh:
             return self._report
         
         if self._refresh:
@@ -350,6 +362,8 @@ class Roster():
         df['student_id'] = roster.student_id['student_id']
         # add a string column containing roster.students['username']
         df['username'] = roster.students['username'].values
+        if 'name' in roster.students.columns:
+            df['name'] = roster.students['name'].values
         df['class_id'] = roster.class_id
         completion_string, completion_percent = roster.fraction_completed()
         df['progress'] = completion_string
@@ -374,8 +388,8 @@ class Roster():
         
         return df
     
-    def short_report(self):
-        if self._short_report is not None and not self._refresh:
+    def short_report(self, refresh = False):
+        if self._short_report is not None and not self._refresh and not refresh:
             return self._short_report
         
         if self._refresh:
@@ -395,6 +409,8 @@ class Roster():
 
         # add a string column containing roster.students['username']
         df['username'] = roster.students['username'].values
+        if 'name' in roster.students.columns:
+            df['name'] = roster.students['name'].values
         df['class_id'] = roster.class_id
         completion_string, completion_percent = roster.fraction_completed()
         df['progress'] = completion_string
