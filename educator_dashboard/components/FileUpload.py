@@ -20,10 +20,10 @@ def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
         if isCSV or (isExcel and allow_excel):
             file_info.set(file)
             set_valid_file(True)
-            set_msg(f"Successfully uploaded {filename}!")
+            set_msg(f"Successfully read in {filename}!")
         else:
             set_valid_file(False)
-            set_msg(f"Upload of {filename} failed. Please upload a CSV file.")
+            set_msg(f"Failed to read {filename}. Please select a valid CSV file.")
         
         upload_complete.set(True)
     
@@ -33,7 +33,12 @@ def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
         set_msg("")
     
     with solara.Div():
-        solara.Markdown("Upload a CSV (comma-separated value) file containing student names and IDs. Include a header row with column names 'student_id' and 'name'.")
+        solara.Markdown(r'''
+            Read in a local CSV (comma-separated value) file containing student IDs and names to display names in the dashboard.
+                        
+            * Include a header row with column names 'student_id' and 'name'. 
+            * To protect student privacy, this information remains on your computer and will NOT be uploaded to CosmicDS servers.
+        ''')
         if not upload_complete.value:
             solara.FileDrop(
                 on_file=on_file,
