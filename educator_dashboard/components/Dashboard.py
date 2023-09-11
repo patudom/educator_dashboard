@@ -12,7 +12,6 @@ from .ClassProgress import ClassProgress
 from .StudentProgress import StudentProgressTable
 from .ResponsesComponents import StudentQuestionsSummary
 from .ResponsesComponents import IndividualStudentResponses
-from .StudentDataUpload import StudentNameUpload
 
 from solara.alias import rv
 
@@ -64,8 +63,6 @@ def Dashboard(roster, student_names = None):
     # a non-displaying component to 
     # make sure the student_id is valid
     initStudentID(student_id, roster)
-    
-    StudentNameUpload(roster, student_names)
 
     # ClassProgress(df, roster)
     labels = ['Stage 1: </br> Velocities', 

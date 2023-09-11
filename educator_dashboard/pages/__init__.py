@@ -3,6 +3,7 @@ import solara
 
 from ..components.Dashboard import Dashboard
 from ..components.SetClass import SetClass
+from ..components.StudentDataUpload import StudentNameUpload
 
 
 
@@ -33,12 +34,14 @@ def Page():
     
     story_name = "HubbleDS"
     
-    with solara.Columns([1, 10, 2]):
+    with solara.Columns([1, 9, 3]):
         solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
 
         solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
 
-        SetClass(class_id, roster, first_run)
+        with solara.Column():
+            SetClass(class_id, roster, first_run)
+            StudentNameUpload(roster, student_names)
         
     Dashboard(roster, student_names=student_names) 
     # solara.DataFrame(df.value)
