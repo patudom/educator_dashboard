@@ -6,7 +6,7 @@ import pandas as pd
 
 
 @solara.component
-def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
+def TableLoad(file_info = None, load_complete = None, allow_excel = False):
     
     valid_file, set_valid_file = solara.use_state(True)
     msg, set_msg = solara.use_state("")
@@ -25,11 +25,11 @@ def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
             set_valid_file(False)
             set_msg(f"Failed to read {filename}. Please select a valid CSV file.")
         
-        upload_complete.set(True)
+        load_complete.set(True)
     
     def on_click():
         file_info.set(None)
-        upload_complete.set(False)
+        load_complete.set(False)
         set_msg("")
     
     with solara.Div():
@@ -39,17 +39,17 @@ def TableUpload(file_info = None, upload_complete = None, allow_excel = False):
             * Include a header row with column names 'student_id' and 'name'. 
             * To protect student privacy, this information remains on your computer and will NOT be uploaded to CosmicDS servers.
         ''')
-        if not upload_complete.value:
+        if not load_complete.value:
             solara.FileDrop(
                 on_file=on_file,
                 lazy=False, # puts data in the [data] part of FileInfo
             )
-        if upload_complete.value and valid_file:
+        if load_complete.value and valid_file:
             solara.Success(msg, dense=True, outlined=True, icon='mdi-file-check')
-        elif upload_complete.value and not valid_file:
+        elif load_complete.value and not valid_file:
             solara.Error(msg, dense=True, outlined=True, icon='mdi-file-alert')
         
-        solara.Button("Clear", on_click=on_click, disabled=not upload_complete.value)
+        solara.Button("Clear", on_click=on_click, disabled=not load_complete.value)
 
     
     

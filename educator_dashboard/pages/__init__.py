@@ -3,7 +3,7 @@ import solara
 
 from ..components.Dashboard import Dashboard
 from ..components.SetClass import SetClass
-from ..components.StudentDataUpload import StudentNameUpload
+from ..components.StudentDataLoad import StudentNameLoad
 
 
 
@@ -41,7 +41,7 @@ def Page():
 
         with solara.Column():
             SetClass(class_id, roster, first_run)
-            StudentNameUpload(roster, student_names)
+            StudentNameLoad(roster, student_names)
         
     Dashboard(roster, student_names=student_names) 
     # solara.DataFrame(df.value)
