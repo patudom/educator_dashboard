@@ -44,15 +44,17 @@ def StudentNameUpload(roster = None, student_names = None, on_update = None):
     student_names_set = solara.use_reactive(False)
     
     dialog_open = solara.use_reactive(False)
-        
+      
     dialog = rv.Dialog(
         v_model = dialog_open.value,
         v_slots = [{
             'name': 'activator',
-            'children': solara.Button(label = "Upload Student Name File", on_click = lambda: dialog_open.set(True), color='primary')
+            'children': 
+                solara.Tooltip(tooltip="Use local csv file to convert IDs to names", 
+                    children = [solara.Button(label = "ID -> Name Translation", on_click = lambda: dialog_open.set(True), color='primary')]
+                )
         }]
     )
-    
     
     with dialog:
         with solara.Card():
