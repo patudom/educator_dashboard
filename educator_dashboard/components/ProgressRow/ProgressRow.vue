@@ -166,27 +166,26 @@ export default {
 }
 
 .completed {
-  background-color: rgb(76, 175, 80);
+  background-color: hsl(122, 39%, 50%);
 }
 
 .completed-lighter {
-  background-color: rgb(76, 175, 80,0.25);
-}
+  background-color: hsl(122, 39%, 80%)}
 
 .in-progress {
-  background-color: rgb(33, 150, 243);
+  background-color: hsl(207, 90%, 50%);
 }
 
 .in-progress-lighter {
-  background-color: rgb(33, 150, 243,0.55);
+  background-color: hsl(207, 90%, 80%);
 }
 
 .not-started {
-  background-color: rgb(202, 48, 48);
+  background-color: hsl(0, 62%, 50%);
 }
 
 .not-started-lighter {
-  background-color: rgb(202, 48, 48,0.25);
+  background-color: hsla(0, 62%, 80%);
 }
 
 </style>
