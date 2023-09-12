@@ -84,12 +84,13 @@ def Dashboard(roster, student_names = None):
 
         with solara.Card():
             solara.Markdown(f"##Student Responses and Data")
+
             with solara.lab.Tabs(vertical=True, align='right', dark=True):
                 
-                with solara.lab.Tab(label="Class Summary", icon_name="mdi-text-box-outline"):
+                with solara.lab.Tab(label="Class Summary", icon_name="mdi-text-box-outline", classes=["my-tabs"]):
                     StudentQuestionsSummary(roster, student_id)
                     
-                with solara.lab.Tab(label="Student Responses" if student_id.value is None else f"Student {student_id.value}"):
+                with solara.lab.Tab(label="Student Responses" if student_id.value is None else f"Student {student_id.value}", classes=["my-tabs"]):
                     IndividualStudentResponses(roster, student_id)
             
                 # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
