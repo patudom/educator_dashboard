@@ -47,50 +47,51 @@ def MultipleChoiceStageSummary(roster, stage = None):
     
     with solara.GridFixed(columns=1, justify_items='stretch', align_items='start') as main:
         solara.Markdown(f"### Stage {stage}")
+
+        # Table of questions with average #of tries across whole space
+        with solara.Column():
+            
+            solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(tries_1d[tries_1d>0].mean().round(2)))
+
+            keys = ['Question', 'Completed by', 'Average # of Tries']
+            # headers appropriate for vuetify headers prop
+            headers = [{'text': k, 'value': k} for k in keys]
+            
+            
+            data_keys = ['Question', 'Completed by', 'Average # of Tries', 'key']
+            
+            # https://www.phind.com/search?cache=qn70q6onf78gz5b035fmmosx
+            data_values = {k: summary_stats[k].astype(str) for k in data_keys}
+            data_values = [dict(zip(data_values.keys(), values)) for values in zip(*data_values.values())]
+
+
+            def on_change(v):                    
+                selected_question.set(v if v is None else v['key'])
+            
+            DataTable(
+                headers=headers,
+                items=data_values,
+                on_row_click=on_change,
+                show_index=True,
+            )
+
         with solara.Columns([1,1]):
+            if (selected_question.value is not None) and (selected_question.value != '') and (selected_question.value in flat_mc_responses.keys()):
             
-            # column with a table of questions with average #of tries
-            with solara.Column():
-                
-                solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(tries_1d[tries_1d>0].mean().round(2)))
-
-                keys = ['Question', 'Completed by', 'Average # of Tries']
-                # headers appropriate for vuetify headers prop
-                headers = [{'text': k, 'value': k} for k in keys]
-                
-                
-                data_keys = ['Question', 'Completed by', 'Average # of Tries', 'key']
-                
-                # https://www.phind.com/search?cache=qn70q6onf78gz5b035fmmosx
-                data_values = {k: summary_stats[k].astype(str) for k in data_keys}
-                data_values = [dict(zip(data_values.keys(), values)) for values in zip(*data_values.values())]
-
-
-                def on_change(v):                    
-                    selected_question.set(v if v is None else v['key'])
-                
-                DataTable(
-                    headers=headers,
-                    items=data_values,
-                    on_row_click=on_change,
-                    show_index=True,
-                )
-            
-            # a column for a particular question showing all student responses
-            with solara.Column():
-                if (selected_question.value is not None) and (selected_question.value != '') and (selected_question.value in flat_mc_responses.keys()):
-                    # Add numeral index after Question
-                    solara.Markdown(f"""***Question:***
-                                {roster.question_keys()[selected_question.value]['text']}
-                                """)
-                    
-                    df = DataFrame(flat_mc_responses[selected_question.value])
-                    fig = px.histogram(df, 'tries',  labels={'tries': "# of Tries"}, range_x=[-0.6,3.6], category_orders={'tries': [0,1,2,3,4]})
-                    fig.update_xaxes(type='category')
-                    solara.FigurePlotly(fig)
-                    
-                    with Collapsable(header='Show Table'):
-                        DataTable(df = df[['student_id', 'tries']], class_ = "mc-question-summary-table")
+                # a column for a particular question showing all student responses
+                with solara.Column():
+                        # Add numeral index after Question
+                        solara.Markdown(f"""***Question:***
+                                    {roster.question_keys()[selected_question.value]['text']}
+                                    """)
+                        
+                        df = DataFrame(flat_mc_responses[selected_question.value])
+                        fig = px.histogram(df, 'tries',  labels={'tries': "# of Tries"}, range_x=[-0.6,3.6], category_orders={'tries': [0,1,2,3,4]})
+                        fig.update_xaxes(type='category')
+                        solara.FigurePlotly(fig)
+                        
+                with Collapsable(header='Show Table'):
+                    DataTable(df = df[['student_id', 'tries']], class_ = "mc-question-summary-table")
         rv.Divider()
     return main
 
