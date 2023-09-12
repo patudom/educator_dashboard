@@ -107,32 +107,43 @@ export default {
   /* grid-template-columns: auto auto;
   grid-template-rows: auto; */
   /* grid-gap: 10px; */
-  background-color: rgba(2, 2, 2, 0.127);
+
+  padding: 0.5rem 0rem;
+  margin-left: 1rem;
 }
 
 .free-response-question div {
-  padding: 0.25rem;
+  /* padding: 0.25rem; */
 }
 .short-question {
   display: inline-block;
-  background-color: lightgreen;
   
 }
 .question {
-  background-color: lightblue;
+  display: inline-block;
+  font-weight: bold;  
+  color: rgb(118, 118, 118);
 }
 
 .response-row {
-  background-color: rgb(227, 240, 128);
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  gap: 0.1rem;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid rgb(118, 118, 118);
 }
 
 .response-item {
   display: inline-block;
-  background-color: lightcoral;
+
 }
 
 .name-item {
   display: inline-block;
-  background-color: lightpink;
+  font-weight: bold;
+  color: rgb(118, 118, 118);
+
 }
 </style>
