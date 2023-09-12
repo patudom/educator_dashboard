@@ -13,6 +13,46 @@ from .AgeHistogram import AgeHoHistogram
 from .BetterTooltip import Tooltip
 
 
+def get_class_subset(data, sid, ungroup = True):
+    if isinstance(sid, solara.Reactive):
+        sid = sid.value
+    if sid is None:
+        return None
+    sid = str(sid)
+    
+    # convert last_modified to datetime
+    data['last_modified'] = to_datetime(data['last_modified'])
+    data['student_id'] = data['student_id'].apply(str)
+
+    # group by student_id
+    grouped = data.groupby('student_id')
+
+    # get people who completed and their times
+    time = DataFrame(grouped['last_modified'].max())
+    size = grouped.size()
+    if all(size == 1):
+        complete = (size == 1)
+    else:
+        complete = (size == 5)
+    
+    before = time['last_modified'] <= time[time.index == sid]['last_modified'].max()
+    ten_earlist_completed = time[complete].sort_values('last_modified').head(10)
+    ten_earliest_mask = time.index.isin(ten_earlist_completed.index)
+    subset = (before & complete) | ten_earliest_mask | (time.index == sid)
+    
+    if not ungroup:
+        return subset.to_list()
+
+    # put complete back into data
+    subset = data['student_id'].isin(time[subset].index).to_list()
+    
+    # assert sum(subset) % 5 == 0
+    
+    
+    return subset
+
+
+
 @solara.component
 def DataSummary(roster = None, student_id = None, on_student_id = None, allow_click = True):
     """
