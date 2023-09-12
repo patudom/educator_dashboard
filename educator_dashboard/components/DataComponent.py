@@ -66,7 +66,7 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
     if roster is None:
         return
     
-    data = DataFrame(roster.get_class_data())
+    data = roster.get_class_data(df=True)
     
     if data is None:
         return
@@ -85,12 +85,21 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
         else:
             on_student_id(None)
     
+    subset = None
+    subset_name = None
+    if student_id.value is not None:
+        
+        subset = get_class_subset(data, student_id)
+        subset_name = f'Data seen by {student_id.value}'
+        
+    
     if allow_click:
         with solara.Column(gap="0px"):
-            ClassPlot(data, on_click=on_plot_click, select_on = 'student_id', selected = student_id, allow_click=True)
+            ClassPlot(data, on_click=on_plot_click, select_on = 'student_id', selected = student_id, allow_click=True, subset = subset, subset_label=subset_name, subset_color='mediumpurple')
     else:
         with solara.Column():
-            ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = False)
+            ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = False, subset = subset, subset_label=subset_name, subset_color='mediumpurple')
+
     
 
 from numpy import nan, array
@@ -208,17 +217,20 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
     data = DataFrame({'h0': h0, 'age': age, 'last_modified': time}).reset_index()
     # student_id to str
     data['student_id'] = data['student_id'].apply(str)
-    data.rename(columns={'student_id':'sids'}, inplace=True)
     data['h0'] = data['h0'].apply(lambda x: around(x,0))
     data['age'] = data['age'].apply(lambda x: around(x,0))
-    ten_earliest = data.sort_values('last_modified').head(10)
-    ten_earliest_mask = data['sids'].isin(ten_earliest['sids'])
+    
 
     if sid is not None and sid.value is not None:
-        single_student_df = roster.get_student_data(sid.value, df = True)
             
-        subset = (data['last_modified'] < to_datetime(single_student_df['last_modified']).max()) & ten_earliest_mask
-        AgeHoHistogram(data, which = 'age', subset = subset, subset_label = f'Data seen by {sid.value}', title = f'Class Age Distribution seen by {sid.value}')
+        subset = get_class_subset(data, sid, ungroup = False)
+
+        AgeHoHistogram(data, 
+                       which = 'age', 
+                       subset = subset, 
+                       subset_label = f'Data seen by {sid.value}', 
+                       subset_color = 'mediumpurple',
+                       title = f'Class Age Distribution seen by {sid.value}')
     else:
 
         # print out number of students with good data

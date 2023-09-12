@@ -22,7 +22,7 @@ def aggregrate(dataframe, col):
 
 
 @solara.component
-def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, title = None):
+def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subset_color = 'mediumpurple', title = None):
     # subset is boolean array which take subset of data
     
     # manual aggregation. instead use pandas groupby and agg
@@ -32,17 +32,17 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, titl
         return '<br>'+ '<br>'.join(sids)
     
 
-    df_agg = data.groupby(which, as_index=False).agg(count=(which,'size'), sids = ('sids', sids_agg))
+    df_agg = data.groupby(which, as_index=False).agg(count=(which,'size'), student_id = ('student_id', sids_agg))
     # add single valued column
     df_agg['group'] = 'Full Class'
 
     xmin, xmax = nanmin(df_agg[which]), nanmax(df_agg[which])
 
-    labels = {'age':'Age of Universe (Gyr)', 'sids':'Student ID', 'h0':'Hubble Constant (km/s/Mpc)'}
+    labels = {'age':'Age of Universe (Gyr)', 'student_id':'Student ID', 'h0':'Hubble Constant (km/s/Mpc)'}
 
-    fig = px.bar(data_frame = df_agg, x = which, y='count', color='group',hover_data='sids', labels = labels, barmode='overlay', opacity=1, hover_name=['Full Class']*len(df_agg))
-    fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['sids'] + ': %{customdata}' + '<extra></extra>')
-    # fig.update_traces(marker_color='grey', marker_line_color='grey', marker_line_width=0, opacity=1)
+    fig = px.bar(data_frame = df_agg, x = which, y='count', color='group',hover_data='student_id', labels = labels, barmode='overlay', opacity=1, hover_name=['Full Class']*len(df_agg))
+    fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>')
+    fig.update_traces(marker_color='grey')
     title = f'Class {which.capitalize()} Distribution' if title is None else title
     fig.update_layout(showlegend=True, title_text=title)
     # show only integers on y-axis
@@ -52,9 +52,15 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, titl
     
     if subset is not None:
         data_subset = data[subset]
-        df_agg_subset = data_subset.groupby(which, as_index=False).agg(count=(which,'size'), sids = ('sids', sids_agg))
-        bar = go.Bar(x=df_agg_subset[which], y=df_agg_subset['count'], name=subset_label, opacity=1, hoverinfo='skip', customdata=df_agg_subset['sids'])
-        bar.hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['sids'] + ': %{customdata}' + '<extra></extra>'
+        df_agg_subset = data_subset.groupby(which, as_index=False).agg(count=(which,'size'), student_id = ('student_id', sids_agg))
+        bar = go.Bar(x=df_agg_subset[which], y=df_agg_subset['count'],
+                     name=subset_label, 
+                     opacity=1, 
+                     marker_color=subset_color,
+                     hoverinfo='skip', 
+                     customdata=df_agg_subset['student_id'])
+        bar.hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>'
+        
         fig.add_trace(bar)
         # show legend
     # fig.update_layout(showlegend=True)
@@ -64,6 +70,6 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, titl
     
     if subset is None:
         # SIDS of students without good data
-        bad_sids = data[isnan(data['h0'])]['sids'].to_list()
+        bad_sids = data[isnan(data['h0'])]['student_id'].to_list()
         if len(bad_sids) > 0:
             solara.Markdown(f"**Students with bad data**: {', '.join(bad_sids)}")
