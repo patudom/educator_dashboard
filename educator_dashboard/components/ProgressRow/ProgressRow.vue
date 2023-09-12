@@ -167,25 +167,26 @@ export default {
 
 .completed {
   background-color: hsl(122, 39%, 50%);
+  
 }
 
 .completed-lighter {
   background-color: hsl(122, 39%, 80%)}
 
 .in-progress {
-  background-color: hsl(207, 90%, 50%);
+  background-color: hsl(122, 39%, 50%);
 }
 
 .in-progress-lighter {
-  background-color: hsl(207, 90%, 80%);
+  background-color: hsl(57, 70%, 50%);;
 }
 
 .not-started {
-  background-color: hsl(0, 62%, 50%);
+  background-color: hsl(57, 70%, 50%);
 }
 
 .not-started-lighter {
-  background-color: hsla(0, 62%, 80%);
+  background-color: hsl(57, 70%, 50%);;
 }
 
 </style>
