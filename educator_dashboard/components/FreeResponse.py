@@ -93,7 +93,7 @@ def FreeResponseSummary(roster):
                 question_responses = roster.l2d(fr_questions[stage]) # {'key': ['response1', 'response2',...]}
                 with rv.Container(id=f"fr-summary-stage-{stage}"):
                     solara.Markdown(f"### Stage {stage}")
-                    FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.student_ids, hideShortQuestion=True)
+                    FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.student_names, hideShortQuestion=True)
         with solara.Column():
             with rv.NavigationDrawer(permanent=True, right=True, clipped=True):
                 with rv.List():
@@ -139,7 +139,6 @@ def FreeResponseQuestionSingleStudent(roster, sid = None):
             FreeResponseQuestion(question = question, 
                                 shortquestion = shortquestion, 
                                 responses = responses, 
-                                names = [sid.value],
                                 hideShortQuestion = True,
                                 )
         
