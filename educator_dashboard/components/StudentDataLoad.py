@@ -47,8 +47,10 @@ def StudentNameLoad(roster = None, student_names = None, on_update = None):
       
     dialog = rv.Dialog(
         v_model = dialog_open.value,
+        on_v_model=dialog_open.set,
         v_slots = [{
             'name': 'activator',
+            'variable': 'dummy_var',
             'children': 
                 solara.Tooltip(tooltip="Use local csv file to convert IDs to names", 
                     children = [solara.Button(label = "ID -> Name Translation", on_click = lambda: dialog_open.set(True), color='primary')]
