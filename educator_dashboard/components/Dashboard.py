@@ -58,8 +58,18 @@ def Dashboard(roster, student_names = None):
     
     student_id = solara.use_reactive(None)
     student_names = solara.use_reactive(student_names)
+    show_student_tab = solara.use_reactive(0)
     old_set = student_id.set
-    student_id.set = print_function_name(old_set)
+    
+    def on_sid_set(value):
+        if value is None:
+            return
+        print(f"Setting student_id to {value}")
+        old_set(value)
+        show_student_tab.set(1)
+        # set tab to student responses
+    
+    student_id.set = print_function_name(on_sid_set)
     
     # a non-displaying component to 
     # make sure the student_id is valid
@@ -85,7 +95,7 @@ def Dashboard(roster, student_names = None):
         with solara.Card():
             solara.Markdown(f"##Student Responses and Data")
 
-            with solara.lab.Tabs(vertical=True, align='right', dark=True):
+            with solara.lab.Tabs(vertical=True, align='right', dark=True, value = show_student_tab):
                 
                 with solara.lab.Tab(label="Class Summary", icon_name="mdi-text-box-outline", classes=["my-tabs"]):
                     StudentQuestionsSummary(roster, student_id)
