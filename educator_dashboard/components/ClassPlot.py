@@ -14,7 +14,10 @@ def ClassPlot(dataframe,
             on_click = None,
             select_on = None,
             selected = solara.reactive(None),
-            allow_click = True
+            allow_click = True,
+            subset = None,
+            subset_label = None,
+            subset_color='mediumpurple',
               ):
     
     
@@ -47,8 +50,10 @@ def ClassPlot(dataframe,
     labels =  {x_col: "{label} ({units})".format(**xy_label['x']),  
                y_col: "{label} ({units})".format(**xy_label['y'])}
     fig = px.scatter(dataframe, x=x_col, y=y_col, custom_data = label_col, labels = labels)
+    fig.update_traces(marker_color='grey')
     fig.update_layout(modebar = config)
-
+    # add empty trace to show on legend
+    fig.add_trace(go.Scatter(x=[None], y=[None], mode = 'markers', name = 'Full Class', marker_color = 'grey'))
 
     xlabel = xy_label["x"]['label']+': %{x:f} ' + xy_label["x"]['units']
     ylabel = xy_label["y"]['label']+': %{y:f} ' + xy_label["y"]['units']
@@ -65,9 +70,22 @@ def ClassPlot(dataframe,
             on_click(points)
         
     
+    if subset is not None:
+        print('Adding seen trace')
+        sub_data = dataframe[subset]
+        hovertemplate = '<b>%{customdata}</b><br>' + xlabel + '<br>' + ylabel
+        fig.add_trace(go.Scatter(x= sub_data[x_col], y= sub_data[y_col], mode = 'markers',
+                                            customdata = sub_data[label_col],
+                                            hovertemplate = hovertemplate,
+                                            name = subset_label,
+                                            marker_symbol = 'circle',   
+                                            marker_size = 7,
+                                            marker_color = subset_color))
+        
     if selected.value is not None:    
-        print('Adding trace')
-        stud_data = dataframe[dataframe[select_on] == selected.value]
+        print('Adding student trace')
+        stud_data = dataframe[dataframe[select_on] == str(selected.value)]
+
         hovertemplate = '<b>%{customdata}</b><br>' + xlabel + '<br>' + ylabel
         fig.add_trace(go.Scatter(x= stud_data[x_col], y= stud_data[y_col], mode = 'markers',
                                             customdata = stud_data[label_col],
@@ -76,6 +94,8 @@ def ClassPlot(dataframe,
                                             marker_symbol = 'circle',   
                                             marker_size = 10,
                                             marker_color = 'red'))
+    
+    
     
     return solara.FigurePlotly(fig, on_click=click_action, )
         

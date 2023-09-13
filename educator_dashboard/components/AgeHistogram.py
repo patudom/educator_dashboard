@@ -1,21 +1,76 @@
 import solara
 import plotly.express as px
+import plotly.graph_objects as go
 
-from math import ceil, floor
+from collections import Counter
+
+from numpy import nanmin, nanmax, isnan
+
+def matching_cols(df, val, col, count = None):
+    """
+    Return a dictionary of columns and values for a given value of a column
+    """
+ 
+    out = {c:df[c][df[col]==val].to_list() for c in df.columns}
+    out.update({'count':count or len(out[col])})
+    out.update({col:val})
+    return out
+
+def aggregrate(dataframe, col):
+    vals = Counter(dataframe[col])
+    return {v:matching_cols(dataframe, v, col, count)  for v,count in vals.items()}
+
 
 @solara.component
-def AgeHoHistogram(data, age_col = 'age', h0_col = 'h0', which = 'age'):
+def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subset_color = 'mediumpurple', title = None):
+    # subset is boolean array which take subset of data
     
-    col_data = data[age_col]; 
-    col_data = col_data[col_data>0]; 
-    xmin, xmax = floor(col_data.min()), ceil(col_data.max())
-    categories = list(range(xmin, xmax+1))
-    fig = px.histogram(data_frame = data, x = which, labels={age_col:'Age of Universe (Gyr)'}, category_orders={age_col: categories})
-    fig.update_xaxes(type='category')
-    fig.update_layout(showlegend=False, title_text='Class Age Distribution')
+    # manual aggregation. instead use pandas groupby and agg
+    # df_agg = DataFrame(aggregrate(data, which)).T
+    # df_agg.sids = df_agg.sids.apply(lambda x:'<br>' + '<br>'.join(x))
+    def sids_agg(sids):
+        return '<br>'+ '<br>'.join(sids)
+    
+
+    df_agg = data.groupby(which, as_index=False).agg(count=(which,'size'), student_id = ('student_id', sids_agg))
+    # add single valued column
+    df_agg['group'] = 'Full Class'
+
+    xmin, xmax = nanmin(df_agg[which]), nanmax(df_agg[which])
+
+    labels = {'age':'Age of Universe (Gyr)', 'student_id':'Student ID', 'h0':'Hubble Constant (km/s/Mpc)'}
+
+    fig = px.bar(data_frame = df_agg, x = which, y='count', hover_data='student_id', labels = labels, barmode='overlay', opacity=1)
+    fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>')
+    fig.update_traces(marker_color='grey')
+    fig.add_trace(go.Bar(x=[None], y=[None], name = 'Full Class', marker_color = 'grey'))
+    title = f'Class {which.capitalize()} Distribution' if title is None else title
+    fig.update_layout(showlegend=True, title_text=title)
     # show only integers on y-axis
     fig.update_yaxes(tick0=0, dtick=1)
     # show ticks every 1
-    # fig.update_xaxes(dtick=1)
+    fig.update_xaxes(range=[xmin-1.5, xmax+1.5])
+    
+    if subset is not None:
+        data_subset = data[subset]
+        df_agg_subset = data_subset.groupby(which, as_index=False).agg(count=(which,'size'), student_id = ('student_id', sids_agg))
+        bar = go.Bar(x=df_agg_subset[which], y=df_agg_subset['count'],
+                     name=subset_label, 
+                     opacity=1, 
+                     marker_color=subset_color,
+                     hoverinfo='skip', 
+                     customdata=df_agg_subset['student_id'])
+        bar.hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>'
+        
+        fig.add_trace(bar)
+        # show legend
+    # fig.update_layout(showlegend=True)
+    
 
     solara.FigurePlotly(fig)
+    
+    if subset is None:
+        # SIDS of students without good data
+        bad_sids = data[isnan(data['h0'])]['student_id'].to_list()
+        if len(bad_sids) > 0:
+            solara.Markdown(f"**Students with bad data**: {', '.join(bad_sids)}")
