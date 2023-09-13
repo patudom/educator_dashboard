@@ -1,24 +1,24 @@
 import solara
 
-from .FileUpload import TableUpload, SetColumns, TableDisplay
+from .FileLoad import TableLoad, SetColumns, TableDisplay
 
 import reacton.ipyvuetify as rv
 
 import copy
 
 @solara.component
-def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
+def StudentDataLoadInterface(name_dataframe = None, on_load = None):
     
     
     file_info = solara.use_reactive(None)
     has_header = solara.use_reactive(True)
     table = solara.use_reactive(None)
     
-    file_uploaded = solara.use_reactive(False)
+    file_loaded = solara.use_reactive(False)
 
     with solara.Columns([1, 1]):
         with solara.Column():
-            TableUpload(file_info, upload_complete = file_uploaded)
+            TableLoad(file_info, load_complete = file_loaded)
         with solara.Column(gap="5px"):
             rv.Checkbox(v_model = has_header.value, 
                         on_v_model = has_header.set,
@@ -36,7 +36,7 @@ def StudentDataUploadInterface(name_dataframe = None, on_upload = None):
 
 
 @solara.component
-def StudentNameUpload(roster = None, student_names = None, on_update = None):
+def StudentNameLoad(roster = None, student_names = None, on_update = None):
     
 
     roster = solara.use_reactive(roster)
@@ -44,19 +44,23 @@ def StudentNameUpload(roster = None, student_names = None, on_update = None):
     student_names_set = solara.use_reactive(False)
     
     dialog_open = solara.use_reactive(False)
-        
+      
     dialog = rv.Dialog(
         v_model = dialog_open.value,
+        on_v_model=dialog_open.set,
         v_slots = [{
             'name': 'activator',
-            'children': solara.Button(label = "Upload Student Name File", on_click = lambda: dialog_open.set(True), color='primary')
+            'variable': 'dummy_var',
+            'children': 
+                solara.Tooltip(tooltip="Use local csv file to convert IDs to names", 
+                    children = [solara.Button(label = "ID -> Name Translation", on_click = lambda: dialog_open.set(True), color='primary')]
+                )
         }]
     )
     
-    
     with dialog:
         with solara.Card():
-            StudentDataUploadInterface(student_names)
+            StudentDataLoadInterface(student_names)
             if student_names_set.value:
                 solara.Success("Successfully updated student names!", dense=True, outlined=True)
             with solara.CardActions():
