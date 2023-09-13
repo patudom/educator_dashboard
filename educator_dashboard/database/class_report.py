@@ -278,6 +278,30 @@ class Roster():
             return [student['student_id'] for student in self.roster]
         else:
             return []
+        
+    def set_student_names(self, student_names = None):
+        """
+        student_names is a dictionary of student_id: name
+        """
+        if len(self.roster) > 0:
+            for student in self.roster:
+                if student_names is None:
+                    # use random string
+                    student['student']['name'] = 'Student '+str(student['student_id'])
+                else:
+                    student['student']['name'] = student_names.get(student['student_id'], 'Student '+str(student['student_id']))
+    
+    def get_student_name(self, sid = None):
+        if sid is None:
+            return 'None'
+        if len(self.roster) > 0:
+            index = self.student_ids.index(sid) if sid in self.student_ids else None
+            if index is not None:
+                return self.roster[index]['student'].get('name', sid)
+            else:
+                print(f'{sid} not in roster')
+        
+        return str(sid)
     
     @property
     def responses(self):
@@ -287,6 +311,8 @@ class Roster():
         else:
             return self.make_dataframe(pd.DataFrame())
     
+    def convert_column_of_dates_to_datetime(self, dataframe_column):
+        return pd.to_datetime(dataframe_column).dt.tz_convert('US/Eastern').dt.strftime("%Y-%m-%d %H:%M:%S (Eastern)")
     
     @property
     def students(self):
@@ -295,6 +321,10 @@ class Roster():
             return self.make_dataframe(students)
         else:
             return pd.DataFrame({'student_id':[], 'username':[], 'class_id':[]})
+    
+    @property
+    def student_names(self):
+        return [self.get_student_name(sid) for sid in self.student_ids]
     
     @property
     def out_of(self):
@@ -321,10 +351,10 @@ class Roster():
             tot_perc.append(state.percent_completion)
         return self.l2d(how_far)['string'], tot_perc
     
-    def report(self):
+    def report(self, refresh = False):
         "refreshing data"
         
-        if self._report is not None and not self._refresh:
+        if self._report is not None and not self._refresh and not refresh:
             return self._report
         
         if self._refresh:
@@ -350,6 +380,8 @@ class Roster():
         df['student_id'] = roster.student_id['student_id']
         # add a string column containing roster.students['username']
         df['username'] = roster.students['username'].values
+        if 'name' in roster.students.columns:
+            df['name'] = roster.students['name'].values
         df['class_id'] = roster.class_id
         completion_string, completion_percent = roster.fraction_completed()
         df['progress'] = completion_string
@@ -374,8 +406,8 @@ class Roster():
         
         return df
     
-    def short_report(self):
-        if self._short_report is not None and not self._refresh:
+    def short_report(self, refresh = False):
+        if self._short_report is not None and not self._refresh and not refresh:
             return self._short_report
         
         if self._refresh:
@@ -395,6 +427,8 @@ class Roster():
 
         # add a string column containing roster.students['username']
         df['username'] = roster.students['username'].values
+        if 'name' in roster.students.columns:
+            df['name'] = roster.students['name'].values
         df['class_id'] = roster.class_id
         completion_string, completion_percent = roster.fraction_completed()
         df['progress'] = completion_string

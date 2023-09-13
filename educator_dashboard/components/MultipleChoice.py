@@ -45,7 +45,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
     tries_1d = Series(tries_1d).dropna()
     
     
-    with solara.Card() as main:
+    with solara.GridFixed(columns=1, justify_items='stretch', align_items='start') as main:
         solara.Markdown(f"### Stage {stage}")
         with solara.Columns([1,1]):
             
@@ -79,7 +79,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
             # a column for a particular question showing all student responses
             with solara.Column():
                 if (selected_question.value is not None) and (selected_question.value != '') and (selected_question.value in flat_mc_responses.keys()):
-                    
+                    # Add numeral index after Question
                     solara.Markdown(f"""***Question:***
                                 {roster.question_keys()[selected_question.value]['text']}
                                 """)
@@ -90,7 +90,14 @@ def MultipleChoiceStageSummary(roster, stage = None):
                     solara.FigurePlotly(fig)
                     
                     with Collapsable(header='Show Table'):
-                        DataTable(df = df[['student_id', 'tries']], class_ = "mc-question-summary-table")
+                        if 'name' in roster.students.columns:
+                            headers = [{'text': 'Name', 'value': 'name'}, {'text': 'Tries', 'value': 'tries'}]
+                            # add names to df
+                            df = df.merge(roster.students[['student_id', 'name']], on='student_id', how='left')
+                        else:
+                            headers = [{'text': 'Student ID', 'value': 'student_id'}, {'text': 'Tries', 'value': 'tries'}]
+                        DataTable(df = df, headers = headers, item_key = 'student_id', class_ = "mc-question-summary-table")
+        rv.Divider()
     return main
 
                 
@@ -169,7 +176,7 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
                 if dquest is not None:
                     solara.Markdown(f"**Question**: {dquest}")
                 else:
-                    solara.Markdown(f"**Select a question form table** ")
+                    solara.Markdown(f"**Select a question from table** ")
             with solara.Column():
                 DataTable(df = df, headers = headers, on_row_click=row_action, show_index=True)
             

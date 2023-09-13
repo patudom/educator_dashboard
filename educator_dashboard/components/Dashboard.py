@@ -12,6 +12,7 @@ from .ClassProgress import ClassProgress
 from .StudentProgress import StudentProgressTable
 from .ResponsesComponents import StudentQuestionsSummary
 from .ResponsesComponents import IndividualStudentResponses
+from .StudentDataUpload import StudentNameUpload
 
 from solara.alias import rv
 
@@ -35,22 +36,46 @@ def initStudentID(student_id, roster):
         
 
 @solara.component
-def Dashboard(roster): 
+def ShowReport(roster):
+    if len(roster.value.roster) == 0:
+        return
+    dialog = rv.Dialog(
+        v_slots = [{
+            'name': 'activator',
+            'variable': 'x',
+            'children': rv.Btn(v_on='x.on', color='primary', dark=True, children=['Show Table'])
+            
+        }]
+    )
+    with dialog:
+        solara.DataFrame(roster.value.short_report())
+
+@solara.component
+def Dashboard(roster, student_names = None): 
     
     if roster.value is None:
         return
     
-    if len(roster.value.roster) == 0:
-        solara.Markdown(f"There are no students in the class {roster.value.class_id}")
-    
     student_id = solara.use_reactive(None)
+    student_names = solara.use_reactive(student_names)
+    show_student_tab = solara.use_reactive(0)
     old_set = student_id.set
-    student_id.set = print_function_name(old_set)
+    
+    def on_sid_set(value):
+        if value is None:
+            return
+        print(f"Setting student_id to {value}")
+        old_set(value)
+        show_student_tab.set(1)
+        # set tab to student responses
+    
+    student_id.set = print_function_name(on_sid_set)
     
     # a non-displaying component to 
     # make sure the student_id is valid
     initStudentID(student_id, roster)
     
+    StudentNameUpload(roster, student_names)
 
     # ClassProgress(df, roster)
     labels = ['Stage 1: </br> Velocities', 
@@ -62,18 +87,21 @@ def Dashboard(roster):
               ]
     
     with solara.GridFixed(columns=1, row_gap='0px', justify_items='stretch', align_items='start'):
-        ClassProgress(roster)
-        StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
-        
-            
+        with solara.Card():
+            solara.Markdown (f"## Class Progress")
+            ClassProgress(roster)
+            StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
 
-        with solara.lab.Tabs(vertical=True, align='right', dark=True):
-            
-            with solara.lab.Tab(label="Summary", icon_name="mdi-text-box-outline"):
-                StudentQuestionsSummary(roster, student_id)
+        with solara.Card():
+            solara.Markdown(f"##Student Responses and Data")
+
+            with solara.lab.Tabs(vertical=True, align='right', dark=True, value = show_student_tab):
                 
-            with solara.lab.Tab(label="Per Student" if student_id.value is None else f"For Student {student_id.value}", icon_name="mdi-file-question-outline"):
-                IndividualStudentResponses(roster, student_id)
-        
-            # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
-            #     StudentDataSummary(roster, student_id = student_id)
+                with solara.lab.Tab(label="Class Summary", icon_name="mdi-text-box-outline", classes=["my-tabs"]):
+                    StudentQuestionsSummary(roster, student_id)
+                    
+                with solara.lab.Tab(label="Student Responses" if student_id.value is None else f"Student {student_id.value}", classes=["my-tabs"]):
+                    IndividualStudentResponses(roster, student_id)
+            
+                # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
+                #     StudentDataSummary(roster, student_id = student_id)

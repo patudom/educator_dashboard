@@ -262,16 +262,18 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
     
     with solara.Column():
         with solara.Column():
-            
+            if 'name' in roster.students.columns:
+                idcol = {'value': 'name', 'text': 'Student Name'}
+            else:
+                idcol = {'value': 'student_id', 'text': 'Student ID'}
             headers = [
-                {'value': 'student_id', 'text': 'Student ID'},
+                idcol,
                 {'value': 'galaxy_id', 'text': 'Galaxy ID'},
                 {'value': 'velocity_value', 'text': 'Velocity <br/> (km/s)'},
                 {'value': 'est_dist_value', 'text': 'Distance <br/> (Mpc)'},
                 {'value': 'obs_wave_value', 'text': 'Observed Wavelength <br/> (Angstrom)'},
                 {'value': 'ang_size_value', 'text': 'Angular Size <br/> (arcsecond)'}
             ]
-            StudentData(roster, id_col="student_id", sid = student_id, cols_to_display = headers, allow_id_set = allow_sid_set)
                           
                           
         with solara.Columns([1,1]):

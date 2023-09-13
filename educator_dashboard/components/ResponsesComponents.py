@@ -23,10 +23,8 @@ def IndividualStudentResponses(roster, sid=None):
     
 
     if sid.value is None:
-        solara.Markdown('**Select a student from the table above to see their responses**')
+        solara.Markdown(f"####  Select a student from the table above to see their responses.")
         return
-    
-    solara.Markdown(f"**Current Student**: {sid}")
     
     # multiple choice questions
     with solara.lab.Tabs():
@@ -44,14 +42,16 @@ def IndividualStudentResponses(roster, sid=None):
 
 @solara.component
 def StudentQuestionsSummary(roster, sid = None):
-    
+
     if isinstance(roster, solara.Reactive):
         roster = roster.value
         if roster is None:
             return
-    
+
     with solara.lab.Tabs():
         with solara.lab.Tab("Multiple Choice"):
+            # if not empty_class:
+            solara.Markdown(f"####  Click any row for more detailed question information.")
             with ScrollY(height='50vh'):
                 MultipleChoiceSummary(roster)
             
