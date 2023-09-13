@@ -274,6 +274,8 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
                 {'value': 'obs_wave_value', 'text': 'Observed Wavelength <br/> (Angstrom)'},
                 {'value': 'ang_size_value', 'text': 'Angular Size <br/> (arcsecond)'}
             ]
+            
+            StudentData(roster, id_col="student_id", sid = student_id, cols_to_display = headers, allow_id_set = allow_sid_set)
                           
                           
         with solara.Columns([1,1]):
