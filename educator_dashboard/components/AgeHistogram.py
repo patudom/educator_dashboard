@@ -40,9 +40,10 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subs
 
     labels = {'age':'Age of Universe (Gyr)', 'student_id':'Student ID', 'h0':'Hubble Constant (km/s/Mpc)'}
 
-    fig = px.bar(data_frame = df_agg, x = which, y='count', color='group',hover_data='student_id', labels = labels, barmode='overlay', opacity=1, hover_name=['Full Class']*len(df_agg))
+    fig = px.bar(data_frame = df_agg, x = which, y='count', hover_data='student_id', labels = labels, barmode='overlay', opacity=1)
     fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>')
     fig.update_traces(marker_color='grey')
+    fig.add_trace(go.Bar(x=[None], y=[None], name = 'Full Class', marker_color = 'grey'))
     title = f'Class {which.capitalize()} Distribution' if title is None else title
     fig.update_layout(showlegend=True, title_text=title)
     # show only integers on y-axis
