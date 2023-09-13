@@ -90,7 +90,13 @@ def MultipleChoiceStageSummary(roster, stage = None):
                     solara.FigurePlotly(fig)
                     
                     with Collapsable(header='Show Table'):
-                        DataTable(df = df[['student_id', 'tries']], class_ = "mc-question-summary-table")
+                        if 'name' in roster.students.columns:
+                            headers = [{'text': 'Name', 'value': 'name'}, {'text': 'Tries', 'value': 'tries'}]
+                            # add names to df
+                            df = df.merge(roster.students[['student_id', 'name']], on='student_id', how='left')
+                        else:
+                            headers = [{'text': 'Student ID', 'value': 'student_id'}, {'text': 'Tries', 'value': 'tries'}]
+                        DataTable(df = df, headers = headers, item_key = 'student_id', class_ = "mc-question-summary-table")
         rv.Divider()
     return main
 

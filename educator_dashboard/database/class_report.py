@@ -291,6 +291,18 @@ class Roster():
                 else:
                     student['student']['name'] = student_names.get(student['student_id'], 'Student '+str(student['student_id']))
     
+    def get_student_name(self, sid = None):
+        if sid is None:
+            return 'None'
+        if len(self.roster) > 0:
+            index = self.student_ids.index(sid) if sid in self.student_ids else None
+            if index is not None:
+                return self.roster[index]['student'].get('name', sid)
+            else:
+                print(f'{sid} not in roster')
+        
+        return str(sid)
+    
     @property
     def responses(self):
         if len(self.roster) > 0:
@@ -299,6 +311,8 @@ class Roster():
         else:
             return self.make_dataframe(pd.DataFrame())
     
+    def convert_column_of_dates_to_datetime(self, dataframe_column):
+        return pd.to_datetime(dataframe_column).dt.tz_convert('US/Eastern').dt.strftime("%Y-%m-%d %H:%M:%S (Eastern)")
     
     @property
     def students(self):
@@ -307,6 +321,10 @@ class Roster():
             return self.make_dataframe(students)
         else:
             return pd.DataFrame({'student_id':[], 'username':[], 'class_id':[]})
+    
+    @property
+    def student_names(self):
+        return [self.get_student_name(sid) for sid in self.student_ids]
     
     @property
     def out_of(self):

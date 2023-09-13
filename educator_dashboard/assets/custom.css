@@ -1,0 +1,29 @@
+
+/* When updating css, you may need to force refresh the page (cmd+shift+r) for the browser to pick up on the changes. */
+
+.student-select {
+    width: 400px;
+}
+
+.mc-question-summary-table td:first-child {
+    background-color: aqua;
+}
+
+body {
+    padding-inline: 5% 
+}
+
+.my-tabs[aria-selected="true"] {
+  background-color: var(--md-blue-400) !important;
+}
+
+.modebar {
+    display: none !important;
+}   
+
+#click-any-row-for-more-detailed-question-information {
+    padding-left: 0.625rem;  /* 10px @ 16px/rem */
+}
+#select-a-student-from-the-table-above-to-see-their-responses {
+    padding-left: 0.625rem;;   
+}

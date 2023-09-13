@@ -130,10 +130,11 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
             solara.Markdown("There is no data for this class")
             return
         sids = dataframe[id_col].unique()
+        names = [roster.get_student_name(sid) for sid in sids]
         h0 = [get_slope(dataframe[dataframe[id_col] == sid]['est_dist_value'], dataframe[dataframe[id_col] == sid]['velocity_value']) for sid in sids]
         age = [slope2age(h) for h in h0]
         
-        data = DataFrame({'sids': [str(s) for s in sids], 'h0': around(h0,0).astype(int), 'age': around(age,0).astype(int)})
+        data = DataFrame({'sids': [str(s) for s in sids], 'names':names, 'h0': around(h0,0).astype(int), 'age': around(age,0).astype(int)})
         
         AgeHoHistogram(data)
 
@@ -154,9 +155,12 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
             DataSummary(roster, student_id, allow_click=allow_sid_set)
         
         with solara.Column():
-            
+            if 'name' in roster.students.columns:
+                idcol = {'value': 'name', 'text': 'Student Name'}
+            else:
+                idcol = {'value': 'student_id', 'text': 'Student ID'}
             headers = [
-                {'value': 'student_id', 'text': 'Student ID'},
+                idcol,
                 {'value': 'galaxy_id', 'text': 'Galaxy ID'},
                 {'value': 'velocity_value', 'text': 'Velocity <br/> (km/s)'},
                 {'value': 'est_dist_value', 'text': 'Distance <br/> (Mpc)'},
