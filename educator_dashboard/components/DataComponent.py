@@ -94,11 +94,9 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
         
     
     if allow_click:
-        with solara.Column(gap="0px"):
-            ClassPlot(data, on_click=on_plot_click, select_on = 'student_id', selected = student_id, allow_click=True, subset = subset, subset_label=subset_name, subset_color='mediumpurple')
+        ClassPlot(data, on_click=on_plot_click, select_on = 'student_id', selected = student_id, allow_click=True, subset = subset, subset_label=subset_name, subset_color='mediumpurple')
     else:
-        with solara.Column():
-            ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = False, subset = subset, subset_label=subset_name, subset_color='mediumpurple')
+        ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = False, subset = subset, subset_label=subset_name, subset_color='mediumpurple')
 
     
 
@@ -122,14 +120,14 @@ def slope2age(h0):
 @solara.component
 def StudentMeasurementTable(roster = None, sid = None, headers = None, show_class = False, show_index = False):
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
+    roster = solara.use_reactive(roster)
+    roster = roster.value
+    sid = solara.use_reactive(sid)
+    sid = sid.value
+    
     if roster is None:
         return
     
-    if isinstance(sid, solara.Reactive):
-        sid = sid.value
-        
     if sid in roster.student_ids:
         dataframe = DataFrame(roster.get_student_data(sid))
     elif (sid is None) and show_class:
@@ -177,7 +175,7 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
 
     if sid is not None and sid.value is not None:
         
-        with solara.Row():
+        with solara.ColumnsResponsive(medium=[3,9], small=12, wrap=True, gutters_dense=True):
             with solara.Column(gap="0px"):
                 single_student_df = roster.get_student_data(sid.value, df = True)
                 h0 = get_slope(single_student_df['est_dist_value'].to_numpy(), single_student_df['velocity_value'].to_numpy())
@@ -185,8 +183,8 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
                 solara.Markdown(f"**Hubble Constant**: {h0:.1f} km/s/Mpc")
                 solara.Markdown(f"**Age of Universe**: {age:.1f} Gyr")
                     
-            
-            StudentMeasurementTable(roster, sid, headers = cols_to_display)
+            with solara.Column():
+                StudentMeasurementTable(roster, sid, headers = cols_to_display)
             
 
 
@@ -226,27 +224,50 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
         subset = get_class_subset(data, sid, ungroup = False)
 
         AgeHoHistogram(data, 
-                       which = 'age', 
                        subset = subset, 
                        subset_label = f'Data seen by {sid.value}', 
-                       subset_color = 'mediumpurple',
-                       title = f'Class Age Distribution seen by {sid.value}')
+                       subset_color = 'mediumpurple')
     else:
-
-        # print out number of students with good data
-        num_good = len(data[~isnan(data['h0'])])
-        num_total = len(data)
-        n_students = len(roster.student_ids)
-        line1 = f"**Number of students**: {n_students} "
-        line2 = f"**Number of students with measurements**: {num_total}"
-        line3 = f"**Number of students with good measurements**: {num_good}"
-        
-        with Tooltip(tooltip = solara.Markdown('<br>'.join([line1,line2,line3])), 
-                     color = 'white',
-                     top=True):
-            solara.Text(f"{num_good}/{num_total} have good data")
-        
         AgeHoHistogram(data)
+
+@solara.component
+def StudentStats(roster):
+    """
+    Display statistics about the class
+    """
+    
+    roster = solara.use_reactive(roster)
+    roster = roster.value
+    if roster is None:
+        return
+    
+    stats = roster.class_measurement_status()
+    summary = stats['summary']
+    num_complete = summary['num_complete'] # number of students with complete measurements
+    n_students = summary['num_total']
+    num_incomplete = summary['num_incomplete']
+    num_vel = summary['num_vel'] # number of students with velocity measurements
+    num_dist = summary['num_dist'] # number of students with distance measurements
+    num_good = summary['num_good']  # number of students with measurements
+
+    # get students with bad measurements (-9999)
+    status_df = stats['status'] # dataframe
+    bad_vel = status_df[status_df['velocities'] == -9999].index.to_list()
+    bad_dist = status_df[status_df['distances'] == -9999].index.to_list()
+    # join
+    bad = set(bad_vel + bad_dist) # ints
+    
+    
+    
+    line1 = f"**Number of students**: {n_students}"
+    line2 = f"**Number of students with measurements**: {num_good}"
+    line3 = f"**Number of students who finished measurements **: {num_complete}"
+    
+    solara.Markdown('**Measurements Status**')
+    solara.Markdown('<br>'.join([line1,line2,line3]))
+    bad_str = ', '.join([str(i) for i in bad])
+    solara.Markdown(f'**Students with bad measurements**: {bad_str}')
+    
 
 
 @solara.component
@@ -278,10 +299,13 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
             StudentData(roster, id_col="student_id", sid = student_id, cols_to_display = headers, allow_id_set = allow_sid_set)
                           
                           
-        with solara.Columns([1,1]):
+        with solara.ColumnsResponsive(small=12, medium=[6,6], wrap=True, gutters_dense=True):
             with solara.Column():
                 DataSummary(roster, student_id, allow_click=allow_sid_set)
             with solara.Column():
                 DataHistogram(roster, sid = student_id)
+            
+            if student_id.value is None:
+                    with solara.Column():
+                        StudentStats(roster)       
         
-          

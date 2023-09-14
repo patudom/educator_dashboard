@@ -95,6 +95,16 @@ def ClassPlot(dataframe,
                                             marker_size = 10,
                                             marker_color = 'red'))
     
+    fig.update_layout(
+        legend = dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        margin=dict(l=50, r=50, t=50, b=50)
+    )
     
     
     return solara.FigurePlotly(fig, on_click=click_action, )
