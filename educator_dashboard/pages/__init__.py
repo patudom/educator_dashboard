@@ -44,7 +44,11 @@ def Page():
         with solara.Column():
             SetClass(class_id, roster, first_run)
             StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
-            RefreshClass(rate_minutes=5, roster = roster, student_names = dashboard_names.value)
+            RefreshClass(rate_minutes=5, roster = roster, student_names = dashboard_names.value,
+                         show_refresh_button=True, stop_start_button=True, refresh_button_text=None,
+                         # show button to manually refresh and to start/stop autorefresh. no text cuz icon_only is set
+                         refresh_button_color='primary', start_button_color='#777', stop_button_color='#ccc', 
+                         icon_only=True)
         
     Dashboard(roster, dashboard_names, add_names = dashboard_names.value is not None) 
     # solara.DataFrame(df.value)

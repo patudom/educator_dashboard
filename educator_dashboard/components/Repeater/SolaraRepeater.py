@@ -24,6 +24,7 @@ def Repeater(periodInMilliseconds = 1 * 60 * 1000, # 1 minute
             stopColor = '#ccc',
             icon_only = True,
             _show_debug = True,
+            refresh_button_text = "Refresh Data",
             **kwargs
             ):
     """    
@@ -71,7 +72,7 @@ def Repeater(periodInMilliseconds = 1 * 60 * 1000, # 1 minute
             tooltip = solara.Markdown(tooltip, style="max-width: 20ch")
             with solara.Tooltip(tooltip = tooltip):                    
                 refresh_button = solara.Button(
-                    label = None if icon_only else "Refresh Data",
+                    label = None if icon_only else refresh_button_text,
                     icon_name = "mdi-refresh-circle",
                     on_click = lambda*_: ping.set(ping.value + 1),
                     color = refresh_button_color,

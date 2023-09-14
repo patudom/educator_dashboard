@@ -13,7 +13,18 @@ def refresh_class(roster, student_names):
     roster.set(r)
 
 @solara.component
-def RefreshClass(rate_minutes = 5, on_refresh = None, roster = None, student_names = None):
+def RefreshClass(rate_minutes = 5, 
+                on_refresh = None, 
+                roster = None, 
+                student_names = None,
+                show_refresh_button = True,
+                stop_start_button = True,
+                refresh_button_color = 'primary',
+                start_button_color = '#777',
+                stop_button_color = '#ccc',
+                icon_only = True,
+                refresh_button_text = "Refresh Data",
+                ):
     print("**** refresh class component ****")
     if on_refresh is None:
         def on_refresh():
@@ -27,5 +38,9 @@ def RefreshClass(rate_minutes = 5, on_refresh = None, roster = None, student_nam
             on_refresh=on_refresh, 
             show_refresh_button=True, 
             stop_start_button=True, 
+            refresh_button_color=refresh_button_color,
+            startColor=start_button_color,
+            stopColor=stop_button_color,
+            refresh_button_text=refresh_button_text,
             icon_only=True,
             _show_debug=False)
