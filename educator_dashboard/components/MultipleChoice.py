@@ -5,7 +5,7 @@ import reacton.ipyvuetify as rv
 from pandas import DataFrame, Series, concat
 from ..database.Query import QueryCosmicDSApi as Query
 import plotly.express as px
-from .Collapsable import Collapsable
+from .Collapsible import Collapsible
 
 from .TableComponents import DataTable
 
@@ -90,7 +90,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
                         fig.update_xaxes(type='category')
                         solara.FigurePlotly(fig)
                                         
-                with Collapsable(header='Individual Student Tries for Question'):
+                with Collapsible(header='Individual Student Tries for Question'):
                     if 'name' in roster.students.columns:
                         headers = [{'text': 'Name', 'value': 'name'}, {'text': 'Tries', 'value': 'tries'}]
                         # add names to df

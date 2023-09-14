@@ -2,7 +2,7 @@ import solara
 from solara.alias import rv
 
 @solara.component
-def Collapsable(children = [], header = "Show Table"):
+def Collapsible(children = [], header = "Show Table"):
     with rv.ExpansionPanels():
         with rv.ExpansionPanel():
             with rv.ExpansionPanelHeader():

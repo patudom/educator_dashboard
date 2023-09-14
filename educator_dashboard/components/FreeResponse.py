@@ -4,7 +4,7 @@ from solara.alias import rv
 
 from pandas import DataFrame
 
-from .Collapsable import Collapsable
+from .Collapsible import Collapsible
 
 from ..database.Query import QueryCosmicDSApi as Query
 
