@@ -10,7 +10,7 @@ from ..components.StudentDataLoad import StudentNameLoad
 from ..database.class_report import Roster
 from typing import cast
 
-from pandas import DataFrame
+from ..components.RefreshClass import RefreshClass, refresh_class
 
 import copy
 
@@ -35,6 +35,7 @@ def Page():
     
     story_name = "HubbleDS"
     
+    
     with solara.Columns([1, 9, 3]):
         solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
 
@@ -43,6 +44,7 @@ def Page():
         with solara.Column():
             SetClass(class_id, roster, first_run)
             StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
+            RefreshClass(rate_minutes=5, roster = roster, student_names = dashboard_names.value)
         
     Dashboard(roster, dashboard_names, add_names = dashboard_names.value is not None) 
     # solara.DataFrame(df.value)
