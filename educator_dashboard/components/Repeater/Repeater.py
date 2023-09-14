@@ -9,6 +9,8 @@ import os
 
 import inspect
 
+from .SimpleRepeater import _callback_wrapper
+
 # stolen from solara/datatypes.py (thanks Maarten!)
 import dataclasses
 def _ensure_dict(d):
@@ -48,9 +50,10 @@ class _vRepeater(v.VuetifyTemplate):
     paused = Bool(default_value=False).tag(sync=True)
 
     
-    def vue_on_refresh(self, data):
+    def vue_on_refresh(self, *args, **kwargs):
+        print(f"vue_on_refresh: args {args}, kwargs {kwargs}")
         for callback in self.callbacks:
-            callback.on_click(data['loopCount'])
+            callback.on_click()
     
 
 @solara.component
@@ -117,19 +120,13 @@ def Repeater(periodInMilliseconds = 5 * 60 * 1000,
         - stopColor: the color of the stop button, by default "#777" (dark grey)
     """
     
-    if len(inspect.getfullargspec(on_refresh).args) == 0:
-        # the callback function must take at least 1 argument
-        callback = lambda _loopCount: on_refresh()
-    else:
-        callback = on_refresh
-    
     
     periodInMilliseconds = solara.use_reactive(periodInMilliseconds)
     
     return _Repeater(
         periodInMilliseconds = periodInMilliseconds.value,
         maxRepeat = maxRepeat,
-        on_refresh = callback,
+        on_refresh = _callback_wrapper(on_refresh),
         manualRefresh = show_refresh_button,
         stopStart = stop_start_button,
         manualRefreshColor = buttonColor,

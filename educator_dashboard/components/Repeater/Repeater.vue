@@ -93,7 +93,7 @@ export default {
       console.log('starting refresh')
       this.paused = false;
       this.intervalId = setInterval(() => {
-        this.on_refresh({ 'loopCount': this.loopCount });
+        this.on_refresh();
         this.loopCount++;
         if (this.maxRepeat > 0 && this.loopCount >= this.maxRepeat) {
           clearInterval(this.intervalId);
@@ -102,7 +102,7 @@ export default {
     },
 
     onClick() {
-      this.on_refresh({ 'loopCount':null});
+      this.on_refresh();
     }
   },
 

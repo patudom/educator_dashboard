@@ -66,7 +66,7 @@ export default {
         return;
       }
       this.intervalId = setInterval(() => {
-        this.on_refresh({ 'loopCount': this.loopCount });
+        this.on_refresh();
         this.loopCount++;
         if (this.maxRepeat > 0 && this.loopCount >= this.maxRepeat) {
           clearInterval(this.intervalId);

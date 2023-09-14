@@ -20,7 +20,13 @@ def _drop_keys_from_list_of_mappings(drop):
         return [{k: v for k, v in _ensure_dict(d).items() if k not in drop} for d in list_of_dicts]
     return closure
 
-
+def _callback_wrapper(callback):
+    argspec = inspect.getfullargspec(callback)
+    if argspec.varargs is None:
+        return lambda *_: callback()
+    else:
+        return callback
+    
 class _vSimpleRepeater(v.VuetifyTemplate):
     template_file = os.path.realpath(os.path.join(os.path.dirname(__file__), "SimpleRepeater.vue"))
     # props
@@ -42,9 +48,10 @@ class _vSimpleRepeater(v.VuetifyTemplate):
     
     # this emits events ['simple-repeat:reset', 'simple-repeat:pause', 'simple-repeat:unpause', 'simple-repeat:done']
     
-    def vue_on_refresh(self, data):
+    def vue_on_refresh(self, *args, **kwargs):
+        # print(f"vue_on_refresh: args {args}, kwargs {kwargs}")
         for callback in self.callbacks:
-            callback.on_click(data['loopCount'])
+            callback.on_click()
     
 
 @solara.component
@@ -79,7 +86,7 @@ def _SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000,
         
 @solara.component
 def SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000, 
-           on_refresh = lambda _loopCount: None, 
+           on_refresh = lambda *_: None, 
            maxRepeat = 0,
            reset = False,
            pause = False,
@@ -95,6 +102,7 @@ def SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000,
         the time between each refresh in milliseconds
     on_refresh : function
         the function to call when the refresh button is clicked or the timer is fired
+        this function should take no arguments or varargs (e.g. *args, **kwargs)
     maxRepeat : int
         the maximum number of times to repeat the refresh   
     reset : bool or solara.Reactive(Bool)
@@ -104,11 +112,7 @@ def SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000,
         if False, the repeater will resume refreshing from the current iteration     
     """
     
-    if len(inspect.getfullargspec(on_refresh).args) == 0:
-        # the callback function must take at least 1 argument
-        callback = lambda _loopCount: on_refresh()
-    else:
-        callback = on_refresh
+
     
     periodInMilliseconds = solara.use_reactive(periodInMilliseconds)
     reset = solara.use_reactive(reset)
@@ -118,7 +122,7 @@ def SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000,
     return _SimpleRepeater(
         periodInMilliseconds = periodInMilliseconds.value,
         maxRepeat = maxRepeat,
-        on_refresh = callback,
+        on_refresh = _callback_wrapper(on_refresh),
         reset = reset,
         pause = pause,
         showDebug = showDebug)
