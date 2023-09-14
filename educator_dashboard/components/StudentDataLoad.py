@@ -82,13 +82,11 @@ def StudentNameLoad(roster, student_names = None, names_set = None, on_update = 
     StudentLoadDialog(student_names, student_names_set = student_names_set)
     r = copy.copy(roster.value)
     if student_names.value is not None:
-        
+        print("updating student names")
         student_names_dict = {row['student_id']: row['name'] for _, row in student_names.value.iterrows()}
-        roster.value.set_student_names(student_names_dict)
-        roster.value.short_report(refresh = True)
-        if on_update is not None:
-            on_update(copy.copy(roster.value))
-        else:
-            roster.set(copy.copy(roster.value))
+        r.set_student_names(student_names_dict)
+        r.short_report(refresh = True)
+        roster.set(r)
         student_names_set.set(True)
+        on_update(student_names.value)
         student_names.set(None)

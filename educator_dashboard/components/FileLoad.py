@@ -120,7 +120,8 @@ def SetColumns(table, fixed_table = None, table_set = None):
         if student_id_column.value in cols and name_column.value in cols:
             df = table.value[[student_id_column.value, name_column.value]]
             df.columns = ['student_id', 'name']
-            fixed_table.set(df)
             table_set.set(df is not None)
+            fixed_table.set(df)
+            
     
 

@@ -12,13 +12,12 @@ from typing import cast
 
 from pandas import DataFrame
 
-
-
+import copy
 
 @solara.component
 def Page():
     solara.Title("CosmicDS Dashboard")
-
+    print(" ================== main page ================== ")
     
     # for testing use 
     # - 195 (a full current class)
@@ -28,8 +27,9 @@ def Page():
     # - 172 (old outdated class - should show stuff but probably incorrect)
     # - 170 (outdated class - should show nothing)
     class_id = solara.use_reactive(195) # add class id here
-    roster = solara.use_reactive(cast(Roster, None))
+    roster = solara.use_reactive(cast(Roster, None), on_change=lambda x: print("roster changed"))
     student_names = solara.use_reactive(None)
+    dashboard_names = solara.use_reactive(None)#, on_change=on_change_names)
     first_run = solara.use_reactive(True)
     are_names_set = solara.use_reactive(False)
     
@@ -42,9 +42,9 @@ def Page():
 
         with solara.Column():
             SetClass(class_id, roster, first_run)
-            StudentNameLoad(roster, student_names, names_set=are_names_set)
+            StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
         
-    Dashboard(roster, student_names=student_names) 
+    Dashboard(roster, dashboard_names, add_names = dashboard_names.value is not None) 
     # solara.DataFrame(df.value)
 
 

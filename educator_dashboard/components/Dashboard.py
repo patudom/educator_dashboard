@@ -50,7 +50,9 @@ def ShowReport(roster):
         solara.DataFrame(roster.value.short_report())
 
 @solara.component
-def Dashboard(roster, student_names = None): 
+def Dashboard(roster, student_names = None, add_names = False): 
+    print(" ========= dashboard component =========")
+    roster = solara.use_reactive(roster)
     
     if roster.value is None:
         return
@@ -69,6 +71,11 @@ def Dashboard(roster, student_names = None):
         # set tab to student responses
     
     student_id.set = print_function_name(on_sid_set)
+    
+    if add_names:
+        roster.value.set_student_names({row['student_id']: row['name'] for _, row in student_names.value.iterrows()})
+        roster.value.short_report(refresh = True)
+        # roster.set(roster.value)
     
     # a non-displaying component to 
     # make sure the student_id is valid
