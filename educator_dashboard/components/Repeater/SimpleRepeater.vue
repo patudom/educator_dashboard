@@ -47,6 +47,12 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+
+    ping: {
+      type: Number,
+      required: false,
+      default: 0
     }
     
     
@@ -78,6 +84,12 @@ export default {
   },
 
   mounted() {
+    // write a console log showing period and starting loop and if it is paused and when it will stop
+    // console.log(`simple-repeat:mounted: period=${this.periodInMilliseconds}ms, maxRepeat=${this.maxRepeat}, pause=${this.pause}`)
+    console.log('simple-repeat:  mounted')
+    console.log(`simple-repeat:  period ${this.periodInMilliseconds}ms (${this.periodInMilliseconds / 1000}s)`)
+    console.log(`simple-repeat:  maxRepeat ${this.maxRepeat} [0=forever]`)
+    console.log(`simple-repeat:  Loop is now ${this.pause ? 'paused' : 'running'}`)
     this.startRefresh();
   },
 
@@ -123,6 +135,12 @@ export default {
         console.log('simple-repeat:done')
         this.$emit('simple-repeat:done');
       }
+    },
+
+    ping() {
+      console.log('simple-repeat:manual-refresh')
+      this.on_refresh();
+      this.$emit('simple-repeat:manual-refresh');
     }
   }
 }

@@ -37,6 +37,7 @@ class _vSimpleRepeater(v.VuetifyTemplate):
     reset = Bool(default_value=False).tag(sync=True)
     pause = Bool(default_value=False).tag(sync=True)
     showDebug = Bool(default_value=False).tag(sync=True)
+    ping = Int(default_value=0).tag(sync=True) # this is a dummy variable to force the component to refresh. Increment it to refresh the component.
 
     # callback
     callbacks = List(Instance(solara.CellAction), default_value=[]).tag(sync=True, to_json=_drop_keys_from_list_of_mappings(['on_click']))
@@ -60,11 +61,13 @@ def _SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000,
              maxRepeat = 0,
              reset = False,
              pause = False,
+             ping = 0,
              showDebug = False):
     
     periodInMilliseconds = solara.use_reactive(periodInMilliseconds)
     reset = solara.use_reactive(reset)
     pause = solara.use_reactive(pause)
+    ping = solara.use_reactive(ping)
     showDebug = solara.use_reactive(showDebug)
     
     
@@ -77,6 +80,7 @@ def _SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000,
         callbacks = cell_actions,
         reset = reset.value,
         pause = pause.value,
+        ping = ping.value,
         showDebug = showDebug.value)    
     
     # create event listeners
@@ -90,6 +94,7 @@ def SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000,
            maxRepeat = 0,
            reset = False,
            pause = False,
+           ping = 0,
            showDebug = False):
            
     """
@@ -117,6 +122,7 @@ def SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000,
     periodInMilliseconds = solara.use_reactive(periodInMilliseconds)
     reset = solara.use_reactive(reset)
     pause = solara.use_reactive(pause)
+    ping = solara.use_reactive(ping)
     showDebug = solara.use_reactive(showDebug)
     
     return _SimpleRepeater(
@@ -125,6 +131,7 @@ def SimpleRepeater(periodInMilliseconds = 5 * 60 * 1000,
         on_refresh = _callback_wrapper(on_refresh),
         reset = reset,
         pause = pause,
+        ping=ping,
         showDebug = showDebug)
 
     
