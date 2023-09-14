@@ -87,7 +87,7 @@ def FreeResponseSummary(roster):
     stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
     
 
-    with solara.Columns([3, 1]):
+    with solara.Columns([5, 1], style={"height": "100%"}):
         with solara.Column():
             for stage in stages:     
                 question_responses = roster.l2d(fr_questions[stage]) # {'key': ['response1', 'response2',...]}
