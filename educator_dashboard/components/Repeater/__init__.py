@@ -1,2 +1,3 @@
 from .SimpleRepeater import SimpleRepeater
-from .Repeater import Repeater
+from .SolaraRepeater import Repeater
+#from .Repeater import Repeater as vueRepeater

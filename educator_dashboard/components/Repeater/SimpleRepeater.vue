@@ -1,15 +1,16 @@
 <template>
   <div :class="['simple-repeater', showDebug ? '' : 'hidden']">
-  <div v-if="showDebug">
-    <p> pause: {{ pause }}</p>
-    <p> reset: {{ reset }}</p>
-    <p> done: {{ done }}</p>
-    <p> loopCount: {{ loopCount }}</p>
-    <p> intervalId: {{ intervalId }}</p>
-    <p> maxRepeat: {{ maxRepeat }}</p>
-    <p> period (ms): {{ periodInMilliseconds }}</p>
+    <div v-if="showDebug">
+      <p> pause: {{ pause }}</p>
+      <p> reset: {{ reset }}</p>
+      <p> done: {{ done }}</p>
+      <p> loopCount: {{ loopCount }}</p>
+      <p> intervalId: {{ intervalId }}</p>
+      <p> maxRepeat: {{ maxRepeat }}</p>
+      <p> period (ms): {{ periodInMilliseconds }}</p>
+    </div>
   </div>
-</div>
+
 </template>
 
 <script>
