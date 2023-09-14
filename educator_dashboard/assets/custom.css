@@ -16,6 +16,17 @@
     --info-dark: #BF360C ;
     --success-dark: #00E676 ;
     --warning-dark: #DD2C00 ;
+    
+    --cosmic-red: #e60001 ;
+    --cosmic-blue: #0e397e ;
+    
+    --cosmic-red-lighter: #ff4d4d ;
+    --cosmic-blue-lighter: #1861d8 ;
+    
+    --cosmic-red-darker: #800000 ;
+    --cosmic-blue-darker: #09234e ;
+    
+    
 }
 
 /* media query preferes light color scheme */

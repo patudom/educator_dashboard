@@ -1,7 +1,7 @@
 
 vuetifyThemes = {
-    theme: {'dark': true},
-    light: {
+    theme: {'light': true}, // this doesn't do anything. 
+    light: { // currently using this one
         // primary: colors.blue.darken3,
         // secondary: colors.cyan.darken4,
         // accent: colors.amber.accent2,
@@ -15,7 +15,9 @@ vuetifyThemes = {
         error: "#F06292" ,
         info: "#FF7043" ,
         success: "#00E676" ,
-        warning: "#DD2C00" ,
+        warning: "#DD2C00",
+        cosmicRed: "#e60001",
+        cosmicBlue: "#0E397E",
     },
     dark: {
         // primary: colors.blue.darken4,
@@ -32,5 +34,7 @@ vuetifyThemes = {
         info: "#BF360C",
         success: "#00E676",
         warning: "#DD2C00",
+        cosmicRed: "#e60001",
+        cosmicBlue: "#0E397E",
     }
 }
