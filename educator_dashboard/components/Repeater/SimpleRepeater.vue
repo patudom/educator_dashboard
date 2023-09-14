@@ -83,7 +83,7 @@ export default {
 
   beforeDestroy() {
     console.log('clearing interval before destroy')
-    this.reset();
+    clearInterval(this.intervalId);
   },
 
   watch: {
