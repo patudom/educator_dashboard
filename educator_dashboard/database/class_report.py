@@ -460,6 +460,9 @@ class Roster():
         print(' >>> Getting class data')
         self.get_class_data()
         self._refresh = False
+    
+    def empty_copy(self):
+        return Roster(class_id = self.class_id)
 
 
 
