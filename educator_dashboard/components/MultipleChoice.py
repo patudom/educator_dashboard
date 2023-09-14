@@ -90,7 +90,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
                         fig.update_xaxes(type='category')
                         solara.FigurePlotly(fig)
                                         
-                with Collapsable(header='Show Table'):
+                with Collapsable(header='Individual Student Tries for Question'):
                     if 'name' in roster.students.columns:
                         headers = [{'text': 'Name', 'value': 'name'}, {'text': 'Tries', 'value': 'tries'}]
                         # add names to df
