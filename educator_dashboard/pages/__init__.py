@@ -31,6 +31,7 @@ def Page():
     roster = solara.use_reactive(cast(Roster, None))
     student_names = solara.use_reactive(None)
     first_run = solara.use_reactive(True)
+    are_names_set = solara.use_reactive(False)
     
     story_name = "HubbleDS"
     
@@ -41,7 +42,7 @@ def Page():
 
         with solara.Column():
             SetClass(class_id, roster, first_run)
-            StudentNameLoad(roster, student_names)
+            StudentNameLoad(roster, student_names, names_set=are_names_set)
         
     Dashboard(roster, student_names=student_names) 
     # solara.DataFrame(df.value)

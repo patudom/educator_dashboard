@@ -7,14 +7,20 @@ import reacton.ipyvuetify as rv
 import copy
 
 @solara.component
-def StudentDataLoadInterface(name_dataframe = None, on_load = None):
+def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = None):
     
     
     file_info = solara.use_reactive(None)
     has_header = solara.use_reactive(True)
     table = solara.use_reactive(None)
+    table_set = solara.use_reactive(table_set)
     
-    file_loaded = solara.use_reactive(False)
+    def on_clear(value):
+        if not value:
+            table.set(None)
+            table_set.set(False)
+    
+    file_loaded = solara.use_reactive(False, on_change = on_clear)
 
     with solara.Columns([1, 1]):
         with solara.Column():
@@ -30,20 +36,18 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None):
             TableDisplay(file_info, has_header, on_table = table.set)
     
     with solara.Div():
-        SetColumns(table, fixed_table = name_dataframe)
+        SetColumns(table, fixed_table = name_dataframe, table_set = table_set)
         
 
 
 
 @solara.component
-def StudentNameLoad(roster = None, student_names = None, on_update = None):
+def StudentLoadDialog(student_names = None, student_names_set = None, dialog_open = False):
     
-
-    roster = solara.use_reactive(roster)
     student_names = solara.use_reactive(student_names)
-    student_names_set = solara.use_reactive(False)
+    student_names_set = solara.use_reactive(student_names_set)
     
-    dialog_open = solara.use_reactive(False)
+    dialog_open = solara.use_reactive(dialog_open)
       
     dialog = rv.Dialog(
         v_model = dialog_open.value,
@@ -60,13 +64,22 @@ def StudentNameLoad(roster = None, student_names = None, on_update = None):
     
     with dialog:
         with solara.Card():
-            StudentDataLoadInterface(student_names)
+            StudentDataLoadInterface(student_names, table_set = student_names_set)
             if student_names_set.value:
                 solara.Success("Successfully updated student names!", dense=True, outlined=True)
             with solara.CardActions():
                 solara.Button(icon_name="mdi-close-circle",label = "Close", on_click = lambda: dialog_open.set(False), text=True, outlined=True)
-        
-    # need a copy in order to update
+
+
+
+@solara.component
+def StudentNameLoad(roster, student_names = None, names_set = None, on_update = None):
+    print("student name load component")
+    roster = solara.use_reactive(roster)
+    student_names = solara.use_reactive(student_names)
+    student_names_set = solara.use_reactive(names_set)
+    
+    StudentLoadDialog(student_names, student_names_set = student_names_set)
     r = copy.copy(roster.value)
     if student_names.value is not None:
         
