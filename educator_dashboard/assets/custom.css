@@ -13,10 +13,47 @@ body {
     padding-inline: 5% 
 }
 
-.my-tabs[aria-selected="true"] {
-  background-color: var(--md-blue-400) !important;
+.my-buttons {
+    background-color: var(--md-blue-800) !important;
+    color: white !important;
 }
 
+.vertical-tabs {
+    width: 100%;
+}
+
+.vertical-tabs[aria-selected="true"] {
+    background-color: var(--md-deep-orange-800) !important;
+}
+
+.v-tabs--vertical .v-tabs-slider {
+    color:  var(--md-deep-orange-800);
+}
+
+.horizontal-tabs[aria-selected="true"] {
+    color: var(--md-blue-800) !important;
+    font-weight: 800; 
+}
+
+.v-card__text {
+    color: black !important;
+}
+
+.info-text{
+    padding: 0.5rem;
+}
+
+#h2 {
+    margin-top: 0rem !important;
+}
+
+.v-expansion-panel-header {
+    padding-left: 1rem;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* Disable plotly tools */
 .modebar {
     display: none !important;
 }   
@@ -25,5 +62,5 @@ body {
     padding-left: 0.625rem;  /* 10px @ 16px/rem */
 }
 #select-a-student-from-the-table-above-to-see-their-responses {
-    padding-left: 0.625rem;;   
+    padding-left: 0.625rem;   
 }

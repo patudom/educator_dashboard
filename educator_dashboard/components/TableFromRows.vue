@@ -50,6 +50,7 @@ export default {
 
 #table-from-rows {
   position: relative;
+  margin-top: 0.75rem;
 }
 
 #table-from-rows > table {
@@ -69,15 +70,15 @@ export default {
 .fixed_header_table_wrapper > table > thead {
   position: sticky;
   top: 0;
-  background-color: #f2f2f2;
-  color: black;
+  background-color: var(--md-blue-800);
+  color: white;
   z-index: 2;
 }
 
 
 
 #table-from-rows tr:hover {
-  background-color: #ededed;
+  background-color: var(--md-grey-300);
 }
 
 #table-from-rows tbody > tr {
@@ -89,8 +90,4 @@ export default {
   text-align: center;
 }
 
-/* every other row */
-#table-from-rows tbody > tr:nth-child(odd):not(:hover) {
-  background-color: #fff2a944;
-}
 </style>
