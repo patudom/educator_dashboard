@@ -13,7 +13,7 @@ from ..database.Query import QueryCosmicDSApi as Query
 
 @solara.component_vue('FreeResponseQuestion.vue')
 def FreeResponseQuestion(question='', shortquestion='', responses=[], names = [],
-                         hideShortQuestion = False, hideQuestion = False, hideResponses = False):
+                         hideShortQuestion = False, hideQuestion = False, hideResponses = False, hideName = False):
     """
     free_response = {
         'question': '',
@@ -25,7 +25,7 @@ def FreeResponseQuestion(question='', shortquestion='', responses=[], names = []
 
 @solara.component
 def FreeResponseQuestionResponseSummary(question_responses, question_text, names = None,
-                                        hideShortQuestion = False, hideQuestion = False, hideResponses = False
+                                        hideShortQuestion = False, hideQuestion = False, hideResponses = False, hideName = False
                                         ):
     """
     question_responses = {'key': ['response1', 'response2',...]}
@@ -69,7 +69,8 @@ def FreeResponseQuestionResponseSummary(question_responses, question_text, names
                                              names = names,
                                              hideShortQuestion = hideShortQuestion, 
                                              hideQuestion = hideQuestion, 
-                                             hideResponses = hideResponses)
+                                             hideResponses = hideResponses,
+                                             hideName = hideName)
 
 
 @solara.component
@@ -140,5 +141,6 @@ def FreeResponseQuestionSingleStudent(roster, sid = None):
                                 shortquestion = shortquestion, 
                                 responses = responses, 
                                 hideShortQuestion = True,
+                                hideName = True
                                 )
         

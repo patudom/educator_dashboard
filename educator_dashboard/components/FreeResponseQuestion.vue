@@ -9,7 +9,7 @@
         </div>
 
         <div  v-if="!hideResponses" class="response-row" v-for="(response, index) in responseList">
-          <div class="name-item" v-if="names != null" >
+          <div class="name-item" v-if="names != null && !hideName" >
             {{ getName(index) }}
           </div>
             <div class="response-item">
@@ -57,6 +57,11 @@ export default {
     },
 
     hideResponses: {
+      type: Boolean,
+      default: false
+    },
+
+    hideName: {
       type: Boolean,
       default: false
     },
