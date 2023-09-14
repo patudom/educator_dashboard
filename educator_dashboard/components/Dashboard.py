@@ -57,20 +57,16 @@ def Dashboard(roster, student_names = None, add_names = False):
     if roster.value is None:
         return
     
-    student_id = solara.use_reactive(None)
+    # student_id = solara.use_reactive(None)
     student_names = solara.use_reactive(student_names)
     show_student_tab = solara.use_reactive(0)
-    old_set = student_id.set
-    
     def on_sid_set(value):
-        if value is None:
-            return
-        print(f"Setting student_id to {value}")
-        old_set(value)
-        show_student_tab.set(1)
-        # set tab to student responses
+        if value is not None:
+            print(f"Setting student_id to {value}")
+            show_student_tab.set(1)
+    student_id = solara.use_reactive(None, on_change=print_function_name(on_sid_set))
     
-    student_id.set = print_function_name(on_sid_set)
+    
     
     if add_names:
         roster.value.set_student_names({row['student_id']: row['name'] for _, row in student_names.value.iterrows()})
