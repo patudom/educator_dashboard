@@ -73,20 +73,10 @@ def StudentProgressTable(roster = None,
     
     """
     
-    if roster is None:
-        if progress_data is None:
-            solara.Markdown("This class does not exist")
-            return
-        else:
-            progress_data = solara.use_reactive(progress_data)
-    else:
-        r = roster.value if isinstance(roster, solara.Reactive) else roster
-        progress_data = solara.use_reactive(r.short_report())
+    roster = solara.use_reactive(roster)
+    data = roster.value.short_report()
     
-    if progress_data.value is None:
-        return
-    
-    data = progress_data.value
+
     
     # make sure we have a dataframe
     if isinstance(data, dict):
