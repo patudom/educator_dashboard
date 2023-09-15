@@ -128,3 +128,15 @@ body {
 .solara-markdown {
     padding-left: 0.5rem;
 }
+
+/* make vertical tabs horizontal on tall screns */
+@media (max-width: 960px) {
+    .v-tabs--vertical {
+        display: block;
+    }
+    
+    .v-tabs--vertical>.v-tabs-bar .v-tabs-bar__content {
+        flex-direction: row
+    }
+
+}
