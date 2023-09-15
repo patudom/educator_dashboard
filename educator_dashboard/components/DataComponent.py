@@ -297,16 +297,16 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
         student_id = solara.use_reactive(student_id)
 
 
-    with solara.ColumnsResponsive(small=12, medium=[6,6], wrap=True, gutters_dense=True):
-        with solara.Columns([1,1]):
+    with solara.ColumnsResponsive(small=10, medium = [6,6], wrap=True, gutters_dense=True, style="justify-content: start;"):
+        with solara.Column():
             with solara.Card(style='height: 95%'):
                 DataSummary(roster, student_id, allow_click=allow_sid_set)
-
+        with solara.Column():
             with solara.Card(style='height: 95%'):
                 DataHistogram(roster, sid = student_id)
 
     if student_id is not None and student_id.value is not None:
-        with solara.ColumnsResponsive(small=12, medium=[6,6], wrap=True, gutters_dense=True):
+        with solara.Row():
             with solara.Columns([1,1]):
                 with solara.Card(style='height: 90%'):
                     solara.Markdown(f"#### Student Galaxy Measurements")
