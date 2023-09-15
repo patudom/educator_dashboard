@@ -73,6 +73,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
                 items=data_values,
                 on_row_click=on_change,
                 show_index=True,
+                class_ = "mc-question-summary-table"
             )
 
         with solara.Columns([1,1]):
@@ -172,14 +173,15 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
                         """.format(stage, completed, total, points, total_points, avg_tries))    
         
     with solara.Row():
-        with solara.Columns([1,2]):
+        with solara.Columns([1,1]):
             with solara.Column():
-                if dquest is not None:
+                if len(dquest)>0:
                     solara.Markdown(f"**Question**: {dquest}")
                 else:
-                    solara.Markdown(f"**Select a question from table** ")
+                    solara.Markdown(f"**Select a row from table to see full question text.** ")
             with solara.Column():
-                DataTable(df = df, headers = headers, on_row_click=row_action, show_index=True)
+                DataTable(df = df, headers = headers, on_row_click=row_action, show_index=True, class_ = "mc-individual-student-table")
+    rv.Divider()
             
 
         
@@ -218,6 +220,5 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None):
             {'text': 'Tries', 'value': 'tries'},
             {'text': 'Score', 'value': 'score'},
         ]
-        with solara.Card():
-            MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage)
+        MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage)
             
