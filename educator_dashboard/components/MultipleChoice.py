@@ -2,7 +2,8 @@ import solara
 
 import reacton.ipyvuetify as rv
 
-from pandas import DataFrame, Series, concat
+import pandas as pd
+from pandas import DataFrame, Series
 from ..database.Query import QueryCosmicDSApi as Query
 import plotly.express as px
 from .Collapsible import Collapsible
@@ -43,7 +44,6 @@ def MultipleChoiceStageSummary(roster, stage = None):
     
     tries_1d = hstack(tries)
     tries_1d = Series(tries_1d).dropna()
-    
     
     with solara.GridFixed(columns=1, justify_items='stretch', align_items='start') as main:
         solara.Markdown(f"### Stage {stage}")
@@ -92,13 +92,17 @@ def MultipleChoiceStageSummary(roster, stage = None):
                         solara.FigurePlotly(fig)
                                         
                 with Collapsible(header='Individual Student Tries for Question'):
+                    # Round tries to integers and leave a blank for nan values
+                    df['rounded_tries'] = df['tries'].round().astype('Int64')
+                    df['rounded_tries'] = df['rounded_tries'].apply(lambda x: '' if pd.isna(x) else x)
+
                     if 'name' in roster.students.columns:
-                        headers = [{'text': 'Name', 'value': 'name'}, {'text': 'Tries', 'value': 'tries'}]
+                        headers = [{'text': 'Name', 'value': 'name'}, {'text': 'Tries', 'value': 'rounded_tries'}]
                         # add names to df
                         df = df.merge(roster.students[['student_id', 'name']], on='student_id', how='left')
                     else:
-                        headers = [{'text': 'Student ID', 'value': 'student_id'}, {'text': 'Tries', 'value': 'tries'}]
-                    DataTable(df = df, headers = headers, item_key = 'student_id', class_ = "mc-question-summary-table")
+                        headers = [{'text': 'Student ID', 'value': 'student_id'}, {'text': 'Tries', 'value': 'rounded_tries'}]
+                    DataTable(df = df, headers = headers, item_key = 'student_id', class_ = "mc-question-students-table")
         rv.Divider()
     return main
 
@@ -128,7 +132,7 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
     
     if isinstance(df, solara.Reactive):
         df = df.value
-    
+
     dquest, set_dquest = solara.use_state('')
    
     
