@@ -35,14 +35,15 @@ def Page():
     story_name = "HubbleDS"
     
     with solara.Columns([1, 9, 3]):
-        solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
+        # solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
+        solara.Image(image="static/assets/cosmicds_logo_transparent.png")
 
         solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
 
         with solara.Column():
             SetClass(class_id, roster, first_run)
             StudentNameLoad(roster, student_names)
-        
+
     Dashboard(roster, student_names=student_names) 
     # solara.DataFrame(df.value)
 
