@@ -82,20 +82,3 @@ body {
 #select-a-student-from-the-table-above-to-see-their-responses {
     padding-left: 0.625rem;;   
 }
-
-
-.completed,
-.in-progress {
-    background-color: var(--md-light-green-600)!important;
-}
-
-.completed-lighter {
-    background-color: var(--md-light-green-300)!important;
-}
-
-
-.in-progress-lighter,
-.not-started,
-.not-started-lighter {
-    background-color: var(--md-amber-300)!important;
-}
