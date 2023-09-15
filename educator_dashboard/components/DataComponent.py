@@ -20,6 +20,9 @@ def get_class_subset(data, sid, ungroup = True):
         return None
     sid = str(sid)
     
+    if 'last_modified' not in data.columns:
+        return [True for i in range(len(data))]
+    
     # convert last_modified to datetime
     data['last_modified'] = to_datetime(data['last_modified'])
     data['student_id'] = data['student_id'].apply(str)
@@ -218,7 +221,6 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
         return
     
     dataframe = roster.get_class_data(df = True)
-    dataframe['last_modified'] = to_datetime(dataframe['last_modified'])
     if len(dataframe) == 0:
         solara.Markdown("There is no data for this class")
         return
