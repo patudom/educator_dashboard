@@ -40,7 +40,7 @@ def Page():
 
         solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
 
-        with solara.Column():
+        with solara.Column(gap="0px"):
             SetClass(class_id, roster, first_run)
             StudentNameLoad(roster, student_names)
 
