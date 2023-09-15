@@ -185,12 +185,14 @@ def StudentAgeHubble(roster = None, sid = None, allow_id_set = True):
     if roster is None:
         return
     
+    sid = solara.use_reactive(sid)
+    
     dataframe = roster.get_class_data(df = True)
     if len(dataframe) == 0:
         solara.Markdown("There is no data for this class")
         return
 
-    if sid is not None and sid.value is not None:        
+    if sid.value is not None and sid.value in roster.student_ids:        
         single_student_df = roster.get_student_data(sid.value, df = True)
         print("single_student", sid, sid.value, single_student_df)
         h0 = get_slope(single_student_df['est_dist_value'].to_numpy(), single_student_df['velocity_value'].to_numpy())
