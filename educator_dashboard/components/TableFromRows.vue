@@ -81,8 +81,10 @@ export default {
   background-color: var(--md-grey-300);
 }
 
-#table-from-rows tbody > tr {
-  border-bottom: 1px solid #d7d7d7;
+
+
+#table-from-rows thead>tr:hover {
+  background-color: unset;
 }
 
 #table-from-rows td, th {
