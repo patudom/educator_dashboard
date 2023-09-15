@@ -2,10 +2,11 @@ import solara
 
 import reacton.ipyvuetify as rv
 
-from pandas import DataFrame, Series, concat
+import pandas as pd
+from pandas import DataFrame, Series
 from ..database.Query import QueryCosmicDSApi as Query
 import plotly.express as px
-from .Collapsable import Collapsable
+from .Collapsible import Collapsible
 
 from .TableComponents import DataTable
 
@@ -44,7 +45,6 @@ def MultipleChoiceStageSummary(roster, stage = None):
     tries_1d = hstack(tries)
     tries_1d = Series(tries_1d).dropna()
     
-    
     with solara.GridFixed(columns=1, justify_items='stretch', align_items='start') as main:
         solara.Markdown(f"### Stage {stage}")
 
@@ -73,6 +73,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
                 items=data_values,
                 on_row_click=on_change,
                 show_index=True,
+                class_ = "mc-question-summary-table"
             )
 
         with solara.Columns([1,1]):
@@ -90,14 +91,18 @@ def MultipleChoiceStageSummary(roster, stage = None):
                         fig.update_xaxes(type='category')
                         solara.FigurePlotly(fig)
                                         
-                with Collapsable(header='Show Table'):
+                with Collapsible(header='Individual Student Tries for Question'):
+                    # Round tries to integers and leave a blank for nan values
+                    df['rounded_tries'] = df['tries'].round().astype('Int64')
+                    df['rounded_tries'] = df['rounded_tries'].apply(lambda x: '' if pd.isna(x) else x)
+
                     if 'name' in roster.students.columns:
-                        headers = [{'text': 'Name', 'value': 'name'}, {'text': 'Tries', 'value': 'tries'}]
+                        headers = [{'text': 'Name', 'value': 'name'}, {'text': 'Tries', 'value': 'rounded_tries'}]
                         # add names to df
                         df = df.merge(roster.students[['student_id', 'name']], on='student_id', how='left')
                     else:
-                        headers = [{'text': 'Student ID', 'value': 'student_id'}, {'text': 'Tries', 'value': 'tries'}]
-                    DataTable(df = df, headers = headers, item_key = 'student_id', class_ = "mc-question-summary-table")
+                        headers = [{'text': 'Student ID', 'value': 'student_id'}, {'text': 'Tries', 'value': 'rounded_tries'}]
+                    DataTable(df = df, headers = headers, item_key = 'student_id', class_ = "mc-question-students-table")
         rv.Divider()
     return main
 
@@ -127,7 +132,7 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
     
     if isinstance(df, solara.Reactive):
         df = df.value
-    
+
     dquest, set_dquest = solara.use_state('')
    
     
@@ -172,14 +177,15 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
                         """.format(stage, completed, total, points, total_points, avg_tries))    
         
     with solara.Row():
-        with solara.Columns([1,2]):
+        with solara.Columns([1,1]):
             with solara.Column():
-                if dquest is not None:
+                if len(dquest)>0:
                     solara.Markdown(f"**Question**: {dquest}")
                 else:
-                    solara.Markdown(f"**Select a question from table** ")
+                    solara.Markdown(f"**Select a row from table to see full question text.** ")
             with solara.Column():
-                DataTable(df = df, headers = headers, on_row_click=row_action, show_index=True)
+                DataTable(df = df, headers = headers, on_row_click=row_action, show_index=True, class_ = "mc-individual-student-table")
+    rv.Divider()
             
 
         
@@ -218,6 +224,5 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None):
             {'text': 'Tries', 'value': 'tries'},
             {'text': 'Score', 'value': 'score'},
         ]
-        with solara.Card():
-            MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage)
+        MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage)
             

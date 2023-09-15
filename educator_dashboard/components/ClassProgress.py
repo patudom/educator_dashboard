@@ -1,5 +1,5 @@
 import solara
-from .Collapsable import Collapsable
+from .Collapsible import Collapsible
 
 
 @solara.component
@@ -11,7 +11,7 @@ def ClassProgress(roster):
             solara.Markdown(f"### Error: There are no students in the class {roster.value.class_id}")
             return
         else:
-            with Collapsable(header = "See Class Roster to see what is wrong"):
+            with Collapsible(header = "See Class Roster to see what is wrong"):
                 solara.Markdown(f"Class roster: {roster.value.roster}")
                 return
                 

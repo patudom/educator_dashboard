@@ -51,7 +51,9 @@ def ClassPlot(dataframe,
                y_col: "{label} ({units})".format(**xy_label['y'])}
     fig = px.scatter(dataframe, x=x_col, y=y_col, custom_data = label_col, labels = labels)
     fig.update_traces(marker_color='grey')
-    fig.update_layout(modebar = config)
+    fig.update_layout(modebar = config, title="Class Hubble Diagram", xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
+    fig.update_xaxes(linecolor='black')
+    fig.update_yaxes(linecolor='black')
     # add empty trace to show on legend
     fig.add_trace(go.Scatter(x=[None], y=[None], mode = 'markers', name = 'Full Class', marker_color = 'grey'))
 

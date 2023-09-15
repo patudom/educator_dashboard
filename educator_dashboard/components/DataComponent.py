@@ -173,20 +173,32 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
         return
 
 
-    if sid is not None and sid.value is not None:
-        
-        with solara.ColumnsResponsive(medium=[3,9], small=12, wrap=True, gutters_dense=True):
-            with solara.Column(gap="0px"):
-                single_student_df = roster.get_student_data(sid.value, df = True)
-                h0 = get_slope(single_student_df['est_dist_value'].to_numpy(), single_student_df['velocity_value'].to_numpy())
-                age = slope2age(h0)
-                solara.Markdown(f"**Hubble Constant**: {h0:.1f} km/s/Mpc")
-                solara.Markdown(f"**Age of Universe**: {age:.1f} Gyr")
-                    
-            with solara.Column():
-                StudentMeasurementTable(roster, sid, headers = cols_to_display)
-            
 
+    if sid is not None and sid.value is not None:        
+        StudentMeasurementTable(roster, sid, headers = cols_to_display)
+            
+@solara.component
+def StudentAgeHubble(roster = None, sid = None, allow_id_set = True):
+
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+    if roster is None:
+        return
+    
+    dataframe = roster.get_class_data(df = True)
+    if len(dataframe) == 0:
+        solara.Markdown("There is no data for this class")
+        return
+
+    if sid is not None and sid.value is not None:        
+        single_student_df = roster.get_student_data(sid.value, df = True)
+        print("single_student", sid, sid.value, single_student_df)
+        h0 = get_slope(single_student_df['est_dist_value'].to_numpy(), single_student_df['velocity_value'].to_numpy())
+        age = slope2age(h0)
+        solara.Markdown(f"#### Student Age of Universe:")
+        solara.Markdown(f"{age:.0f} Gyr")
+        solara.Markdown(f"#### Student Hubble Constant:")
+        solara.Markdown(f"{h0:.0f} km/s/Mpc")
 
 
 @solara.component
@@ -280,32 +292,39 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
 
     if not isinstance(student_id, solara.Reactive):
         student_id = solara.use_reactive(student_id)
-    
-    with solara.Column():
-        with solara.Column():
-            if 'name' in roster.students.columns:
-                idcol = {'value': 'name', 'text': 'Student Name'}
-            else:
-                idcol = {'value': 'student_id', 'text': 'Student ID'}
-            headers = [
-                idcol,
-                {'value': 'galaxy_id', 'text': 'Galaxy ID'},
-                {'value': 'velocity_value', 'text': 'Velocity <br/> (km/s)'},
-                {'value': 'est_dist_value', 'text': 'Distance <br/> (Mpc)'},
-                {'value': 'obs_wave_value', 'text': 'Observed Wavelength <br/> (Angstrom)'},
-                {'value': 'ang_size_value', 'text': 'Angular Size <br/> (arcsecond)'}
-            ]
-            
-            StudentData(roster, id_col="student_id", sid = student_id, cols_to_display = headers, allow_id_set = allow_sid_set)
-                          
-                          
-        with solara.ColumnsResponsive(small=12, medium=[6,6], wrap=True, gutters_dense=True):
-            with solara.Column():
+
+
+    with solara.ColumnsResponsive(small=12, medium=[6,6], wrap=True, gutters_dense=True):
+        with solara.Columns([1,1]):
+            with solara.Card(style='height: 95%'):
                 DataSummary(roster, student_id, allow_click=allow_sid_set)
-            with solara.Column():
+
+            with solara.Card(style='height: 95%'):
                 DataHistogram(roster, sid = student_id)
-            
-            if student_id.value is None:
-                    with solara.Column():
-                        StudentStats(roster)       
+
+    if student_id is not None and student_id.value is not None:
+        with solara.ColumnsResponsive(small=12, medium=[6,6], wrap=True, gutters_dense=True):
+            with solara.Columns([1,1]):
+                with solara.Card(style='height: 90%'):
+                    solara.Markdown(f"#### Student Galaxy Measurements")
+                    
+                    headers = [
+                        {'value': 'galaxy_id', 'text': 'Galaxy ID'},
+                        {'value': 'obs_wave_value', 'text': 'Observed Wavelength <br/> (Angstrom)'},
+                        {'value': 'velocity_value', 'text': 'Velocity <br/> (km/s)'},
+                        {'value': 'ang_size_value', 'text': 'Angular Size <br/> (arcsecond)'},
+                        {'value': 'est_dist_value', 'text': 'Distance <br/> (Mpc)'},
+                    ]
+                    
+                    StudentData(roster, id_col="student_id", sid = student_id, cols_to_display = headers, allow_id_set = allow_sid_set)
+
+                with solara.Card(style='height: 90%'):
+                    StudentAgeHubble(roster, sid = student_id)
+
         
+                          
+                          
+
+        
+          
+

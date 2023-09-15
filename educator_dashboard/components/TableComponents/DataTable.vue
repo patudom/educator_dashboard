@@ -122,21 +122,11 @@ export default {
 }
 
 
+
 </script>
 
 <style>
-  tr.v-data-table__selected {
-    background: #d7d7d7 !important;
-  }
-  
-  .dashboard-table tr th:first-of-type {
-    width: 3ch;
-  }
-  
-  .dashboard-table tr td:first-of-type {
-    width: 3ch;
-  }
-  
+ 
   @media screen and (max-width: 600px) {
     .full-width-header-slot {
       display: none;
@@ -144,3 +134,4 @@ export default {
   }
   
 </style>
+
