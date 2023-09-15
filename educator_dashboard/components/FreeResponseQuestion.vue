@@ -9,7 +9,7 @@
         </div>
 
         <div  v-if="!hideResponses" class="response-row" v-for="(response, index) in responseList">
-          <div class="name-item" v-if="names != null" >
+          <div class="name-item" v-if="names != null && !hideName" >
             {{ getName(index) }}
           </div>
             <div class="response-item">
@@ -57,6 +57,11 @@ export default {
     },
 
     hideResponses: {
+      type: Boolean,
+      default: false
+    },
+
+    hideName: {
       type: Boolean,
       default: false
     },
@@ -121,8 +126,7 @@ export default {
 }
 .question {
   display: inline-block;
-  font-weight: bold;  
-  color: rgb(118, 118, 118);
+  color: black;
 }
 
 .response-row {
@@ -132,18 +136,23 @@ export default {
   grid-template-rows: auto;
   gap: 0.1rem;
   margin-top: 0.5rem;
-  border-bottom: 1px solid rgb(118, 118, 118);
 }
 
 .response-item {
   display: inline-block;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--md-grey-900);
+  background-color: var(--md-amber-100);
 
 }
 
 .name-item {
   display: inline-block;
   font-weight: bold;
-  color: rgb(118, 118, 118);
+  color: var(--md-grey-900);
+  padding-left: 0.5rem;
+  margin-top: 1rem;
 
 }
 </style>

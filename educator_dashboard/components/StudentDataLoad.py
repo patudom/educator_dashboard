@@ -57,7 +57,7 @@ def StudentLoadDialog(student_names = None, student_names_set = None, dialog_ope
             'variable': 'dummy_var',
             'children': 
                 solara.Tooltip(tooltip="Use local csv file to convert IDs to names", 
-                    children = [solara.Button(label = "ID -> Name Translation", on_click = lambda: dialog_open.set(True), color='primary')]
+                    children = [solara.Button(label = "ID -> Name Translation", on_click = lambda: dialog_open.set(True), classes=["my-buttons"])]
                 )
         }]
     )

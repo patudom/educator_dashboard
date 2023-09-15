@@ -4,7 +4,7 @@ from solara.alias import rv
 
 from pandas import DataFrame
 
-from .Collapsable import Collapsable
+from .Collapsible import Collapsible
 
 from ..database.Query import QueryCosmicDSApi as Query
 
@@ -13,7 +13,7 @@ from ..database.Query import QueryCosmicDSApi as Query
 
 @solara.component_vue('FreeResponseQuestion.vue')
 def FreeResponseQuestion(question='', shortquestion='', responses=[], names = [],
-                         hideShortQuestion = False, hideQuestion = False, hideResponses = False):
+                         hideShortQuestion = False, hideQuestion = False, hideResponses = False, hideName = False):
     """
     free_response = {
         'question': '',
@@ -25,7 +25,7 @@ def FreeResponseQuestion(question='', shortquestion='', responses=[], names = []
 
 @solara.component
 def FreeResponseQuestionResponseSummary(question_responses, question_text, names = None,
-                                        hideShortQuestion = False, hideQuestion = False, hideResponses = False
+                                        hideShortQuestion = False, hideQuestion = False, hideResponses = False, hideName = False
                                         ):
     """
     question_responses = {'key': ['response1', 'response2',...]}
@@ -69,7 +69,8 @@ def FreeResponseQuestionResponseSummary(question_responses, question_text, names
                                              names = names,
                                              hideShortQuestion = hideShortQuestion, 
                                              hideQuestion = hideQuestion, 
-                                             hideResponses = hideResponses)
+                                             hideResponses = hideResponses,
+                                             hideName = hideName)
 
 
 @solara.component
@@ -87,7 +88,7 @@ def FreeResponseSummary(roster):
     stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
     
 
-    with solara.Columns([3, 1]):
+    with solara.Columns([5, 1], style={"height": "100%"}):
         with solara.Column():
             for stage in stages:     
                 question_responses = roster.l2d(fr_questions[stage]) # {'key': ['response1', 'response2',...]}
@@ -140,5 +141,6 @@ def FreeResponseQuestionSingleStudent(roster, sid = None):
                                 shortquestion = shortquestion, 
                                 responses = responses, 
                                 hideShortQuestion = True,
+                                hideName = True
                                 )
         

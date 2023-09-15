@@ -1,22 +1,119 @@
+:root {
+    /* define light material desing them */
+    --primary-light: #1565C0 ;
+    --secondary-light: #006064 ;
+    --accent-light: #FFD740 ;
+    --error-light: #F06292 ;
+    --info-light: #FF7043 ;
+    --success-light: #00E676 ;
+    --warning-light: #DD2C00 ;
+    
+    /* define dark material desing them */
+    --primary-dark: #0D47A1 ;
+    --secondary-dark: #00838F ;
+    --accent-dark: #FFC400 ;
+    --error-dark: #D81B60 ;
+    --info-dark: #BF360C ;
+    --success-dark: #00E676 ;
+    --warning-dark: #DD2C00 ;
+    
+    --cosmic-red: #e60001 ;
+    --cosmic-blue: #0e397e ;
+    
+    --cosmic-red-lighter: #ff4d4d ;
+    --cosmic-blue-lighter: #1861d8 ;
+    
+    --cosmic-red-darker: #800000 ;
+    --cosmic-blue-darker: #09234e ;
+    
+    
+}
 
-/* When updating css, you may need to force refresh the page (cmd+shift+r) for the browser to pick up on the changes. */
+/* media query preferes light color scheme */
+@media (prefers-color-scheme: light) {
+    :root {
+        --primary: var(--primary-light);
+        --secondary: var(--secondary-light);
+        --accent: var(--accent-light);
+        --error: var(--error-light);
+        --info: var(--info-light);
+        --success: var(--success-light);
+        --warning: var(--warning-light);
+    }
+}
+
+/* media query prefers dark color scheme */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary: var(--primary-dark);
+        --secondary: var(--secondary-dark);
+        --accent: var(--accent-dark);
+        --error: var(--error-dark);
+        --info: var(--info-dark);
+        --success: var(--success-dark);
+        --warning: var(--warning-dark);
+    }
+}
+
 
 .student-select {
     width: 400px;
 }
 
-.mc-question-summary-table td:first-child {
-    background-color: aqua;
+.mc-question-summary-table .v-data-table__selected {
+    background: var(--md-amber-100) !important;
+}
+
+.mc-individual-student-table .v-data-table__selected {
+    background: var(--md-amber-100) !important;
+
 }
 
 body {
     padding-inline: 5% 
 }
 
-.my-tabs[aria-selected="true"] {
-  background-color: var(--md-blue-400) !important;
+.my-buttons {
+    background-color: var(--md-blue-800) !important;
+    color: white !important;
 }
 
+.vertical-tabs {
+    width: 100%;
+}
+
+.vertical-tabs[aria-selected="true"] {
+    background-color: var(--md-deep-orange-800) !important;
+}
+
+.v-tabs--vertical .v-tabs-slider {
+    color:  var(--md-deep-orange-800);
+}
+
+.horizontal-tabs[aria-selected="true"] {
+    color: var(--md-blue-800) !important;
+    font-weight: 800; 
+}
+
+.v-card__text {
+    color: black !important;
+}
+
+.info-text{
+    padding: 0.5rem;
+}
+
+#h2 {
+    margin-top: 0rem !important;
+}
+
+.v-expansion-panel-header {
+    padding-left: 1rem;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* Disable plotly tools */
 .modebar {
     display: none !important;
 }   
@@ -25,5 +122,9 @@ body {
     padding-left: 0.625rem;  /* 10px @ 16px/rem */
 }
 #select-a-student-from-the-table-above-to-see-their-responses {
-    padding-left: 0.625rem;;   
+    padding-left: 0.625rem;   
+}
+
+.solara-markdown {
+    padding-left: 0.5rem;
 }

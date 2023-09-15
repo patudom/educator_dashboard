@@ -37,12 +37,14 @@ def Page():
     
     
     with solara.Columns([1, 9, 3]):
-        solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
+        # solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
+        solara.Image(image="static/assets/cosmicds_logo_transparent.png")
 
         solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
 
         with solara.Column():
             SetClass(class_id, roster, first_run)
+
             StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
             RefreshClass(rate_minutes=5, roster = roster, student_names = dashboard_names.value,
                          show_refresh_button=True, stop_start_button=True, refresh_button_text=None,
@@ -51,6 +53,7 @@ def Page():
                          icon_only=True)
         
     Dashboard(roster, dashboard_names, add_names = dashboard_names.value is not None) 
+
     # solara.DataFrame(df.value)
 
 

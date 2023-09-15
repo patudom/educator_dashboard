@@ -45,11 +45,11 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subs
     fig.update_traces(marker_color='grey')
     fig.add_trace(go.Bar(x=[None], y=[None], name = 'Full Class', marker_color = 'grey'))
     title = f'Class {which.capitalize()} Distribution' if title is None else title
-    fig.update_layout(showlegend=True, title_text=title)
+    fig.update_layout(showlegend=True, title_text=title, xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
     # show only integers on y-axis
-    fig.update_yaxes(tick0=0, dtick=1)
+    fig.update_yaxes(tick0=0, dtick=1, linecolor="black")
     # show ticks every 1
-    fig.update_xaxes(range=[xmin-1.5, xmax+1.5])
+    fig.update_xaxes(range=[xmin-1.5, xmax+1.5], linecolor="black")
     
     if subset is not None:
         data_subset = data[subset]
