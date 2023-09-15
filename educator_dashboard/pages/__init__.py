@@ -13,7 +13,7 @@ from typing import cast
 from pandas import DataFrame
 
 
-
+class_id_list = [188, 195, 192, 185, 172, 170]
 
 @solara.component
 def Page():
@@ -41,7 +41,7 @@ def Page():
         solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
 
         with solara.Column(gap="0px"):
-            SetClass(class_id, roster, first_run)
+            SetClass(class_id, roster, first_run, class_id_list)
             StudentNameLoad(roster, student_names)
 
     Dashboard(roster, student_names=student_names) 
