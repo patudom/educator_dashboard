@@ -194,14 +194,15 @@ def StudentAgeHubble(roster = None, sid = None, allow_id_set = True):
 
     if sid.value is not None and sid.value in roster.student_ids:        
         single_student_df = roster.get_student_data(sid.value, df = True)
-        print("single_student", sid, sid.value, single_student_df)
+        # print("single_student", sid, sid.value, single_student_df)
         h0 = get_slope(single_student_df['est_dist_value'].to_numpy(), single_student_df['velocity_value'].to_numpy())
         age = slope2age(h0)
-        solara.Markdown(f"#### Student Age of Universe:")
-        solara.Markdown(f"{age:.0f} Gyr")
-        solara.Markdown(f"#### Student Hubble Constant:")
-        solara.Markdown(f"{h0:.0f} km/s/Mpc")
-
+        solara.Markdown(f"""
+                        #### Student Age of Universe:
+                        {age:.0f} Gyr
+                        #### Student Hubble Constant:
+                        {h0:.0f} km/s/Mpc
+                        """)
 
 @solara.component
 def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
