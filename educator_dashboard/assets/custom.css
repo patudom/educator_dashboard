@@ -5,8 +5,13 @@
     width: 400px;
 }
 
-.mc-question-summary-table td:first-child {
-    background-color: aqua;
+.mc-question-summary-table .v-data-table__selected {
+    background: var(--md-amber-100) !important;
+}
+
+.mc-individual-student-table .v-data-table__selected {
+    background: var(--md-amber-100) !important;
+
 }
 
 body {
@@ -63,4 +68,8 @@ body {
 }
 #select-a-student-from-the-table-above-to-see-their-responses {
     padding-left: 0.625rem;   
+}
+
+.solara-markdown {
+    padding-left: 0.5rem;
 }
