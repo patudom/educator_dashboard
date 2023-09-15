@@ -299,7 +299,7 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
         student_id = solara.use_reactive(student_id)
 
 
-    with solara.ColumnsResponsive(small=10, medium = [6,6], wrap=True, gutters_dense=True, style="justify-content: start;"):
+    with solara.ColumnsResponsive(small=12, medium = [6,6], wrap=True, gutters=False, style="justify-content: start;"):
         with solara.Column():
             with solara.Card(style='height: 95%'):
                 DataSummary(roster, student_id, allow_click=allow_sid_set)
