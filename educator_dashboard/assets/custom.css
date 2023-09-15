@@ -130,7 +130,8 @@ body {
 }
 
 /* make vertical tabs horizontal on tall screns */
-@media (max-width: 960px) {
+/* 1130 to account for plot legend overlap */
+@media (max-width: 1130px) {
     .v-tabs--vertical {
         display: block;
     }
