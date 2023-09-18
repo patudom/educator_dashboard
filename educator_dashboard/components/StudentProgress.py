@@ -31,6 +31,7 @@ def StudentProgressRow(progress,
         'ID': progress['student_id'],
         'Name': progress['student_name'],
         'Total Points': progress['total_points'],
+        'Progress': f"{progress['percent_complete']}%"
     }
     
     def on_row_click(event):
@@ -104,7 +105,7 @@ def StudentProgressTable(roster = None,
     
 
     if headers is None:
-        headers = ['', 'Student ID', 'Student Name', 'Points/available' ] + stage_labels
+        headers = ['', 'Student ID', 'Student Name', 'Points/available', 'Progress (%)'] + stage_labels
     with TableFromRows(headers=headers, table_height=height):
         for i in range(len(data)):
             max_stage_progress = data['progress'][i].split('%')[0]
@@ -121,6 +122,7 @@ def StudentProgressTable(roster = None,
                 'number_of_stages': 6,
                 'current_stage': int(data['max_stage_index'][i]),
                 'current_stage_progress': max_stage_progress,
+                'percent_complete': data['percent_story_complete'][i]
             }
 
             StudentProgressRow(progress = student_progress,
