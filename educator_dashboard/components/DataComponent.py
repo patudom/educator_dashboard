@@ -308,8 +308,8 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
                 DataHistogram(roster, sid = student_id)
 
     if student_id is not None and student_id.value is not None:
-        with solara.Row():
-            with solara.Columns([1,1]):
+       with solara.ColumnsResponsive(small=12, medium = [6,6], wrap=True, gutters=False, style="justify-content: start;"):
+            with solara.Column():
                 with solara.Card(style='height: 90%'):
                     solara.Markdown(f"#### Student Galaxy Measurements")
                     
@@ -322,7 +322,7 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
                     ]
                     
                     StudentData(roster, id_col="student_id", sid = student_id, cols_to_display = headers, allow_id_set = allow_sid_set)
-
+            with solara.Column():
                 with solara.Card(style='height: 90%'):
                     StudentAgeHubble(roster, sid = student_id)
 
