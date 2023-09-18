@@ -379,7 +379,7 @@ class Roster():
             tot_perc.append(state.percent_completion)
         return self.l2d(how_far)['string'], tot_perc
     
-    def report(self, refresh = False):
+    def report(self, refresh = False, for_teacher = True):
         "refreshing data"
         
         if self._report is not None and not self._refresh and not refresh:
@@ -391,7 +391,7 @@ class Roster():
         roster = self
         if len(roster.roster) == 0:
             return None
-        if hasattr(roster,'stages'):
+        if hasattr(roster,'stages') and (not for_teacher):
             data = [[s.get('marker',None) for s in stage] for stage in roster.stages]
             cols = ['Stage 1 marker', 'Stage 3 marker', 'Stage 4 marker', 'Stage 5 marker', 'Stage 6 marker']
             c1 = {k:v for k,v in zip(cols, data)}
@@ -400,11 +400,7 @@ class Roster():
         else:
             df = pd.DataFrame({'student_id':roster.student_id['student_id']})
        
-        data = [[s.get('marker',None) for s in stage] for stage in roster.stages]
-        cols = ['Stage 1 marker', 'Stage 3 marker', 'Stage 4 marker', 'Stage 5 marker', 'Stage 6 marker']
-        c1 = {k:v for k,v in zip(cols, data)}
         
-        df = pd.DataFrame(c1)
         df['student_id'] = roster.student_id['student_id']
         # add a string column containing roster.students['username']
         df['username'] = roster.students['username'].values
