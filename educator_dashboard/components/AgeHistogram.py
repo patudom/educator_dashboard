@@ -49,7 +49,7 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
 
     fig.update_traces(marker_color=main_color)
     fig.add_trace(go.Bar(x=[None], y=[None], name = main_label, marker_color = main_color))
-    title = f'Class {which.capitalize()} Distribution' if title is None else title
+    title = f'Class {which.capitalize()}<br>Distribution' if title is None else title
     fig.update_layout(showlegend=True, title_text=title, xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
     # show only integers on y-axis
     fig.update_yaxes(tick0=0, dtick=1, linecolor="black")
@@ -84,11 +84,14 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
             itemdoubleclick = False,
             font=dict(size=11),
         ),
-        margin=dict(l=0, r=50, t=50, b=0),
+        margin=dict(l=0, r=25, t=50, b=0),
         title = dict(
-            xref='paper',
-            x=0,
+            xref='container',
+            x=0.05,
             xanchor='left',
+            yref='container',
+            yanchor='top',
+            y=.95,
         )
     )
     

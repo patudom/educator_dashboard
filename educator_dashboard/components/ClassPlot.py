@@ -62,7 +62,7 @@ def ClassPlot(dataframe,
         
 
     fig.update_traces(marker_color=main_color, marker_size = main_marker_size)
-    fig.update_layout(modebar = config, title="Class Hubble Diagram", xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
+    fig.update_layout(modebar = config, title="Class Hubble<br>Diagram", xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
     fig.update_xaxes(linecolor='black')
     fig.update_yaxes(linecolor='black')
     # add empty trace to show on legend
@@ -122,11 +122,14 @@ def ClassPlot(dataframe,
             itemdoubleclick = False,
             font=dict(size=11),
         ),
-        margin=dict(l=0, r=50, t=50, b=0),
+        margin=dict(l=0, r=25, t=50, b=0),
         title = dict(
-            xref='paper',
-            x=0,
-            xanchor='left'
+            xref='container',
+            x=0.05,
+            xanchor='left',
+            yref='container',
+            yanchor='top',
+            y=.95,
         )
     )
     
