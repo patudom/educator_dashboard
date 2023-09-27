@@ -75,10 +75,33 @@ export default {
   z-index: 2;
 }
 
+.fixed_header_table_wrapper > table > tbody > tr > td:nth-child(3),
+.fixed_header_table_wrapper > table > thead > tr > th:nth-child(3) {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
 
 
-#table-from-rows tr:hover {
+.fixed_header_table_wrapper > table > tbody > tr:not(:hover) > td:nth-child(3) {
+  background-color: inherit;
+}
+
+.fixed_header_table_wrapper > table > tbody > tr:hover > td:nth-child(3) {
+  background-color: inherit;
+}
+
+.fixed_header_table_wrapper > table > thead > tr > th:nth-child(3)  {
+  background-color: var(--md-blue-800);
+}
+
+#table-from-rows tbody tr {
+  background-color: white;
+}
+
+#table-from-rows > table > tbody tr:hover {
   background-color: var(--md-grey-300);
+
 }
 
 

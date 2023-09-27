@@ -22,7 +22,7 @@ def aggregrate(dataframe, col):
 
 
 @solara.component
-def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subset_color = 'mediumpurple', title = None):
+def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main_label = None, subset_color = '#0097A7', main_color = '#BBBBBB', title = None):
     # subset is boolean array which take subset of data
     
     # manual aggregation. instead use pandas groupby and agg
@@ -42,9 +42,14 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subs
 
     fig = px.bar(data_frame = df_agg, x = which, y='count', hover_data='student_id', labels = labels, barmode='overlay', opacity=1)
     fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>')
-    fig.update_traces(marker_color='grey')
-    fig.add_trace(go.Bar(x=[None], y=[None], name = 'Full Class', marker_color = 'grey'))
-    title = f'Class {which.capitalize()} Distribution' if title is None else title
+
+    if subset is None:
+        main_color = subset_color
+        main_label = "Full Class"
+
+    fig.update_traces(marker_color=main_color)
+    fig.add_trace(go.Bar(x=[None], y=[None], name = main_label, marker_color = main_color))
+    title = f'Class {which.capitalize()}<br>Distribution' if title is None else title
     fig.update_layout(showlegend=True, title_text=title, xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
     # show only integers on y-axis
     fig.update_yaxes(tick0=0, dtick=1, linecolor="black")
@@ -65,12 +70,31 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subs
         fig.add_trace(bar)
         # show legend
     # fig.update_layout(showlegend=True)
+    fig.update_layout(
+        legend = dict(
+            orientation="v",
+            yanchor="bottom",
+            y=1,
+            xanchor="right",
+            x=1,
+            bordercolor="#444",
+            borderwidth=0,
+            bgcolor='#efefef',
+            itemclick = False,
+            itemdoubleclick = False,
+            font=dict(size=11),
+        ),
+        margin=dict(l=0, r=25, t=50, b=0),
+        title = dict(
+            xref='container',
+            x=0.05,
+            xanchor='left',
+            yref='container',
+            yanchor='top',
+            y=.95,
+        )
+    )
+    
     
 
     solara.FigurePlotly(fig)
-    
-    if subset is None:
-        # SIDS of students without good data
-        bad_sids = data[isnan(data['h0'])]['student_id'].to_list()
-        if len(bad_sids) > 0:
-            solara.Markdown(f"**Students with bad data**: {', '.join(bad_sids)}")

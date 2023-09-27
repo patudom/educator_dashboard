@@ -128,3 +128,19 @@ body {
 .solara-markdown {
     padding-left: 0.5rem;
 }
+
+/* make vertical tabs horizontal on tall screns */
+/* 1130 to account for plot legend overlap */
+@media (max-width: 1130px) {
+    .v-tabs--vertical {
+        display: block;
+    }
+    
+    .v-tabs--vertical > .v-tabs-bar > .v-slide-group__wrapper {
+        flex: 0 1 auto;
+    }
+    .v-tabs--vertical>.v-tabs-bar .v-tabs-bar__content {
+        flex-direction: row
+    }
+
+}

@@ -14,7 +14,7 @@
   >
   <!-- there header should be able to HTML code that gets rendered, so use a slot -->
     <template v-slot:header="{ props: {headers} }">
-      <thead>
+      <thead class="full-width-header-slot">
         <tr>
           <th v-for="header in headers" :key="header.text">
             <!-- if header has header.tooltip display tooltip -->
@@ -122,4 +122,16 @@ export default {
 }
 
 
+
 </script>
+
+<style>
+ 
+  @media screen and (max-width: 600px) {
+    .full-width-header-slot {
+      display: none;
+    }
+  }
+  
+</style>
+
