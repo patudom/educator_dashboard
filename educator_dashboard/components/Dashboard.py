@@ -32,22 +32,7 @@ def initStudentID(student_id, roster):
             return
     student_id.set(None)
     return 
-        
 
-@solara.component
-def ShowReport(roster):
-    if len(roster.value.roster) == 0:
-        return
-    dialog = rv.Dialog(
-        v_slots = [{
-            'name': 'activator',
-            'variable': 'x',
-            'children': rv.Btn(v_on='x.on', color='primary', dark=True, children=['Show Table'])
-            
-        }]
-    )
-    with dialog:
-        solara.DataFrame(roster.value.short_report())
 
 @solara.component
 def Dashboard(roster, student_names = None): 

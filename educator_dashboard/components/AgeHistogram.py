@@ -44,7 +44,7 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subs
     fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>')
     fig.update_traces(marker_color='grey')
     fig.add_trace(go.Bar(x=[None], y=[None], name = 'Full Class', marker_color = 'grey'))
-    title = f'Class {which.capitalize()} Distribution' if title is None else title
+    title = f'Class {which.capitalize()}<br>Distribution' if title is None else title
     fig.update_layout(showlegend=True, title_text=title, xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
     # show only integers on y-axis
     fig.update_yaxes(tick0=0, dtick=1, linecolor="black")
@@ -65,12 +65,27 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subs
         fig.add_trace(bar)
         # show legend
     # fig.update_layout(showlegend=True)
+    fig.update_layout(
+        legend = dict(
+            orientation="v",
+            yanchor="bottom",
+            y=1,
+            xanchor="right",
+            x=1,
+            bordercolor="#444",
+            borderwidth=0,
+            bgcolor='#fff',
+            itemclick = False,
+            itemdoubleclick = False,
+        ),
+        margin=dict(l=0, r=50, t=50, b=0),
+        title = dict(
+            xref='paper',
+            x=0,
+            xanchor='left',
+        )
+    )
+    
     
 
     solara.FigurePlotly(fig)
-    
-    if subset is None:
-        # SIDS of students without good data
-        bad_sids = data[isnan(data['h0'])]['student_id'].to_list()
-        if len(bad_sids) > 0:
-            solara.Markdown(f"**Students with bad data**: {', '.join(bad_sids)}")

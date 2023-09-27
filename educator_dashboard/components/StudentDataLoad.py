@@ -53,7 +53,7 @@ def StudentNameLoad(roster = None, student_names = None, on_update = None):
             'variable': 'dummy_var',
             'children': 
                 solara.Tooltip(tooltip="Use local csv file to convert IDs to names", 
-                    children = [solara.Button(label = "ID -> Name Translation", on_click = lambda: dialog_open.set(True), classes=["my-buttons"])]
+                    children = [solara.Button(label = "ID → Name", icon_name='mdi-google-spreadsheet', on_click = lambda: dialog_open.set(True), classes=["my-buttons"])]
                 )
         }]
     )
