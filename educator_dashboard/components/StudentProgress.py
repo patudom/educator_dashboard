@@ -2,7 +2,6 @@
 import solara
 from pandas import DataFrame
 
-from .MultiStepProgressBar import MultiStepProgressBar
 from .TableFromRows import TableFromRows
 from .ProgressRow import ProgressRow
 

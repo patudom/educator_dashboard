@@ -1,13 +1,5 @@
 import solara
 
-
-from typing import cast
-
-from pandas import DataFrame
-
-import plotly.express as px
-import plotly.graph_objects as go
-
 from .ClassProgress import ClassProgress
 from .StudentProgress import StudentProgressTable
 from .ResponsesComponents import StudentQuestionsSummary

@@ -11,7 +11,7 @@ from ..database.class_report import Roster
 from typing import cast
 
 
-from ..components.RefreshClass import RefreshClass, refresh_class
+from ..components.RefreshClass import RefreshClass
 
 
 class_id_list = [188, 195, 192, 185, 172, 170]

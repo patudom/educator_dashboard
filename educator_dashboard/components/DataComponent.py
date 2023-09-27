@@ -1,16 +1,15 @@
 import solara
-import reacton.ipyvuetify as rv
-from .ClassPlot import ClassPlot
-from .TableDisplay import TableDisplay
-from pandas import DataFrame, to_datetime
-import plotly.express as px
 
-from numpy import around, isnan
-from math import ceil, floor
+from .ClassPlot import ClassPlot
+
+from pandas import DataFrame, to_datetime
+
+
+from numpy import around
 
 from .TableComponents import DataTable
 from .AgeHistogram import AgeHoHistogram
-from .BetterTooltip import Tooltip
+
 
 
 def get_class_subset(data, sid, ungroup = True):
