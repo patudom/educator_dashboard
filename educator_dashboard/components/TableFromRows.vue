@@ -84,11 +84,11 @@ export default {
 
 
 .fixed_header_table_wrapper > table > tbody > tr:not(:hover) > td:nth-child(3) {
-  background-color: white;
+  background-color: inherit;
 }
 
 .fixed_header_table_wrapper > table > tbody > tr:hover > td:nth-child(3) {
-  background-color: var(--md-grey-300);
+  background-color: inherit;
 }
 
 .fixed_header_table_wrapper > table > thead > tr > th:nth-child(3)  {

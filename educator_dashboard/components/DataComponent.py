@@ -89,17 +89,19 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
             on_student_id(None)
     
     subset = None
+    main_name = None
     subset_name = None
     if student_id.value is not None:
         
         subset = get_class_subset(data, student_id)
+        main_name = f'Data not seen by {student_id.value}'
         subset_name = f'Data seen by {student_id.value}'
         
     
     if allow_click:
-        ClassPlot(data, on_click=on_plot_click, select_on = 'student_id', selected = student_id, allow_click=True, subset = subset, subset_label=subset_name, subset_color='mediumpurple')
+        ClassPlot(data, on_click=on_plot_click, select_on = 'student_id', selected = student_id, allow_click=True, subset = subset, subset_label=subset_name, main_label=main_name, subset_color='#0097A7', main_color='#BBBBBB')
     else:
-        ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = False, subset = subset, subset_label=subset_name, subset_color='mediumpurple')
+        ClassPlot(data, select_on = 'student_id', selected = student_id, allow_click = False, subset = subset, subset_label=subset_name, main_label=main_name, subset_color='#0097A7', main_color='#BBBBBB')
 
     
 
@@ -242,8 +244,9 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
 
         AgeHoHistogram(data, 
                        subset = subset, 
+                       main_label = f'Data not seen by {sid.value}',
                        subset_label = f'Data seen by {sid.value}', 
-                       subset_color = 'mediumpurple')
+                       subset_color = '#0097A7')
     else:
         AgeHoHistogram(data)
 

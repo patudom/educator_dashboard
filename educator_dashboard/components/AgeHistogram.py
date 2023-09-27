@@ -22,7 +22,7 @@ def aggregrate(dataframe, col):
 
 
 @solara.component
-def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subset_color = 'mediumpurple', title = None):
+def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main_label = None, subset_color = '#0097A7', main_color = '#BBBBBB', title = None):
     # subset is boolean array which take subset of data
     
     # manual aggregation. instead use pandas groupby and agg
@@ -42,8 +42,13 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subs
 
     fig = px.bar(data_frame = df_agg, x = which, y='count', hover_data='student_id', labels = labels, barmode='overlay', opacity=1)
     fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>')
-    fig.update_traces(marker_color='grey')
-    fig.add_trace(go.Bar(x=[None], y=[None], name = 'Full Class', marker_color = 'grey'))
+
+    if subset is None:
+        main_color = subset_color
+        main_label = "Full Class"
+
+    fig.update_traces(marker_color=main_color)
+    fig.add_trace(go.Bar(x=[None], y=[None], name = main_label, marker_color = main_color))
     title = f'Class {which.capitalize()}<br>Distribution' if title is None else title
     fig.update_layout(showlegend=True, title_text=title, xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
     # show only integers on y-axis
@@ -74,15 +79,19 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, subs
             x=1,
             bordercolor="#444",
             borderwidth=0,
-            bgcolor='#fff',
+            bgcolor='#efefef',
             itemclick = False,
             itemdoubleclick = False,
+            font=dict(size=11),
         ),
-        margin=dict(l=0, r=50, t=50, b=0),
+        margin=dict(l=0, r=25, t=50, b=0),
         title = dict(
-            xref='paper',
-            x=0,
+            xref='container',
+            x=0.05,
             xanchor='left',
+            yref='container',
+            yanchor='top',
+            y=.95,
         )
     )
     
