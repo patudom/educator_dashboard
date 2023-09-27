@@ -33,7 +33,7 @@ def RefreshClass(rate_minutes = 5,
 
     print("refresh class component")
 
-    refreshRate = rate_minutes * 60 * 1000
+    refreshRate = int(rate_minutes * 60 * 1000)
     Repeater(periodInMilliseconds=refreshRate, 
             on_refresh=on_refresh, 
             show_refresh_button=True, 
