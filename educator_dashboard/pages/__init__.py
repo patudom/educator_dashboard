@@ -46,15 +46,13 @@ def Page():
         solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
 
 
-        with solara.Column(gap="0px"):
+        with solara.Column():
             SetClass(class_id, roster, first_run, class_id_list)
-            ShowReport(roster)
-            StudentNameLoad(roster, student_names)
-            
+            with solara.Row():
                 
-
-
-            StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
+                ShowReport(roster)
+ 
+                StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
             RefreshClass(rate_minutes=5, roster = roster, student_names = dashboard_names.value,
                          show_refresh_button=True, stop_start_button=True, refresh_button_text=None,
                          # show button to manually refresh and to start/stop autorefresh. no text cuz icon_only is set
