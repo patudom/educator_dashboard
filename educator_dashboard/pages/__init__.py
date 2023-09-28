@@ -1,6 +1,6 @@
 
 import solara
-
+from ..components.TeacherCodeInput import TeacherCodeEntry
 from ..components.Dashboard import Dashboard
 from ..components.SetClass import SetClass
 from ..components.StudentDataLoad import StudentNameLoad
@@ -17,6 +17,16 @@ class_id_list = [188, 195, 192, 185, 172, 170]
 
 @solara.component
 def Page():
+    
+    classes = { "188": [188, 190, 195, 192], "184": [184, 195, 192] }
+    show_dashboard = solara.use_reactive(False)
+    class_id_list = solara.use_reactive([])
+    if not show_dashboard.value: 
+        TeacherCodeEntry(class_id_list, classes, lambda: show_dashboard.set(True))
+        return
+    else:
+        class_id_list = class_id_list.value
+    
     solara.Title("CosmicDS Dashboard")
 
     
