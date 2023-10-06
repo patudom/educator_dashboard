@@ -31,7 +31,7 @@ class QueryCosmicDSApi():
         variables are set correctly)
         """
         session = requests.Session()
-        session.headers.update({'Authorization': os.getenv['CDS_API_KEY']})
+        session.headers.update({'Authorization': os.getenv('CDS_API_KEY')})
         return session
     
     @staticmethod
