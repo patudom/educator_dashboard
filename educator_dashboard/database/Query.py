@@ -23,7 +23,7 @@ class QueryCosmicDSApi():
         self._request_session = self.request_session()
         pass
     
-    def request_session():
+    def request_session(self):
         """
         Returns a request session object that has the 
         relevant authorization praameters to interface
