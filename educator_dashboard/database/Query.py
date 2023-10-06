@@ -1,11 +1,12 @@
 import requests
+from requests import Session
+import os
 import json
 import numpy as np
 from urllib.parse import urljoin
 
 API_URL = "https://api.cosmicds.cfa.harvard.edu"
 HUBBLE_ROUTE_PATH = "hubbles_law"
-
 
 from .State import State, StateList
     
@@ -19,7 +20,19 @@ class QueryCosmicDSApi():
     def __init__(self, story = HUBBLE_ROUTE_PATH, class_id = None):
         self.class_id = class_id
         self.story = story
+        self._request_session = self.request_session()
         pass
+    
+    def request_session():
+        """
+        Returns a request session object that has the 
+        relevant authorization praameters to interface
+        with the CosmicDS API server (provided environment 
+        variables are set correctly)
+        """
+        session = requests.Session()
+        session.headers.update({'Authorization': os.getenv['CDS_API_KEY']})
+        return session
     
     @staticmethod
     def l2d(list_of_dicts):
@@ -32,9 +45,9 @@ class QueryCosmicDSApi():
         dict_of_lists = {k: np.asarray([o[k] for o in list_of_dicts]) for k in keys}
         return dict_of_lists
     
-    @staticmethod
-    def get(url):
-        response = requests.request("GET", url)
+    def get(self, url):
+        # response = requests.request("GET", url)
+        response = self._request_session.get(url)
         return response
         
         
@@ -156,13 +169,13 @@ class QueryCosmicDSApi():
         req = self.get(url)
         return req.json()
     
-    @classmethod
-    def get_question(cls, question_tag):
+
+    def get_question(self, question_tag):
         endpoint = f'/question/{question_tag}'
-        url = urljoin(cls.url_head, endpoint)
-        cls.question_url = url
+        url = urljoin(self.url_head, endpoint)
+        self.question_url = url
         print(url)
-        req = cls.get(url)
+        req = self.get(url)
         if req.status_code == 404:
             print(f"Question {question_tag} not found")
             return None
