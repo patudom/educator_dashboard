@@ -4,6 +4,8 @@ import os
 import json
 import numpy as np
 from urllib.parse import urljoin
+from dotenv import load_dotenv
+from pathlib import Path  # python3 only
 
 API_URL = "https://api.cosmicds.cfa.harvard.edu"
 HUBBLE_ROUTE_PATH = "hubbles_law"
@@ -23,6 +25,26 @@ class QueryCosmicDSApi():
         self._request_session = self.request_session()
         pass
     
+    def get_env(self):
+        dotenv_path = Path('.') / '.env'
+        
+        api_key = os.getenv('CDS_API_KEY')
+        
+        if api_key is not None:
+            print("Found API key in environment variables")
+
+        elif dotenv_path.exists():
+            print("Found .env file")
+            load_dotenv(dotenv_path=dotenv_path)
+            api_key = os.getenv('CDS_API_KEY')
+            if api_key is not None:
+                print("Found API key in .env file")
+
+        if api_key is None:
+            print("PLEASE SET CDS_API_KEY ENVIRONMENT VARIABLE")
+    
+        return api_key
+    
     def request_session(self):
         """
         Returns a request session object that has the 
@@ -30,8 +52,8 @@ class QueryCosmicDSApi():
         with the CosmicDS API server (provided environment 
         variables are set correctly)
         """
-        session = requests.Session()
-        session.headers.update({'Authorization': os.getenv('CDS_API_KEY')})
+        session = requests.Session()        
+        session.headers.update({'Authorization': self.get_env()})
         return session
     
     @staticmethod
@@ -46,7 +68,6 @@ class QueryCosmicDSApi():
         return dict_of_lists
     
     def get(self, url):
-        # response = requests.request("GET", url)
         response = self._request_session.get(url)
         return response
         
