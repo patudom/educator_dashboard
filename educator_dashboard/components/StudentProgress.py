@@ -76,7 +76,9 @@ def StudentProgressTable(roster = None,
     roster = solara.use_reactive(roster)
     data = roster.value.short_report()
     
-
+    if data is None:
+        return solara.Error(label="No data available. Please contact the CosmicDS team for help.", outlined=True, text = True)
+    
     
     # make sure we have a dataframe
     if isinstance(data, dict):

@@ -73,8 +73,7 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
     if data is None:
         return
     
-    if not isinstance(student_id, solara.Reactive):
-        student_id = solara.use_reactive(student_id)
+    student_id = solara.use_reactive(student_id)
     
     if on_student_id is None:
         on_student_id = student_id.set
@@ -198,7 +197,10 @@ def StudentAgeHubble(roster = None, sid = None, allow_id_set = True):
 
     if sid.value is not None and sid.value in roster.student_ids:        
         single_student_df = roster.get_student_data(sid.value, df = True)
-        # print("single_student", sid, sid.value, single_student_df)
+        if len(single_student_df) == 0:
+            solara.Warning("There is no data for this student")
+            return
+        
         h0 = get_slope(single_student_df['est_dist_value'].to_numpy(), single_student_df['velocity_value'].to_numpy())
         age = slope2age(h0)
         solara.Markdown(f"""
