@@ -26,10 +26,9 @@ class QueryCosmicDSApi():
         pass
     
     def get_env(self):
-        dotenv_path = Path('.') / '.env'
-        
+        dotenv_path = Path(__file__).resolve().parent.parent.parent / '.env'
         api_key = os.getenv('CDS_API_KEY')
-        
+        print(dotenv_path)
         if api_key is not None:
             print("Found API key in environment variables")
 
