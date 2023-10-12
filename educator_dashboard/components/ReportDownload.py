@@ -1,7 +1,7 @@
 import solara
 
 @solara.component
-def ShowReport(roster):
+def DownloadReport(roster):
     roster = solara.use_reactive(roster)
     # if len(roster.value.roster) == 0:
     #     return

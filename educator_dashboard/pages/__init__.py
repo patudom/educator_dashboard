@@ -4,7 +4,7 @@ import solara
 from ..components.Dashboard import Dashboard
 from ..components.SetClass import SetClass
 from ..components.StudentDataLoad import StudentNameLoad
-from ..components.ReportDownload import ShowReport
+from ..components.ReportDownload import DownloadReport
 
 
 from ..database.class_report import Roster
@@ -42,7 +42,7 @@ def Page():
 
         with solara.Column(gap="0px"):
             SetClass(class_id, roster, first_run, class_id_list)
-            ShowReport(roster)
+            DownloadReport(roster)
             StudentNameLoad(roster, student_names)
             
                 
