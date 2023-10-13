@@ -10,7 +10,7 @@ from pandas import DataFrame
 ## TODO: split summary into stages like the inidividual student responses
 
 @solara.component
-def IndividualStudentResponses(roster, sid=None):
+def IndividualStudentResponses(roster, sid=None, stage_labels=[]):
     """
     Show response detail for each student
     sid is the currently selected student
@@ -30,7 +30,7 @@ def IndividualStudentResponses(roster, sid=None):
     with solara.lab.Tabs():
         with solara.lab.Tab("Multiple Choice", classes=["horizontal-tabs"]):
             with ScrollY(height='40vh'):
-                MultipleChoiceQuestionSingleStudent(roster, sid = sid)
+                MultipleChoiceQuestionSingleStudent(roster, sid = sid, stage_labels=stage_labels)
             
         with solara.lab.Tab("Free Response", classes=["horizontal-tabs"]):
             with ScrollY(height='40vh'):
@@ -41,7 +41,7 @@ def IndividualStudentResponses(roster, sid=None):
 
 
 @solara.component
-def StudentQuestionsSummary(roster, sid = None):
+def StudentQuestionsSummary(roster, sid = None, stage_labels=[]):
 
     if isinstance(roster, solara.Reactive):
         roster = roster.value
@@ -53,7 +53,7 @@ def StudentQuestionsSummary(roster, sid = None):
             # if not empty_class:
             solara.Markdown(f"####  Click any row for more detailed question information.")
             with ScrollY(height='40vh'):
-                MultipleChoiceSummary(roster)
+                MultipleChoiceSummary(roster, stage_labels=stage_labels)
             
         with solara.lab.Tab("Free Response", classes=["horizontal-tabs"]):
             with ScrollY(height='40vh'):

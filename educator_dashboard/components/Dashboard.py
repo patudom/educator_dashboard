@@ -57,11 +57,19 @@ def Dashboard(roster, student_names = None):
 
     # ClassProgress(df, roster)
     labels = ['Stage 1: </br> Velocities', 
-              'Stage 2: </br> Ang size Intro', 
-              'Stage 3: </br> Angular Size',
-              'Stage 4: </br> Find H0',
-              'Stage 5: </br> Uncertainty',
+              'Stage 2: </br> Distance Intro', 
+              'Stage 3: </br> Distances',
+              'Stage 4: </br> Universe Age',
+              'Stage 5: </br> Uncertainties',
               'Stage 6: </br> Professional Data'
+              ]
+    
+    stage_titles = ['Velocities', 
+              'Distance Intro', 
+              'Distances',
+              'Universe Age',
+              'Uncertainties',
+              'Professional Data'
               ]
     
     with solara.GridFixed(columns=1, row_gap='10px', justify_items='stretch', align_items='start'):
@@ -77,10 +85,10 @@ def Dashboard(roster, student_names = None):
             with solara.lab.Tabs(vertical=True, align='right', dark=True, value = show_student_tab):
                 
                 with solara.lab.Tab(label="Class Summary", icon_name="mdi-text-box-outline", classes=["vertical-tabs"]):
-                    StudentQuestionsSummary(roster, student_id)
+                    StudentQuestionsSummary(roster, student_id, stage_labels = stage_titles)
                     
                 with solara.lab.Tab(label="Student Responses" if student_id.value is None else f"Student {student_id.value}", classes=["vertical-tabs"]):
-                    IndividualStudentResponses(roster, student_id)
+                    IndividualStudentResponses(roster, student_id, stage_labels = stage_titles)
             
                 # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
                 #     StudentDataSummary(roster, student_id = student_id)
