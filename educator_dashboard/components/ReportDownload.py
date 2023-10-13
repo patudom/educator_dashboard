@@ -24,4 +24,4 @@ def DownloadReport(roster):
     # file_obj = BytesIO()
     # df.to_excel(file_obj, index=False)
     with solara.FileDownload(df.to_csv(index=False), "Class Report.csv", mime_type="application/vnd.ms-excel"):
-        solara.Button("Report", icon_name="mdi-download", color="primary", text=True, outlined=True)
+        solara.Button("Report", icon_name="mdi-download", classes=["my-buttons"], text=True, outlined=True)

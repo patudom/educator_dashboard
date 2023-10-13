@@ -29,11 +29,11 @@ def IndividualStudentResponses(roster, sid=None):
     # multiple choice questions
     with solara.lab.Tabs():
         with solara.lab.Tab("Multiple Choice", classes=["horizontal-tabs"]):
-            with ScrollY(height='55vh'):
+            with ScrollY(height='40vh'):
                 MultipleChoiceQuestionSingleStudent(roster, sid = sid)
             
         with solara.lab.Tab("Free Response", classes=["horizontal-tabs"]):
-            with ScrollY(height='55vh'):
+            with ScrollY(height='40vh'):
                 FreeResponseQuestionSingleStudent(roster, sid = sid)
         
         with solara.lab.Tab("Data", classes=["horizontal-tabs"]):
@@ -52,11 +52,11 @@ def StudentQuestionsSummary(roster, sid = None):
         with solara.lab.Tab("Multiple Choice", classes=["horizontal-tabs"]):
             # if not empty_class:
             solara.Markdown(f"####  Click any row for more detailed question information.")
-            with ScrollY(height='55vh'):
+            with ScrollY(height='40vh'):
                 MultipleChoiceSummary(roster)
             
         with solara.lab.Tab("Free Response", classes=["horizontal-tabs"]):
-            with ScrollY(height='55vh'):
+            with ScrollY(height='40vh'):
                 FreeResponseSummary(roster)
         
         with solara.lab.Tab("Data", classes=["horizontal-tabs"]):

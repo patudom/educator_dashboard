@@ -105,7 +105,7 @@ def StudentProgressTable(roster = None,
     
 
     if headers is None:
-        headers = ['', 'Student ID', 'Student Name', 'Points/available', 'Progress (%)'] + stage_labels
+        headers = ['', 'Student<br>ID', 'Student<br>Name', 'Points/<br>available', 'Progress<br>(%)'] + stage_labels
     with TableFromRows(headers=headers, table_height=height):
         for i in range(len(data)):
             max_stage_progress = data['progress'][i].split('%')[0]

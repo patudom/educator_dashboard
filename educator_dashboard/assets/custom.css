@@ -70,12 +70,18 @@
 }
 
 body {
-    padding-inline: 5% 
+    padding-inline: 5%; 
 }
 
 .my-buttons {
+    width: 100%;
     background-color: var(--md-blue-800) !important;
     color: white !important;
+    margin-bottom: 5px;
+}
+
+.col {
+    padding-block: 0;
 }
 
 .vertical-tabs {
@@ -95,16 +101,22 @@ body {
     font-weight: 800; 
 }
 
+.v-btn__content {
+    font-size: small;
+}
+
+.v-btn--contained {
+    padding-block: 0;
+}
+
 .v-card__text {
     color: black !important;
+    padding-top: 0;
+    padding-bottom: 16px;
 }
 
 .info-text{
     padding: 0.5rem;
-}
-
-#h2 {
-    margin-top: 0rem !important;
 }
 
 .v-expansion-panel-header {
@@ -127,6 +139,7 @@ body {
 
 .solara-markdown {
     padding-left: 0.5rem;
+    padding-top: 0.5rem;
 }
 
 /* make vertical tabs horizontal on tall screns */

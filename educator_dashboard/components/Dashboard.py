@@ -64,13 +64,13 @@ def Dashboard(roster, student_names = None):
               'Stage 6: </br> Professional Data'
               ]
     
-    with solara.GridFixed(columns=1, row_gap='0px', justify_items='stretch', align_items='start'):
-        with solara.Card():
+    with solara.GridFixed(columns=1, row_gap='10px', justify_items='stretch', align_items='start'):
+        with solara.Card(elevation=4):
             solara.Markdown (f"## Class Progress")
             ClassProgress(roster)
-            StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='30vh')
+            StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='35vh')
 
-        with solara.Card():
+        with solara.Card(elevation=4):
             solara.Markdown(f"##Student Responses and Data")
 
             # Heads up: Tabs are considered experimental in Solara and the API may change in the future
@@ -84,3 +84,6 @@ def Dashboard(roster, student_names = None):
             
                 # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
                 #     StudentDataSummary(roster, student_id = student_id)
+        # This is just so the "This website runs on Solara" credit doesn't land on top of the Student Response card
+        solara.Markdown("   ")  
+        solara.Markdown("   ")
