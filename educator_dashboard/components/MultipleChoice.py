@@ -176,7 +176,7 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0, labe
                         - Completed {} out of {} multiple choice questions
                         - Multiple Choice Score: {}/{}
                         - Took on average {} tries to complete the multiple choice questions
-                        """.format(stage, completed, total, points, total_points, avg_tries))    
+                        """.format(stage, label,  completed, total, points, total_points, avg_tries))    
         
     with solara.Row():
         with solara.Columns([1,1]):
