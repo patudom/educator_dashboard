@@ -63,7 +63,7 @@ export default {
 .fixed_header_table_wrapper {
   overflow-y: auto;
   width: 100%;
-  height: var(--table-height);
+  max-height: var(--table-height);
 }
 
 
