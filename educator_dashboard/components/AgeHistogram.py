@@ -35,8 +35,10 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
     df_agg = data.groupby(which, as_index=False).agg(count=(which,'size'), student_id = ('student_id', sids_agg))
     # add single valued column
     df_agg['group'] = 'Full Class'
-
-    xmin, xmax = nanmin(df_agg[which]), nanmax(df_agg[which])
+    if len(df_agg) == 0:
+        xmin, xmax = 0, 1
+    else:
+        xmin, xmax = nanmin(df_agg[which]), nanmax(df_agg[which])
 
     labels = {'age':'Age of Universe (Gyr)', 'student_id':'Student ID', 'h0':'Hubble Constant (km/s/Mpc)'}
 

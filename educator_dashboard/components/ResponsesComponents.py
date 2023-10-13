@@ -4,7 +4,6 @@ from .FreeResponse import FreeResponseQuestionSingleStudent, FreeResponseSummary
 from .MultipleChoice import MultipleChoiceQuestionSingleStudent, MultipleChoiceSummary
 from .DataComponent import StudentDataSummary
 from .LayoutComponents import ScrollY
-from pandas import DataFrame
 
 ## TODO: persitantly hightlight selected row in question summary
 ## TODO: split summary into stages like the inidividual student responses
