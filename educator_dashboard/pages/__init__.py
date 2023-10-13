@@ -14,7 +14,7 @@ from typing import cast
 from ..components.RefreshClass import RefreshClass
 
 
-class_id_list = [188, 195, 192, 185, 172, 170]
+class_id_list = [188, 195, 192, 185, 172, 170, 199, 191]
 
 
 @solara.component
@@ -54,7 +54,7 @@ def Page():
                 ShowReport(roster)
  
                 StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
-            RefreshClass(rate_minutes=.5, roster = roster, student_names = dashboard_names.value,
+            RefreshClass(rate_minutes=20./60., roster = roster, student_names = dashboard_names.value,
                          show_refresh_button=True, stop_start_button=True, refresh_button_text=None,
                          # show button to manually refresh and to start/stop autorefresh. no text cuz icon_only is set
                          refresh_button_color='primary', start_button_color='#777', stop_button_color='#ccc', 
