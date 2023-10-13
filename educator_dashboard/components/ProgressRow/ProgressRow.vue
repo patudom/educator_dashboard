@@ -166,27 +166,28 @@ export default {
 }
 
 .completed {
-  background-color: var(--md-deep-orange-500);
+  background-color: var(--md-cyan-700);
   
 }
 
 .completed-lighter {
-  background-color: var(--md-deep-orange-500)}
+  background-color: var(--md-cyan-700);
+}
 
 .in-progress {
-  background-color: var(--md-deep-orange-500);
+  background-color: var(--md-cyan-700);
 }
 
 .in-progress-lighter {
-  background-color: var(--md-cyan-300);
+  background-color: var(--md-deep-orange-300);
 }
 
 .not-started {
-  background-color: var(--md-cyan-300);
+  background-color: var(--md-deep-orange-300);
 }
 
 .not-started-lighter {
-  background-color: var(--md-cyan-300);
+  background-color: var(--md-deep-orange-300);
 }
 
 </style>
