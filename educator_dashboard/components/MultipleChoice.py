@@ -165,7 +165,7 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0, labe
         bot = len([i for i in x if isgood(i)])
         if bot == 0:
             return '--'
-        return top/bot
+        return str(round(top/bot,2))
     
     avg_tries = df.tries.aggregate(avg)
     
@@ -175,8 +175,8 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0, labe
                         ### Stage {}: {}
                         - Completed {} out of {} multiple choice questions
                         - Multiple Choice Score: {}/{}
-                        - Took on average {:0.2f} tries to complete the multiple choice questions
-                        """.format(stage, label, completed, total, points, total_points, avg_tries))    
+                        - Took on average {} tries to complete the multiple choice questions
+                        """.format(stage, completed, total, points, total_points, avg_tries))    
         
     with solara.Row():
         with solara.Columns([1,1]):

@@ -3,8 +3,6 @@ import solara
 import plotly.express as px
 import plotly.graph_objects as go
 
-from pandas import DataFrame
-
 @solara.component
 def ClassPlot(dataframe, 
             x_col = "est_dist_value", 
