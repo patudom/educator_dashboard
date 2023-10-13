@@ -34,7 +34,7 @@ def IndividualStudentResponses(roster, sid=None, stage_labels=[]):
             
         with solara.lab.Tab("Free Response", classes=["horizontal-tabs"]):
             with ScrollY(height='40vh'):
-                FreeResponseQuestionSingleStudent(roster, sid = sid)
+                FreeResponseQuestionSingleStudent(roster, sid = sid, stage_labels=stage_labels)
         
         with solara.lab.Tab("Data", classes=["horizontal-tabs"]):
             StudentDataSummary(roster, student_id = sid.value, allow_sid_set=False)
@@ -57,7 +57,7 @@ def StudentQuestionsSummary(roster, sid = None, stage_labels=[]):
             
         with solara.lab.Tab("Free Response", classes=["horizontal-tabs"]):
             with ScrollY(height='40vh'):
-                FreeResponseSummary(roster)
+                FreeResponseSummary(roster, stage_labels=stage_labels)
         
         with solara.lab.Tab("Data", classes=["horizontal-tabs"]):
             StudentDataSummary(roster, student_id = None, allow_sid_set=False)

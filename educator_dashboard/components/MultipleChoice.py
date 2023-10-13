@@ -212,7 +212,6 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
     
     dflist = []
     for stage, v in mc_questions.items():
-        print(stage, type(stage))
         index = int(stage) - 1
         label = stage_labels[index]
         
