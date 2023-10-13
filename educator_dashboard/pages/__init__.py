@@ -14,7 +14,7 @@ from typing import cast
 from ..components.RefreshClass import RefreshClass
 
 
-class_id_list = [188, 195, 192, 185, 172, 170, 199, 191]
+class_id_list = [199, 188, 195, 192, 185, 172, 170, 199, 191]
 
 
 @solara.component
@@ -23,13 +23,14 @@ def Page():
     print(" ================== main page ================== ")
     
     # for testing use 
+    # - 199 (test class for dashboard refresh)
     # - 195 (a full current class)
     # - 192 (an empty class)
     # - 188 (real spring beta class)
     # - 185 (testing spring beta class)
     # - 172 (old outdated class - should show stuff but probably incorrect)
     # - 170 (outdated class - should show nothing)
-    class_id = solara.use_reactive(195) # add class id here
+    class_id = solara.use_reactive(199) # add class id here
     roster = solara.use_reactive(cast(Roster, None), on_change=lambda x: print("roster changed"))
     student_names = solara.use_reactive(None)
     dashboard_names = solara.use_reactive(None)#, on_change=on_change_names)
@@ -49,13 +50,11 @@ def Page():
 
         with solara.Column(gap="0px", classes=["my-column"]):
             SetClass(class_id, roster, first_run, class_id_list)
-            with solara.Row():
+            StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
+            DownloadReport(roster) 
                 
-                DownloadReport(roster)
- 
-                StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
             RefreshClass(rate_minutes=20./60., roster = roster, student_names = dashboard_names.value,
-                         show_refresh_button=True, stop_start_button=True, refresh_button_text=None,
+                         show_refresh_button=False, stop_start_button=False, refresh_button_text=None,
                          # show button to manually refresh and to start/stop autorefresh. no text cuz icon_only is set
                          refresh_button_color='primary', start_button_color='#777', stop_button_color='#ccc', 
                          icon_only=True)
