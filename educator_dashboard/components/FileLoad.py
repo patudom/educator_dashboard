@@ -8,6 +8,10 @@ import pandas as pd
 @solara.component
 def TableLoad(file_info = None, load_complete = None, allow_excel = False):
     
+    
+    file_info = solara.use_reactive(file_info)
+    load_complete = solara.use_reactive(load_complete)
+    
     valid_file, set_valid_file = solara.use_state(True)
     msg, set_msg = solara.use_state("")
     
@@ -87,17 +91,22 @@ def TableDisplay(file_info, has_header = False, on_table = None):
     solara.DataFrame(table.head(5))
 
 @solara.component
-def SetColumns(table, fixed_table = None):
+def SetColumns(table, fixed_table = None, table_set = None):
     
+    student_id_column = solara.use_reactive('student_id')
+    name_column = solara.use_reactive('name')
+    table_set = solara.use_reactive(table_set)
     
+    if table.value is None:
+        fixed_table.set(None)
+        
+
     if table.value is not None:
 
         cols = list(table.value.columns.to_numpy().astype(str))
         cols = [c.strip() for c in cols]
         table.value.columns = cols
-        student_id_column = solara.use_reactive('student_id')
-        name_column = solara.use_reactive('name')
-    
+
 
         if 'student_id' not in cols:
             if student_id_column.value not in cols:
@@ -111,5 +120,8 @@ def SetColumns(table, fixed_table = None):
         if student_id_column.value in cols and name_column.value in cols:
             df = table.value[[student_id_column.value, name_column.value]]
             df.columns = ['student_id', 'name']
+            table_set.set(df is not None)
             fixed_table.set(df)
+            
+    
 

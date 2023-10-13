@@ -5,20 +5,22 @@ from ..components.Dashboard import Dashboard
 from ..components.SetClass import SetClass
 from ..components.StudentDataLoad import StudentNameLoad
 from ..components.ReportDownload import ShowReport
-
+import reacton.ipyvuetify as rv
 
 from ..database.class_report import Roster
 from typing import cast
 
-from pandas import DataFrame
+
+from ..components.RefreshClass import RefreshClass
 
 
-class_id_list = [188, 195, 192, 185, 172, 170]
+class_id_list = [188, 195, 192, 185, 172, 170, 199, 191]
+
 
 @solara.component
 def Page():
     solara.Title("CosmicDS Dashboard")
-
+    print(" ================== main page ================== ")
     
     # for testing use 
     # - 195 (a full current class)
@@ -28,26 +30,38 @@ def Page():
     # - 172 (old outdated class - should show stuff but probably incorrect)
     # - 170 (outdated class - should show nothing)
     class_id = solara.use_reactive(195) # add class id here
-    roster = solara.use_reactive(cast(Roster, None))
+    roster = solara.use_reactive(cast(Roster, None), on_change=lambda x: print("roster changed"))
     student_names = solara.use_reactive(None)
+    dashboard_names = solara.use_reactive(None)#, on_change=on_change_names)
     first_run = solara.use_reactive(True)
+    are_names_set = solara.use_reactive(False)
     
     story_name = "HubbleDS"
     
+    
     with solara.Columns([1, 9, 3]):
         # solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
-        solara.Image(image="static/assets/cosmicds_logo_transparent.png")
-
+        with rv.Html(tag="a", attributes={'href':"https://www.cosmicds.cfa.harvard.edu/", 'target':"_blank"}):
+            solara.Image(image="static/assets/cosmicds_logo_transparent.png")
+         
         solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
 
-        with solara.Column(gap="0px"):
-            SetClass(class_id, roster, first_run, class_id_list)
-            ShowReport(roster)
-            StudentNameLoad(roster, student_names)
-            
-                
 
-    Dashboard(roster, student_names=student_names) 
+        with solara.Column():
+            SetClass(class_id, roster, first_run, class_id_list)
+            with solara.Row():
+                
+                ShowReport(roster)
+ 
+                StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
+            RefreshClass(rate_minutes=20./60., roster = roster, student_names = dashboard_names.value,
+                         show_refresh_button=True, stop_start_button=True, refresh_button_text=None,
+                         # show button to manually refresh and to start/stop autorefresh. no text cuz icon_only is set
+                         refresh_button_color='primary', start_button_color='#777', stop_button_color='#ccc', 
+                         icon_only=True)
+        
+    Dashboard(roster, dashboard_names, add_names = dashboard_names.value is not None) 
+
     # solara.DataFrame(df.value)
 
 

@@ -1,13 +1,5 @@
 import solara
 
-
-from typing import cast
-
-from pandas import DataFrame
-
-import plotly.express as px
-import plotly.graph_objects as go
-
 from .ClassProgress import ClassProgress
 from .StudentProgress import StudentProgressTable
 from .ResponsesComponents import StudentQuestionsSummary
@@ -35,7 +27,9 @@ def initStudentID(student_id, roster):
 
 
 @solara.component
-def Dashboard(roster, student_names = None): 
+def Dashboard(roster, student_names = None, add_names = False): 
+    print(" ========= dashboard component =========")
+    roster = solara.use_reactive(roster)
     
     if roster.value is None:
         return
@@ -50,6 +44,11 @@ def Dashboard(roster, student_names = None):
     student_id = solara.use_reactive(None, on_change=print_function_name(on_sid_set))
     
     
+    
+    if add_names:
+        roster.value.set_student_names({row['student_id']: row['name'] for _, row in student_names.value.iterrows()})
+        roster.value.short_report(refresh = True)
+        # roster.set(roster.value)
     
     # a non-displaying component to 
     # make sure the student_id is valid

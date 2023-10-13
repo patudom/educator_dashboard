@@ -2,12 +2,6 @@ import solara
 
 from solara.alias import rv
 
-from pandas import DataFrame
-
-from .Collapsible import Collapsible
-
-from ..database.Query import QueryCosmicDSApi as Query
-
 ## discriminate between blank answers from not reached vs not done
 ## free question row
 
