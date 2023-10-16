@@ -270,20 +270,24 @@ class Roster():
     def get_questions_text(self):
         return self.query.get_questions()
     
-    def question_keys(self, testing = False):
+    def question_keys(self, testing = False, get_all = True):
         if (self._question_keys is not None) and (not self._refresh):
             return self._question_keys
-
-        self._question_keys = {}
-        keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
         
-        questions = self.get_questions_text()
+        self._question_keys = {}
+        
+        if get_all:
+            questions = self.get_questions_text()
+            keys = questions.keys()
+        else:
+            keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
+        
         for k in keys:
             if testing:
                 q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
             elif (k not in questions.keys()):
                 print(f'{k} not in question database')
-                q = {'text': 'Not in Question Database', 'shorthand': ''}
+                q = {'text': 'Not in Question Database', 'shorthand': 'Not Available'}
             else:
                 q = questions[k]
             
