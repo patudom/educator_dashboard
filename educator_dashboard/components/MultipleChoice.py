@@ -10,7 +10,7 @@ from .Collapsible import Collapsible
 
 from .TableComponents import DataTable
 
-from numpy import hstack
+from numpy import hstack, around
 
 @solara.component
 def MultipleChoiceStageSummary(roster, stage = None, label= None):
@@ -36,7 +36,19 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
         flat_mc_responses[k]['Question'] = roster.get_question_text(k)['shorttext']
         flat_mc_responses[k]['key'] = k
         flat_mc_responses[k]['student_id'] = roster.student_ids
-
+    
+    # there may be missing keys
+    mc_keys = roster.mc_question_keys()[stage]
+    for k in mc_keys:
+        if k not in flat_mc_responses.keys():
+            flat_mc_responses[k] = {}
+            flat_mc_responses[k]['student_id'] = roster.student_ids
+            flat_mc_responses[k]['key'] = k
+            flat_mc_responses[k]['Question'] = roster.get_question_text(k)['shorttext']
+            flat_mc_responses[k]['tries'] = [None] * len(roster.student_ids)
+            flat_mc_responses[k]['choice'] = [None] * len(roster.student_ids)
+            flat_mc_responses[k]['score'] = [None] * len(roster.student_ids)
+    
     summary_stats = DataFrame(flat_mc_responses).T
     tries = summary_stats['tries']
     # N = tries.aggregate(len)
@@ -215,11 +227,16 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
     idx = roster.student_ids.index(sid.value)
     mc_questions = roster.roster[idx]['story_state']['mc_scoring']
     
+    mc_keys = roster.mc_question_keys()
     
     dflist = []
     for stage, v in mc_questions.items():
         index = int(stage) - 1
         label = stage_labels[index]
+        
+        for k in mc_keys[stage]:
+            if k not in v.keys():
+                v[k] = {'tries': None, 'choice': None, 'score': None}
         
         df = DataFrame(v).T
         df['stage'] = stage
