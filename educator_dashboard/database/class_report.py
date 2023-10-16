@@ -323,7 +323,6 @@ class Roster():
                         if q not in keys:
                             keys.append(q)
                     self._mc_keys[stage] = keys
-        self._mc_keys['5'].append('my-fake-question')
         return self._mc_keys
     
     def fr_question_keys(self):
