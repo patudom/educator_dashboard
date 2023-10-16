@@ -37,6 +37,7 @@ def Dashboard(roster, student_names = None, add_names = False):
     # student_id = solara.use_reactive(None)
     student_names = solara.use_reactive(student_names)
     show_student_tab = solara.use_reactive(0)
+    sub_tab_index = solara.use_reactive(0)
     def on_sid_set(value):
         if value is not None:
             print(f"Setting student_id to {value}")
@@ -84,10 +85,10 @@ def Dashboard(roster, student_names = None, add_names = False):
             with solara.lab.Tabs(vertical=True, align='right', dark=True, value = show_student_tab):
                 
                 with solara.lab.Tab(label="Class Summary", icon_name="mdi-text-box-outline", classes=["vertical-tabs"]):
-                    StudentQuestionsSummary(roster, student_id, stage_labels = stage_titles)
+                    StudentQuestionsSummary(roster, student_id, stage_labels = stage_titles, which_tab = sub_tab_index)
                     
                 with solara.lab.Tab(label="Student Responses" if student_id.value is None else f"Student {student_id.value}", classes=["vertical-tabs"]):
-                    IndividualStudentResponses(roster, student_id, stage_labels = stage_titles)
+                    IndividualStudentResponses(roster, student_id, stage_labels = stage_titles, which_tab = sub_tab_index)
             
                 # with solara.lab.Tab("Student Data", icon_name="mdi-chart-scatter-plot"):
                 #     StudentDataSummary(roster, student_id = student_id)

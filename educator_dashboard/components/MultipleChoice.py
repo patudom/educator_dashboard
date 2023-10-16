@@ -10,7 +10,7 @@ from .Collapsible import Collapsible
 
 from .TableComponents import DataTable
 
-from numpy import hstack
+from numpy import hstack, around
 
 @solara.component
 def MultipleChoiceStageSummary(roster, stage = None, label= None):
@@ -51,7 +51,8 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
         # Table of questions with average #of tries across whole space
         with solara.Column():
             
-            solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(tries_1d[tries_1d>0].mean().round(2)))
+            avg_tries = around(tries_1d[tries_1d>0].mean(),2)
+            solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(avg_tries))
 
             keys = ['Question', 'Completed by', 'Average # of Tries']
             # headers appropriate for vuetify headers prop
