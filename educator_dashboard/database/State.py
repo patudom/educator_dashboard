@@ -37,8 +37,11 @@ class State:
     def stage_score(self, stage):
         score = 0
         possible_score = 0
+        if str(stage) not in self.mc_scoring:
+            return score, possible_score
         for key, value in self.mc_scoring[str(stage)].items():
             score += value['score']
+            
             possible_score += 10
         return score, possible_score
     
@@ -111,6 +114,13 @@ class State:
     def score(self):
         return self.total_score / self.possible_score
     
+    @property
+    def story_score(self):
+        total = 0
+        for key, stage in self.stages.items():
+            score, possible = self.stage_score(key)
+            total += score
+        return total
     
     @property
     def current_marker(self):
