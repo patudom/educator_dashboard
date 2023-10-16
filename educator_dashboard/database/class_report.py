@@ -301,8 +301,14 @@ class Roster():
                 self._question_keys[k] = {'text':q['text'], 'shorttext':short, 'nicetag': nice_tag}
                 
         return self._question_keys
+    
+    def get_question_text(self, key):
+        if key in self.question_keys().keys():
+            return self.question_keys()[key]
+        else:
+            print(f'{key} not in question database')
+            return {'text': 'Not in Question Database', 'shorttext': 'Not Available', 'nicetag': key}
                 
-        
     
     @property
     def student_ids(self):

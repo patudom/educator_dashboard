@@ -24,13 +24,16 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
     
     mc_responses = roster.multiple_choice_questions()
         
+    if stage is None:
+        return
+    
 
     flat_mc_responses = {}
     q = roster.l2d(mc_responses[stage],fill_val={})
     for k, v in q.items():
         flat_mc_responses[k] = roster.l2d(v)
         # flat_mc_responses[k]['Stage'] = stage
-        flat_mc_responses[k]['Question'] = roster.question_keys()[k]['shorttext']
+        flat_mc_responses[k]['Question'] = roster.get_question_text(k)['shorttext']
         flat_mc_responses[k]['key'] = k
         flat_mc_responses[k]['student_id'] = roster.student_ids
 
@@ -38,7 +41,7 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
     tries = summary_stats['tries']
     # N = tries.aggregate(len)
     attempts = tries.aggregate(lambda x: f"{len([i for i in x if i is not None])} / {len(x)}")
-    avg_tries = tries.aggregate(lambda x: sum([i for i in x if i is not None])/len([i for i in x if i is not None]))
+    avg_tries = tries.aggregate(lambda x: sum([i for i in x if i is not None])/max(1,len([i for i in x if i is not None])))
     summary_stats['Completed by'] = attempts
     summary_stats['Average # of Tries'] = avg_tries.round(2)
     
@@ -83,7 +86,7 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
                 with solara.Column():
                         # Add numeral index after Question
                         solara.Markdown(f"""***Question:***
-                                    {roster.question_keys()[selected_question.value]['text']}
+                                    {roster.get_question_text(selected_question.value)['text']}
                                     """)
                         
                         df = DataFrame(flat_mc_responses[selected_question.value])
@@ -93,8 +96,9 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
                                         
                 with Collapsible(header='Individual Student Tries for Question'):
                     # Round tries to integers and leave a blank for nan values
-                    df['rounded_tries'] = df['tries'].round().astype('Int64')
-                    df['rounded_tries'] = df['rounded_tries'].apply(lambda x: '' if pd.isna(x) else x)
+                    df = df.fillna(-999)
+                    df['rounded_tries'] = df['tries'].round().astype(int)
+                    df['rounded_tries'] = df['rounded_tries'].apply(lambda x: '' if (x==-999) else x)
 
                     if 'name' in roster.students.columns:
                         headers = [{'text': 'Name', 'value': 'name'}, {'text': 'Tries', 'value': 'rounded_tries'}]
@@ -146,6 +150,8 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0, labe
         if qjson is not None:
             q = qjson['question']['text']
             set_dquest(q)
+        else:
+            set_dquest('Not in Database')
         
 
     
@@ -218,7 +224,7 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
         df = DataFrame(v).T
         df['stage'] = stage
         df['key'] = df.index
-        df['question'] = [roster.question_keys()[k]['shorttext'] for k in df.key]
+        df['question'] = [roster.get_question_text(k)['shorttext'] for k in df.key]
         dflist.append(df)
         
         # which columns do you want to see and what should the displayed name be?
