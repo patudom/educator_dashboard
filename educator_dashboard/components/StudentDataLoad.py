@@ -28,10 +28,7 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = 
         with solara.Column(gap="5px"):
             rv.Checkbox(v_model = has_header.value, 
                         on_v_model = has_header.set,
-                        v_slots=[{
-                            'name': 'label',
-                            'children': [solara.Markdown('Does the file have a header row? <br> (Un/check if unsure. First row will be used as header if checked.)')]
-                        }]
+                        label = 'Does the file have a header row? (Un/check if unsure. First row will be used as header if checked.)'
                         )
             TableDisplay(file_info, has_header, on_table = table.set)
     
