@@ -10,10 +10,10 @@ from .Collapsible import Collapsible
 
 from .TableComponents import DataTable
 
-from numpy import hstack
+from numpy import hstack, around
 
 @solara.component
-def MultipleChoiceStageSummary(roster, stage = None):
+def MultipleChoiceStageSummary(roster, stage = None, label= None):
     
     if isinstance(roster, solara.Reactive):
         roster = roster.value
@@ -46,12 +46,13 @@ def MultipleChoiceStageSummary(roster, stage = None):
     tries_1d = Series(tries_1d).dropna()
     
     with solara.GridFixed(columns=1, justify_items='stretch', align_items='start') as main:
-        solara.Markdown(f"### Stage {stage}")
+        solara.Markdown(f"### Stage {stage}: {label}")
 
         # Table of questions with average #of tries across whole space
         with solara.Column():
             
-            solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(tries_1d[tries_1d>0].mean().round(2)))
+            avg_tries = around(tries_1d[tries_1d>0].mean(),2)
+            solara.Markdown("Students on average took {} tries to complete the multiple choice questions".format(avg_tries))
 
             keys = ['Question', 'Completed by', 'Average # of Tries']
             # headers appropriate for vuetify headers prop
@@ -108,7 +109,7 @@ def MultipleChoiceStageSummary(roster, stage = None):
 
                 
 @solara.component
-def MultipleChoiceSummary(roster):
+def MultipleChoiceSummary(roster, stage_labels=[]):
     
     if isinstance(roster, solara.Reactive):
         roster = roster.value
@@ -121,10 +122,12 @@ def MultipleChoiceSummary(roster):
     stages = list(filter(lambda s: s.isdigit(),sorted(list(sorted(mc_responses.keys())))))
     
     for stage in stages:
-        MultipleChoiceStageSummary(roster, stage = stage)
+        index = int(stage) - 1
+        label = stage_labels[index]
+        MultipleChoiceStageSummary(roster, stage = stage, label = label)
 
 @solara.component
-def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
+def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0, label = None):
     
     if df is None:
         solara.Markdown("There are no completed multiple choice questions for this stage")
@@ -170,11 +173,11 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
 
     with solara.Row():
         solara.Markdown("""
-                        ### Stage {}
+                        ### Stage {}: {}
                         - Completed {} out of {} multiple choice questions
                         - Multiple Choice Score: {}/{}
                         - Took on average {} tries to complete the multiple choice questions
-                        """.format(stage, completed, total, points, total_points, avg_tries))    
+                        """.format(stage, label,  completed, total, points, total_points, avg_tries))    
         
     with solara.Row():
         with solara.Columns([1,1]):
@@ -191,7 +194,7 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0):
         
     
 @solara.component
-def MultipleChoiceQuestionSingleStudent(roster, sid = None):
+def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
     
     if not isinstance(sid, solara.Reactive):
         sid = solara.use_reactive(sid)
@@ -210,7 +213,8 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None):
     
     dflist = []
     for stage, v in mc_questions.items():
-
+        index = int(stage) - 1
+        label = stage_labels[index]
         
         df = DataFrame(v).T
         df['stage'] = stage
@@ -224,5 +228,5 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None):
             {'text': 'Tries', 'value': 'tries'},
             {'text': 'Score', 'value': 'score'},
         ]
-        MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage)
+        MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage, label = label)
             
