@@ -1,6 +1,6 @@
 import solara
 
-from .FileLoad import TableLoad, SetColumns, TableDisplay
+from .FileLoad import TableLoad, SetColumns, CSVFileInfoToTable
 
 import reacton.ipyvuetify as rv
 
@@ -11,7 +11,6 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = 
     
     
     file_info = solara.use_reactive(None)
-    has_header = solara.use_reactive(True)
     table = solara.use_reactive(None)
     table_set = solara.use_reactive(table_set)
     
@@ -19,27 +18,35 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = 
         if not value:
             table.set(None)
             table_set.set(False)
+            name_dataframe.set(None)
     
     file_loaded = solara.use_reactive(False, on_change = on_clear)
 
     with solara.Columns([1, 1]):
         with solara.Column():
             TableLoad(file_info, load_complete = file_loaded)
-        with solara.Column(gap="5px"):
-            rv.Checkbox(v_model = has_header.value, 
-                        on_v_model = has_header.set,
-                        label = 'Does the file have a header row? (Un/check if unsure. First row will be used as header if checked.)'
-                        )
-            TableDisplay(file_info, has_header, on_table = table.set)
+        with solara.Row(gap="5px"):
+            CSVFileInfoToTable(file_info, on_table = table.set)
+            
+            # with solara.Column():
+            #     if table.value is not None:
+            #         solara.Markdown("Does your table look okay? If data appears in your header row, press the button below")
+            #         rv.Checkbox(v_model = has_header.value, 
+            #                 on_v_model = has_header.set,
+            #                 label = f'Header row is {"" if has_header.value else "not"} correct'
+            #                 )
+                
+            
     
-    with solara.Div():
-        SetColumns(table, fixed_table = name_dataframe, table_set = table_set)
+        # with solara.Div():
+            with solara.Card():
+                SetColumns(table, fixed_table = name_dataframe, table_set = table_set)
         
 
 
 
 @solara.component
-def StudentLoadDialog(student_names = None, student_names_set = None, dialog_open = False):
+def StudentLoadDialog(student_names = None, student_names_set = None, dialog_open = False, no_dialog = False):
     
     student_names = solara.use_reactive(student_names)
     student_names_set = solara.use_reactive(student_names_set)
@@ -58,8 +65,8 @@ def StudentLoadDialog(student_names = None, student_names_set = None, dialog_ope
                 )
         }]
     )
-    
-    with dialog:
+    comp = dialog if not no_dialog else solara.Div()
+    with comp:
         with solara.Card():
             StudentDataLoadInterface(student_names, table_set = student_names_set)
             if student_names_set.value:
