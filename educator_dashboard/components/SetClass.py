@@ -6,7 +6,7 @@ from ..database.class_report import Roster
 def SetClass(class_id, roster, first_run = False, class_id_list = None):
     
     print('in SetClass')
-    
+    class_id_list = solara.reactive(class_id_list).value
     
     def on_value(value):
         print("SetClass: on_value", value)
@@ -36,6 +36,9 @@ def SetClass(class_id, roster, first_run = False, class_id_list = None):
         solara.Markdown(warning_text, color='warning', style="font-size: 2em" )
     
     if class_id_list is None:
-        solara.InputText(label="Class ID",  value = str(class_id), on_value=on_value)
+        solara.Error("""Manual entry of the class ID is no longer supported. 
+                     Please provide a list of class IDs to the SetClass component. 
+                     If you are seeing this error please contact the CosmicDataStories team
+                     """)
     else:
         solara.Select(label="Class ID", values = class_id_list, value = class_id.value, on_value=on_value)
