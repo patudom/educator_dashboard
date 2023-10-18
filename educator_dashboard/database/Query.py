@@ -212,7 +212,7 @@ class QueryCosmicDSApi():
             return {q['tag']:q for q in req.json()['questions']}
         
     def get_class_for_teacher(self,teacher_key = None):
-        endpoint = f"/dashboard-class-groups/{teacher_key}"
+        endpoint = f"/dashboard-group-classes/{teacher_key}"
         url = urljoin(self.url_head, endpoint)
         self.teacher_classes_url = url 
         print(url)
