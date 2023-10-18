@@ -117,7 +117,7 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
     use_first_row_as_header.set(True)
 
 
-def validate_column_choices(table, id_col, name_col):
+def validate_column_choices(table, id_col, name_col, id_validator = lambda x: (True, [])):
     if id_col == name_col:
         return False
 
@@ -128,7 +128,11 @@ def validate_column_choices(table, id_col, name_col):
         return False
 
     if is_numeric_array(table[id_col]):
-        pass
+        valid, _ = id_validator(table)
+        if valid:
+            pass
+        else:
+            return False
     else:
         return False
 
@@ -136,7 +140,7 @@ def validate_column_choices(table, id_col, name_col):
 
 
 @solara.component
-def SetColumns(table, fixed_table = None, table_set = None):
+def SetColumns(table, fixed_table = None, table_set = None, id_validator = lambda x: (True, [])):
     
     student_id_column = solara.use_reactive('student_id')
     name_column = solara.use_reactive('name')
@@ -157,7 +161,7 @@ def SetColumns(table, fixed_table = None, table_set = None):
 
         valid_id_cols = [c for c in cols if is_numeric_array(table.value[c])]
         
-        if validate_column_choices(table.value, 'student_id', 'name'):
+        if validate_column_choices(table.value, 'student_id', 'name', id_validator = id_validator):
             student_id_column.set('student_id')
             name_column.set('name')
             skip_setting = True
