@@ -27,7 +27,7 @@ def TableLoad(file_info = None, load_complete = None, allow_excel = False):
             set_valid_file(True)
         else:
             set_valid_file(False)
-            set_msg(f"Failed to read {filename}. Please select a valid CSV or Excel file.")
+            set_msg(f"Failed to read {filename}. Please select a valid CSV file.")
         
         load_complete.set(True)
     
@@ -90,7 +90,7 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
     regex = r',(?!(?:[^"]*"[^"]*")*[^"]*$)'
     matches = re.findall(regex, bytes_data.decode('utf-8'))
     if len(matches) > 0:
-        solara.Warning("We found some commas that are inbetween words enclosed in double quotes. Will attempt removal. If data appears mangled, please remove them manually.")
+        solara.Warning("Some cells in your csv file contain commas, possibly in the form 'last name, first name.' If student names do not look right, you may need to remove extra commas and reload the file.")
     bytes_data = re.sub(regex, '', bytes_data.decode('utf-8')).encode('utf-8')    
     
     if filename.endswith('.csv'):
