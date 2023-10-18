@@ -67,7 +67,9 @@ def is_numeric_array(array):
 
 def verify_table(df):
     # check that the columns are 'student_id' and 'name'
-    return ('student_id' in df.columns) and ('name' in df.columns)
+    cols = list(df.columns.to_numpy().astype(str))
+    cols = [c.strip() for c in cols]
+    return ('student_id' in cols) and ('name' in cols)
     
 @solara.component
 def CSVFileInfoToTable(file_info, on_table = None, display = True):
