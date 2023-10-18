@@ -28,7 +28,7 @@ def TableLoad(file_info = None, load_complete = None, allow_excel = False):
             set_msg(f"Successfully read in {filename}!")
         else:
             set_valid_file(False)
-            set_msg(f"Failed to read {filename}. Please select a valid CSV file.")
+            set_msg(f"Failed to read {filename}. Please select a valid CSV or Excel file.")
         
         load_complete.set(True)
     
@@ -43,7 +43,7 @@ def TableLoad(file_info = None, load_complete = None, allow_excel = False):
                         
             * Include a header row with column names 'student_id' and 'name'. 
             * To protect student privacy, this information remains on your computer and will NOT be uploaded to CosmicDS servers.
-            * You can load a single name file that includes students from multiple classes, and they will be applied when the relevant class is being viewed. (If you use separate name files for each class, you will need to reload the file every time you toggle between classes).
+            * You can load a single name file that includes students from multiple classes, and they will be applied when the relevant class is viewed. (If you use separate name files for each class, you will need to reload the file every time you toggle between classes).
         ''')
         if not load_complete.value:
             solara.FileDrop(
@@ -52,10 +52,11 @@ def TableLoad(file_info = None, load_complete = None, allow_excel = False):
             )
         if load_complete.value and valid_file:
             solara.Success(msg, dense=True, outlined=True, icon='mdi-file-check')
+            solara.Button("Clear data", on_click=on_click)
         elif load_complete.value and not valid_file:
             solara.Error(msg, dense=True, outlined=True, icon='mdi-file-alert')
-        
-        solara.Button("Clear", on_click=on_click, disabled=not load_complete.value)
+            solara.Button("Try another file", on_click=on_click)
+            
 
 def strip_non_alpha(string):
     return (''.join([c for c in str(string) if c.isalpha()])).lower()
