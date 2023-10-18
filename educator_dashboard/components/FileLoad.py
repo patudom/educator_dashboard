@@ -25,7 +25,6 @@ def TableLoad(file_info = None, load_complete = None, allow_excel = False):
         if isCSV or (isExcel and allow_excel):
             file_info.set(file)
             set_valid_file(True)
-            set_msg(f"Successfully read in {filename}!")
         else:
             set_valid_file(False)
             set_msg(f"Failed to read {filename}. Please select a valid CSV or Excel file.")
@@ -51,7 +50,6 @@ def TableLoad(file_info = None, load_complete = None, allow_excel = False):
                 lazy=False, # puts data in the [data] part of FileInfo
             )
         if load_complete.value and valid_file:
-            solara.Success(msg, dense=True, outlined=True, icon='mdi-file-check')
             solara.Button("Clear data", on_click=on_click)
         elif load_complete.value and not valid_file:
             solara.Error(msg, dense=True, outlined=True, icon='mdi-file-alert')
@@ -101,9 +99,7 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
         # if the first row is a valid header row, read in the table again
         if is_header_row(table.iloc[0].to_numpy()) and use_first_row_as_header.value:
             table = pd.read_csv(BytesIO(bytes_data), header=0, skip_blank_lines=True, quotechar='"', encoding='utf-8')
-            if verify_table(table):
-                solara.Success("It has a valid header row!", dense=True)
-            else:
+            if not verify_table(table):
                 solara.Warning("Let's double check the headers. Use the panel on the left to set the ID and Name columns", dense=True)
                 use_first_row_as_header.set(False)
     else:
