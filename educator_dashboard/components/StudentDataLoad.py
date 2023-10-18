@@ -7,7 +7,7 @@ import reacton.ipyvuetify as rv
 import copy
 
 @solara.component
-def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = None, id_validator = lambda x: (True, [])):
+def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = None):
     
     
     file_info = solara.use_reactive(None)
@@ -27,7 +27,7 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = 
             TableLoad(file_info, load_complete = file_loaded)
     with solara.Row(gap="10px"):
         with solara.Div():
-            SetColumns(table, fixed_table = name_dataframe, table_set = table_set, id_validator=id_validator)
+            SetColumns(table, fixed_table = name_dataframe, table_set = table_set)
         CSVFileInfoToTable(file_info, on_table = table.set)
             
             # with solara.Column():
@@ -61,7 +61,7 @@ def StudentLoadDialog(student_names = None, student_names_set = None, dialog_ope
     comp = dialog if not no_dialog else solara.Div()
     with comp:
         with solara.Card():
-            StudentDataLoadInterface(student_names, table_set = student_names_set, id_validator = validator)
+            StudentDataLoadInterface(student_names, table_set = student_names_set)
             if student_names_set.value:
                 valid, missing = validator(student_names.value)
                 if not valid:
@@ -80,11 +80,11 @@ def StudentNameLoad(roster, student_names = None, names_set = None, on_update = 
     student_names = solara.use_reactive(student_names)
     student_names_set = solara.use_reactive(names_set)
     
-    def validator(table, id_col = 'student_id'):
+    def validator(table):
         if table is None:
             return False, []
         # check all roster sids are in the loaded table
-        sids = table[id_col].tolist()
+        sids = table['student_id'].tolist()
         roster_ids = roster.value.student_ids
         present = [(rid in sids) for rid in roster_ids]
         # get the missing roster_ids
