@@ -142,12 +142,12 @@ def SetColumns(table, fixed_table = None, table_set = None):
             
             if 'student_id' not in cols:
                 if student_id_column.value not in cols:
-                    solara.Markdown("File does not have a column with header `student_id`. < br> Please select the column that contains student ids")
-                solara.Select(label = 'Student ID column', values = cols, value = student_id_column, dense=True, style="width: 30ch")
+                    solara.Markdown("File does not have a column with header `student_id`. Please select the column that contains student ids.")
+                solara.Select(label = 'Student ID column', values = cols, value = student_id_column, dense=True, style="width: 40ch")
             if 'name' not in cols:
                 if name_column.value not in cols:
-                    solara.Markdown("File does not have a column with header 'name'. </br> Please select the column that contains student names")
-                solara.Select(label = 'Student name column', values = cols, value = name_column, dense=True, style="width: 30ch")
+                    solara.Markdown("File does not have a column with header `name`. Please select the column that contains student names.")
+                solara.Select(label = 'Student name column', values = cols, value = name_column, dense=True, style="width: 40ch")
 
         if student_id_column.value in cols and name_column.value in cols:
             df = table.value[[student_id_column.value, name_column.value]]

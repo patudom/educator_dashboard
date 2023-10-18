@@ -22,11 +22,13 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = 
     
     file_loaded = solara.use_reactive(False, on_change = on_clear)
 
-    with solara.Columns([1, 1]):
+    with solara.Row():
         with solara.Column():
             TableLoad(file_info, load_complete = file_loaded)
-        with solara.Row(gap="5px"):
-            CSVFileInfoToTable(file_info, on_table = table.set)
+    with solara.Row(gap="10px"):
+        with solara.Div():
+            SetColumns(table, fixed_table = name_dataframe, table_set = table_set)
+        CSVFileInfoToTable(file_info, on_table = table.set)
             
             # with solara.Column():
             #     if table.value is not None:
@@ -34,16 +36,7 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = 
             #         rv.Checkbox(v_model = has_header.value, 
             #                 on_v_model = has_header.set,
             #                 label = f'Header row is {"" if has_header.value else "not"} correct'
-            #                 )
-                
-            
-    
-        # with solara.Div():
-            with solara.Div():
-                SetColumns(table, fixed_table = name_dataframe, table_set = table_set)
-        
-
-
+            #                 )   
 
 @solara.component
 def StudentLoadDialog(student_names = None, student_names_set = None, dialog_open = False, no_dialog = False):
@@ -70,9 +63,9 @@ def StudentLoadDialog(student_names = None, student_names_set = None, dialog_ope
         with solara.Card():
             StudentDataLoadInterface(student_names, table_set = student_names_set)
             if student_names_set.value:
-                solara.Success("Successfully updated student names!", dense=True, outlined=True)
+                solara.Success("Successfully updated student names.", dense=True, outlined=True)
             with solara.CardActions():
-                solara.Button(icon_name="mdi-close-circle",label = "Close", on_click = lambda: dialog_open.set(False), text=True, outlined=True)
+                solara.Button(icon_name="mdi-close-circle",label = "Close", on_click = lambda: dialog_open.set(False), text=True, outlined=True, classes=["dialog-button"])
 
 
 
