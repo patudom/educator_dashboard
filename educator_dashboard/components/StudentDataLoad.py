@@ -39,7 +39,7 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = 
             #                 )   
 
 @solara.component
-def StudentLoadDialog(student_names = None, student_names_set = None, dialog_open = False, no_dialog = False):
+def StudentLoadDialog(student_names = None, student_names_set = None, dialog_open = False, no_dialog = False, validator = lambda x: (True, [])):
     
     student_names = solara.use_reactive(student_names)
     student_names_set = solara.use_reactive(student_names_set)
@@ -63,7 +63,11 @@ def StudentLoadDialog(student_names = None, student_names_set = None, dialog_ope
         with solara.Card():
             StudentDataLoadInterface(student_names, table_set = student_names_set)
             if student_names_set.value:
-                solara.Success("Successfully updated student names.", dense=True, outlined=True)
+                valid, missing = validator(student_names.value)
+                if not valid:
+                    solara.Error(f"Some students ({missing}) in the loaded class are not present in the loaded table. You may still proceed, but their names will not be loaded", dense=True, outlined=True)
+                else:
+                    solara.Success("Successfully updated student names.", dense=True, outlined=True)
             with solara.CardActions():
                 solara.Button(icon_name="mdi-close-circle",label = "Close", on_click = lambda: dialog_open.set(False), text=True, outlined=True, classes=["dialog-button"])
 
@@ -76,7 +80,19 @@ def StudentNameLoad(roster, student_names = None, names_set = None, on_update = 
     student_names = solara.use_reactive(student_names)
     student_names_set = solara.use_reactive(names_set)
     
-    StudentLoadDialog(student_names, student_names_set = student_names_set)
+    def validator(table):
+        if table is None:
+            return False, []
+        # check all roster sids are in the loaded table
+        sids = table['student_id'].tolist()
+        roster_ids = roster.value.student_ids
+        present = [(rid in sids) for rid in roster_ids]
+        # get the missing roster_ids
+        missing = [rid for rid, p in zip(roster_ids, present) if not p]
+        return all(present), missing
+    
+    
+    StudentLoadDialog(roster, student_names, student_names_set = student_names_set, validator = validator)
     r = copy.copy(roster.value)
     if student_names.value is not None:
         print("updating student names")
