@@ -62,6 +62,9 @@ def strip_non_alpha(string):
 def is_header_row(array):
     return all([strip_non_alpha(c).isalpha() for c in array])
 
+def is_numeric_array(array):
+    return all((str(val).isnumeric() for val in array))
+
 def verify_table(df):
     # check that the columns are 'student_id' and 'name'
     return ('student_id' in df.columns) and ('name' in df.columns)
@@ -91,7 +94,7 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
     matches = re.findall(regex, bytes_data.decode('utf-8'))
     if len(matches) > 0:
         solara.Warning("Some cells in your csv file contain commas, possibly in the form 'last name, first name.' If student names do not look right, you may need to remove extra commas and reload the file.")
-    bytes_data = re.sub(regex, '', bytes_data.decode('utf-8')).encode('utf-8')    
+    bytes_data = re.sub(regex, '', bytes_data.decode('utf-8')).encode('utf-8')
     
     if filename.endswith('.csv'):
         # read in the table assuming it has no header row
@@ -107,14 +110,27 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
         solara.Error(f"The dashboard cannot read ${ext} files. Please convert your file to a CSV (comma-separate values file) and try again.")
         return
     
-    if len(table.columns) != 2:
-        solara.Error("Your table does not have exactly two columns. Please check your file for extra commas and try again.")
-        return
-    
     do_on_table(table)
     
     if display:
         solara.DataFrame(table.head(5))
+
+
+def validate_column_choices(table, id_col, name_col):
+    if id_col == name_col:
+        return False
+
+    if id_col not in table.columns:
+        return False
+
+    if name_col not in table.columns:
+        return False
+
+    if is_numeric_array(table[id_col]):
+        pass
+
+    return True
+
 
 @solara.component
 def SetColumns(table, fixed_table = None, table_set = None):
@@ -134,22 +150,24 @@ def SetColumns(table, fixed_table = None, table_set = None):
         cols = [c.strip() for c in cols]
         table.value.columns = cols
 
+        valid_id_cols = [c for c in cols if is_numeric_array(table.value[c])]
+        valid_name_cols = cols  # name column can include any identifier the teacher wants
         
         if ('student_id' in cols) and ('name' in cols):
             skip_setting = True
         
         if not skip_setting:
             
-            if 'student_id' not in cols:
+            if 'student_id' not in valid_id_cols:
                 if student_id_column.value not in cols:
                     solara.Markdown("File does not have a column with header `student_id`. Please select the column that contains student ids.")
-                solara.Select(label = 'Student ID column', values = cols, value = student_id_column, dense=True, style="width: 40ch")
+                solara.Select(label = 'Student ID column', values = valid_id_cols, value = student_id_column, dense=True, style="width: 40ch")
             if 'name' not in cols:
                 if name_column.value not in cols:
                     solara.Markdown("File does not have a column with header `name`. Please select the column that contains student names.")
-                solara.Select(label = 'Student name column', values = cols, value = name_column, dense=True, style="width: 40ch")
+                solara.Select(label = 'Student name column', values = [c for c in cols if c != student_id_column.value], value = name_column, dense=True, style="width: 40ch")
 
-        if student_id_column.value in cols and name_column.value in cols:
+        if validate_column_choices(table.value, student_id_column.value, name_column.value):
             df = table.value[[student_id_column.value, name_column.value]]
             df.columns = ['student_id', 'name']
             table_set.set(df is not None)
