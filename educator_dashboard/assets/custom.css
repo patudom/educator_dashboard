@@ -80,6 +80,14 @@ body {
     margin-bottom: 5px;
 }
 
+.dialog-button {
+    position:absolute;
+    right: 1.5rem;
+    bottom: 0.5rem;
+    background-color: var(--md-blue-800) !important;
+    color: white !important;
+}
+
 .col {
     padding-block: 0;
 }
