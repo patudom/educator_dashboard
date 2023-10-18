@@ -73,6 +73,7 @@ def verify_table(df):
 def CSVFileInfoToTable(file_info, on_table = None, display = True):
     
     use_first_row_as_header = solara.use_reactive(True)
+    
         
     if isinstance(file_info, solara.Reactive):
         file_info = file_info.value
@@ -107,14 +108,12 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
     else:
         ext = filename.split('.')[-1]
         solara.Error(f"The dashboard cannot read ${ext} files. Please convert your file to a CSV (comma-separate values file) and try again.")
-        use_first_row_as_header.set(True)
         return
     
     do_on_table(table)
     
     if display:
         solara.DataFrame(table.head(5))
-    use_first_row_as_header.set(True)
 
 
 def validate_column_choices(table, id_col, name_col):
@@ -129,8 +128,6 @@ def validate_column_choices(table, id_col, name_col):
 
     if is_numeric_array(table[id_col]):
         pass
-    else:
-        return False
 
     return True
 
@@ -141,13 +138,11 @@ def SetColumns(table, fixed_table = None, table_set = None):
     student_id_column = solara.use_reactive('student_id')
     name_column = solara.use_reactive('name')
     table_set = solara.use_reactive(table_set)
-    skip_setting = False
-    fixed_table = solara.use_reactive(fixed_table)
     
     if table.value is None:
         fixed_table.set(None)
     
-    
+    skip_setting = False
 
     if table.value is not None:
 
@@ -156,37 +151,27 @@ def SetColumns(table, fixed_table = None, table_set = None):
         table.value.columns = cols
 
         valid_id_cols = [c for c in cols if is_numeric_array(table.value[c])]
+        valid_name_cols = cols  # name column can include any identifier the teacher wants
         
-        if validate_column_choices(table.value, 'student_id', 'name'):
-            student_id_column.set('student_id')
-            name_column.set('name')
+        if ('student_id' in cols) and ('name' in cols):
             skip_setting = True
-        
-        elif 'student_id' in cols and 'name' in cols:
-            solara.Error('`student_id` and `name` found, but not labeling the correct columns. Please select the correct columns', dense=True, outlined=True, icon='mdi-file-alert')
         
         if not skip_setting:
             
-            with solara.Card():
-                solara.Markdown("Please select the column that contains student ids.")
+            if 'student_id' not in valid_id_cols:
+                if student_id_column.value not in cols:
+                    solara.Markdown("File does not have a column with header `student_id`. Please select the column that contains student ids.")
                 solara.Select(label = 'Student ID column', values = valid_id_cols, value = student_id_column, dense=True, style="width: 40ch")
-            
-            with solara.Card():
-                solara.Markdown("Please select the column that contains student names.")
-                solara.Select(label = 'Student name column', values = cols, value = name_column, dense=True, style="width: 40ch")
+            if 'name' not in cols:
+                if name_column.value not in cols:
+                    solara.Markdown("File does not have a column with header `name`. Please select the column that contains student names.")
+                solara.Select(label = 'Student name column', values = [c for c in cols if c != student_id_column.value], value = name_column, dense=True, style="width: 40ch")
 
         if validate_column_choices(table.value, student_id_column.value, name_column.value):
             df = table.value[[student_id_column.value, name_column.value]]
             df.columns = ['student_id', 'name']
             table_set.set(df is not None)
             fixed_table.set(df)
-            if not skip_setting:
-                solara.Markdown('Preview corrected table:')
-                solara.DataFrame(df.head(5))
-        else:
-            solara.Error("Please select valid columns", dense=True, outlined=True)
-            fixed_table.set(None)
-            table_set.set(False)
             
     
 
