@@ -19,7 +19,7 @@ def TeacherCodeEntry(class_id_list, class_id, callback):
                              message = f'You entered {code.value}',
                              )
         
-        class_query_res = q.get_class_for_teacher(str(code.value))
+        class_query_res = q.get_class_for_teacher(str(code.value))['class_ids']
         if code.value != '' and len(class_query_res) == 0:
             solara.Error(f'No classes found for code {code.value}')
         elif code.value != '' and len(class_query_res) > 0:
