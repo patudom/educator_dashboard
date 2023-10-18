@@ -39,7 +39,7 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = 
             
     
         # with solara.Div():
-            with solara.Card():
+            with solara.Div():
                 SetColumns(table, fixed_table = name_dataframe, table_set = table_set)
         
 
