@@ -221,7 +221,7 @@ class QueryCosmicDSApi():
             print(f"Teacher code {teacher_key} not found")
             return { 'class_ids' : [] }
         else:
-            req.json()
+            return req.json()
             
         
         
