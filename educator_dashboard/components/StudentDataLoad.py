@@ -92,7 +92,7 @@ def StudentNameLoad(roster, student_names = None, names_set = None, on_update = 
         return all(present), missing
     
     
-    StudentLoadDialog(roster, student_names, student_names_set = student_names_set, validator = validator)
+    StudentLoadDialog(student_names, student_names_set = student_names_set, validator = validator)
     r = copy.copy(roster.value)
     if student_names.value is not None:
         print("updating student names")
