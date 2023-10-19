@@ -36,6 +36,8 @@ class Roster():
         self._fr_questions = None
         self._questions = None
         self._question_keys = None
+        self._mc_keys = {}
+        self._fr_keys = {}
         self._report = None
         self._short_report = None
         
@@ -57,6 +59,23 @@ class Roster():
     def flatten_dict(d):
         return flatten(d)
     
+    @staticmethod
+    def fix_mc_scoring(roster):
+        for i,student in enumerate(roster):
+            count = 0
+            story_state = student['story_state']
+            mc_scoring = story_state['mc_scoring']
+            for stage, scores in mc_scoring.items():
+                for key, value in scores.items():
+                    if value['tries'] == 0:
+                        count += 1
+                        print(value)
+                        mc_scoring[stage][key]['score'] = 10
+                        mc_scoring[stage][key]['tries'] = 1
+            print(count)
+            roster[i]['story_state']['mc_scoring'] = mc_scoring
+        return roster
+    
     def grab_data(self):
         print('Getting roster')
         self.roster = self.query.get_roster()
@@ -71,6 +90,7 @@ class Roster():
             self.last_modified = ''
             self.stage_index = 0
             return
+        self.roster = self.fix_mc_scoring(self.roster)
         keys = self.roster[0].keys()
         new_out = self.l2d(self.roster)
         keys = new_out.keys()
@@ -270,20 +290,24 @@ class Roster():
     def get_questions_text(self):
         return self.query.get_questions()
     
-    def question_keys(self, testing = False):
+    def question_keys(self, testing = False, get_all = True):
         if (self._question_keys is not None) and (not self._refresh):
             return self._question_keys
-
-        self._question_keys = {}
-        keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
         
-        questions = self.get_questions_text()
+        self._question_keys = {}
+        
+        if get_all:
+            questions = self.get_questions_text()
+            keys = questions.keys()
+        else:
+            keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
+        
         for k in keys:
             if testing:
                 q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
             elif (k not in questions.keys()):
                 print(f'{k} not in question database')
-                q = {'text': 'Not in Question Database', 'shorthand': ''}
+                q = {'text': 'Not in Question Database', 'shorthand': 'Not Available'}
             else:
                 q = questions[k]
             
@@ -297,8 +321,42 @@ class Roster():
                 self._question_keys[k] = {'text':q['text'], 'shorttext':short, 'nicetag': nice_tag}
                 
         return self._question_keys
+    
+    def get_question_text(self, key):
+        if key in self.question_keys().keys():
+            return self.question_keys()[key]
+        else:
+            print(f'{key} not in question database')
+            return {'text': 'Not in Question Database', 'shorttext': 'Not Available', 'nicetag': key}
                 
-        
+    def mc_question_keys(self): 
+        mc = self.multiple_choice_questions()
+        for stage in mc.keys():
+            if stage == 'student_id':
+                continue
+            keys = self._mc_keys.get(stage, [])
+            for s in mc[stage]:
+                if s is not None:
+                    for q in s.keys():
+                        if q not in keys:
+                            keys.append(q)
+                    self._mc_keys[stage] = keys
+        return self._mc_keys
+    
+    def fr_question_keys(self):
+        fr = self.free_response_questions()
+        for stage in fr.keys():
+            if stage == 'student_id':
+                continue
+            keys = self._fr_keys.get(stage, [])
+            for s in fr[stage]:
+                if s is not None:
+                    for q in s.keys():
+                        if q not in keys:
+                            keys.append(q)
+                    self._fr_keys[stage] = keys
+                
+        return self._fr_keys
     
     @property
     def student_ids(self):
@@ -359,15 +417,21 @@ class Roster():
         if len(self.roster) == 0:
             return
         out_of = []
-        for mc_score in self.story_state['mc_scoring']:
-            if mc_score is None or (len(mc_score) == 0):
-                out_of.append(0)
-                continue
-            num = 0
-            for key, val in mc_score.items():
-                num += len(val)
-            out_of.append(num * 10)
+        for student in self.roster:
+            state = State(student['story_state'])
+            state.mc_scoring
+            out_of.append(state.get_possible_score())
         return out_of
+    
+    @property
+    def student_scores(self):
+        if len(self.roster) == 0:
+            return None
+        scores = []
+        for student in self.roster:
+            state = State(student['story_state'])
+            scores.append(state.story_score)
+        return scores
     
     def fraction_completed(self):
         # for each stage, create a state object using their story_state
@@ -414,7 +478,7 @@ class Roster():
         df['max_stage_index'] = roster.new_story_state.max_stage_index
         df['max_stage_marker'] = roster.new_story_state.max_marker
         df['stage_index'] = roster.stage_index
-        df['total_score'] = roster.story_state['total_score']
+        df['total_score'] = roster.student_scores
         df['out_of_possible'] = roster.out_of
         summ = roster.get_class_summary()
         df['Hubble_Constant'] = summ['H0'].apply(lambda x: round(x,2))
@@ -461,7 +525,8 @@ class Roster():
         df['max_stage_index'] = roster.new_story_state.max_stage_index
         df['max_stage_marker'] = roster.new_story_state.max_marker
         df['stage_index'] = roster.stage_index
-        df['total_score'] = roster.story_state['total_score']
+        # df['total_score'] = roster.story_state['total_score']
+        df['total_score'] = roster.student_scores
         df['out_of_possible'] = roster.out_of
         summ = roster.get_class_summary()
         df['Hubble_Constant'] = summ['H0'].apply(lambda x: round(x,2))
