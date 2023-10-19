@@ -95,7 +95,7 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
     regex = r',(?!(?:[^"]*"[^"]*")*[^"]*$)'
     matches = re.findall(regex, bytes_data.decode('utf-8'))
     if len(matches) > 0:
-        solara.Warning("Some cells in your csv file contain commas, possibly in the form 'last name, first name.' If student names do not look right, you may need to remove extra commas and reload the file.")
+        solara.Warning("Some cells in your csv file contain commas, possibly in the form 'last name, first name.' If student names do not look right, you may need to remove extra commas and reload the file.", icon='mdi-traffic-cone', dense=True)
     bytes_data = re.sub(regex, '', bytes_data.decode('utf-8')).encode('utf-8')
     
     if filename.endswith('.csv'):
@@ -105,7 +105,6 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
         if is_header_row(table.iloc[0].to_numpy()) and use_first_row_as_header.value:
             table = pd.read_csv(BytesIO(bytes_data), header=0, skip_blank_lines=True, quotechar='"', encoding='utf-8')
             if not verify_table(table):
-                solara.Warning("Let's double check the headers. Use the panel on the left to set the ID and Name columns", dense=True)
                 use_first_row_as_header.set(False)
     else:
         ext = filename.split('.')[-1]
@@ -193,14 +192,15 @@ def SetColumns(table, on_set = None):
         skip_setting = True
     else:
         print("cols check failed")
+        solara.Warning('There is an issue with your column headers. Use these dropdown menus to specify the correct columns.', icon='mdi-traffic-cone', dense=True)
         skip_setting = False
 
     
     if not skip_setting and len(cols) > 0:
-        solara.Markdown("Please make sure the column containing student IDs is selected.")
+        solara.Markdown("Select column containing student IDs from dropdown list.")
         solara.Select(label = 'Student ID column', values = valid_id_cols, value = student_id_column, dense=True, style="width: 40ch")
         
-        solara.Markdown("Please make sure the column containing student names is selected.")
+        solara.Markdown("Select column containing names from dropdown list.")
         solara.Select(label = 'Student name column', values = [c for c in cols if c != student_id_column.value], value = name_column, dense=True, style="width: 40ch")
         
         def on_click():
@@ -212,9 +212,6 @@ def SetColumns(table, on_set = None):
         df = table[[student_id_column.value, name_column.value]]
         df.columns = ['student_id', 'name']
         on_set(df)
-        solara.Success('Successfully set columns.', dense=True, outlined=True)
     elif cols_set.value:
         solara.Error('Please select valid columns.', dense=True, outlined=True)
-    else:
-        solara.Markdown("Please select columns.")
             
