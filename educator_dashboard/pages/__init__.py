@@ -16,11 +16,13 @@ from ..components.RefreshClass import RefreshClass
 @solara.component
 def Page():
 
-    show_dashboard = solara.use_reactive(False)
+    show_dashboard, set_show_dashboard = solara.use_state(False)
     class_id_list = solara.use_reactive([None])
     class_id = solara.use_reactive(None) # add class id here
-    if not show_dashboard.value: 
-        TeacherCodeEntry(class_id_list, class_id, lambda: show_dashboard.set(True))
+    if not show_dashboard: 
+        def callback():
+            set_show_dashboard(True)
+        TeacherCodeEntry(class_id_list, class_id, callback)
         return
     
     solara.Title("CosmicDS Dashboard")
