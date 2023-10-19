@@ -119,61 +119,103 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
 
 
 def validate_column_choices(table, id_col, name_col):
+    if table is None:
+        return False
+    
     if id_col == name_col:
+        print("id_col == name_col")
         return False
 
     if id_col not in table.columns:
+        print("id_col not in table.columns")
         return False
 
     if name_col not in table.columns:
+        print("name_col not in table.columns")
         return False
 
     if is_numeric_array(table[id_col]):
+        print("is_numeric_array(table[id_col])")
         pass
 
     return True
 
+def check_cols(table, cols, valid_id_cols):
+
+    if not ('student_id' in valid_id_cols):
+        return False
+    if not ('name' in cols):
+        return False
+    if not (len(valid_id_cols) == 1):
+        return False
+    if not (len(cols) == 2):
+        return False
+    if not is_numeric_array(table[valid_id_cols[0]].to_numpy()):
+        return False
+    print("check cols passed")
+    return True
+    
+    
 
 @solara.component
-def SetColumns(table, fixed_table = None, table_set = None):
-    
+def SetColumns(table, on_set = None):
+
     student_id_column = solara.use_reactive('student_id')
     name_column = solara.use_reactive('name')
-    table_set = solara.use_reactive(table_set)
+    cols_set = solara.use_reactive(False)
     
-    if table.value is None:
-        fixed_table.set(None)
+    def on_table_change(new_table):
+        print("table changed")
+        # reset this component when the table changes
+        cols_set.set(False)
+        student_id_column.set('student_id')
+        name_column.set('name')
+    
+    in_table = solara.use_reactive(table, on_change=on_table_change)
+    table = in_table.value
+    
+    if table is None:
+        solara.Markdown("Please load a table")
+        return
+    
+    if on_set is None:
+        on_set = lambda x: None
     
     skip_setting = False
 
-    if table.value is not None:
 
-        cols = list(table.value.columns.to_numpy().astype(str))
-        cols = [c.strip() for c in cols]
-        table.value.columns = cols
+    cols = list(table.columns.to_numpy().astype(str))
+    cols = [str(c).strip() for c in cols]
+    table.columns = cols
 
-        valid_id_cols = [c for c in cols if is_numeric_array(table.value[c])]
-        valid_name_cols = cols  # name column can include any identifier the teacher wants
-        
-        if ('student_id' in cols) and ('name' in cols):
-            skip_setting = True
-        
-        if not skip_setting:
-            
-            if 'student_id' not in valid_id_cols:
-                if student_id_column.value not in cols:
-                    solara.Markdown("File does not have a column with header `student_id`. Please select the column that contains student ids.")
-                solara.Select(label = 'Student ID column', values = valid_id_cols, value = student_id_column, dense=True, style="width: 40ch")
-            if 'name' not in cols:
-                if name_column.value not in cols:
-                    solara.Markdown("File does not have a column with header `name`. Please select the column that contains student names.")
-                solara.Select(label = 'Student name column', values = [c for c in cols if c != student_id_column.value], value = name_column, dense=True, style="width: 40ch")
+    valid_id_cols = [c for c in cols if is_numeric_array(table[c])]
+    cols_are_valid = check_cols(table, cols, valid_id_cols)
+    if cols_are_valid:
+        skip_setting = True
+    else:
+        print("cols check failed")
+        skip_setting = False
 
-        if validate_column_choices(table.value, student_id_column.value, name_column.value):
-            df = table.value[[student_id_column.value, name_column.value]]
-            df.columns = ['student_id', 'name']
-            table_set.set(df is not None)
-            fixed_table.set(df)
-            
     
+    if not skip_setting and len(cols) > 0:
+        solara.Markdown("Please make sure the column containing student IDs is selected.")
+        solara.Select(label = 'Student ID column', values = valid_id_cols, value = student_id_column, dense=True, style="width: 40ch")
+        
+        solara.Markdown("Please make sure the column containing student names is selected.")
+        solara.Select(label = 'Student name column', values = [c for c in cols if c != student_id_column.value], value = name_column, dense=True, style="width: 40ch")
+        
+        def on_click():
+            print('clicked')
+            cols_set.set(True)
+        solara.Button("Set columns", on_click = on_click)
 
+    if (cols_are_valid or cols_set.value) and validate_column_choices(table, student_id_column.value, name_column.value):
+        df = table[[student_id_column.value, name_column.value]]
+        df.columns = ['student_id', 'name']
+        on_set(df)
+        solara.Success('Successfully set columns.', dense=True, outlined=True)
+    elif cols_set.value:
+        solara.Error('Please select valid columns.', dense=True, outlined=True)
+    else:
+        solara.Markdown("Please select columns.")
+            
