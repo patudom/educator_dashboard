@@ -87,8 +87,7 @@ def StudentLoadDialog(student_names = None, student_names_set = None, dialog_ope
                 solara.Success("Successfully updated student names.", dense=True, outlined=True)
             elif (not table_valid.value[0]) and student_names_set.value:
                 solara.Error("Some student IDs ({}) are missing from the table.".format(table_valid.value[1]), dense=True, outlined=True)
-            else:
-                solara.Markdown("Please load a table and set the columns.")
+            
                 
             with solara.CardActions():
                 solara.Button(icon_name="mdi-close-circle",label = "Close", on_click = lambda: dialog_open.set(False), text=True, outlined=True, classes=["dialog-button"])
