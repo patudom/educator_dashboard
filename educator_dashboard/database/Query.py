@@ -36,6 +36,11 @@ class QueryCosmicDSApi():
     
         return api_key
     
+    def in_dev_mode(self):
+        dev_mode = os.getenv('CDS_DEV_MODE')
+        api_key = self.get_env()
+        return (api_key is not None) and (dev_mode is not None)
+    
     def request_session(self):
         """
         Returns a request session object that has the 
