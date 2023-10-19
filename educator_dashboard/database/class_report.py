@@ -36,6 +36,8 @@ class Roster():
         self._fr_questions = None
         self._questions = None
         self._question_keys = None
+        self._mc_keys = {}
+        self._fr_keys = {}
         self._report = None
         self._short_report = None
         
@@ -288,20 +290,24 @@ class Roster():
     def get_questions_text(self):
         return self.query.get_questions()
     
-    def question_keys(self, testing = False):
+    def question_keys(self, testing = False, get_all = True):
         if (self._question_keys is not None) and (not self._refresh):
             return self._question_keys
-
-        self._question_keys = {}
-        keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
         
-        questions = self.get_questions_text()
+        self._question_keys = {}
+        
+        if get_all:
+            questions = self.get_questions_text()
+            keys = questions.keys()
+        else:
+            keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
+        
         for k in keys:
             if testing:
                 q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
             elif (k not in questions.keys()):
                 print(f'{k} not in question database')
-                q = {'text': 'Not in Question Database', 'shorthand': ''}
+                q = {'text': 'Not in Question Database', 'shorthand': 'Not Available'}
             else:
                 q = questions[k]
             
@@ -315,8 +321,42 @@ class Roster():
                 self._question_keys[k] = {'text':q['text'], 'shorttext':short, 'nicetag': nice_tag}
                 
         return self._question_keys
+    
+    def get_question_text(self, key):
+        if key in self.question_keys().keys():
+            return self.question_keys()[key]
+        else:
+            print(f'{key} not in question database')
+            return {'text': 'Not in Question Database', 'shorttext': 'Not Available', 'nicetag': key}
                 
-        
+    def mc_question_keys(self): 
+        mc = self.multiple_choice_questions()
+        for stage in mc.keys():
+            if stage == 'student_id':
+                continue
+            keys = self._mc_keys.get(stage, [])
+            for s in mc[stage]:
+                if s is not None:
+                    for q in s.keys():
+                        if q not in keys:
+                            keys.append(q)
+                    self._mc_keys[stage] = keys
+        return self._mc_keys
+    
+    def fr_question_keys(self):
+        fr = self.free_response_questions()
+        for stage in fr.keys():
+            if stage == 'student_id':
+                continue
+            keys = self._fr_keys.get(stage, [])
+            for s in fr[stage]:
+                if s is not None:
+                    for q in s.keys():
+                        if q not in keys:
+                            keys.append(q)
+                    self._fr_keys[stage] = keys
+                
+        return self._fr_keys
     
     @property
     def student_ids(self):
