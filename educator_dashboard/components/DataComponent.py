@@ -1,7 +1,7 @@
 import solara
 
 from .ClassPlot import ClassPlot
-
+from .Collapsible import Collapsible
 from pandas import DataFrame, to_datetime
 
 
@@ -329,6 +329,25 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
             with solara.Column():
                 with solara.Card(style='height: 90%'):
                     StudentAgeHubble(roster, sid = student_id)
+    else:
+        with solara.Column():
+            with solara.Card(style="height: 90%"):
+                solara.Markdown(f"#### Class Galaxy Measurements")
+                
+                summ = roster.get_class_summary()
+                headers = [
+                        {'value': 'galaxy_id', 'text': 'Galaxy ID'},
+                        {'value': 'obs_wave_value', 'text': 'Observed Wavelength <br/> (Angstrom)'},
+                        {'value': 'velocity_value', 'text': 'Velocity <br/> (km/s)'},
+                        {'value': 'ang_size_value', 'text': 'Angular Size <br/> (arcsecond)'},
+                        {'value': 'est_dist_value', 'text': 'Distance <br/> (Mpc)'},
+                    ]
+                    
+                with Collapsible(header = "Class Velocity / Age Measurements"):
+                    DataTable(df = summ, class_ = "student-measurement-table", show_index=False)
+                
+                with Collapsible(header = "All Student Galaxy Measurements"):
+                    StudentMeasurementTable(roster, sid = None, headers = headers, show_class = True, show_index=False)
 
         
                           
