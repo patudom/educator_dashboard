@@ -84,9 +84,10 @@ def StudentLoadDialog(student_names = None, student_names_set = None, dialog_ope
                 student_names_set.set(True)
                 
             if table_valid.value[0] and student_names_set.value:
-                solara.Success("Successfully updated student names.", dense=True, outlined=True)
+                solara.Success("Successfully updated student names.", dense=True, outlined=True, classes=["my-success"])
             elif (not table_valid.value[0]) and student_names_set.value:
-                solara.Error("Some student IDs ({}) are missing from the table.".format(table_valid.value[1]), dense=True, outlined=True)
+                solara.Success("Updated student names.", dense=True, outlined=True, classes=["my-success"])
+                solara.Warning("Some student IDs ({}) are missing from the table.".format(table_valid.value[1]), dense=True, outlined=True, icon='mdi-traffic-cone')
             
                 
             with solara.CardActions():

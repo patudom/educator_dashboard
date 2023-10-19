@@ -89,6 +89,20 @@ body {
     box-shadow: none;
 }
 
+
+.v-alert.success--text.my-success {
+    color: #388E3C !important;
+    opacity: 1 !important;
+}
+.my-success .v-icon.success--text {
+    color: #388E3C !important;
+    opacity: 1 !important;
+}
+
+.my-success {
+    margin-block: 10px;
+}
+
 .dialog-button {
     position:absolute;
     right: 1.5rem;
