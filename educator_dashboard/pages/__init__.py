@@ -1,6 +1,6 @@
 
 import solara
-
+from ..components.TeacherCodeInput import TeacherCodeEntry
 from ..components.Dashboard import Dashboard
 from ..components.SetClass import SetClass
 from ..components.StudentDataLoad import StudentNameLoad
@@ -13,12 +13,18 @@ from typing import cast
 
 from ..components.RefreshClass import RefreshClass
 
-
-class_id_list = [199, 188, 195, 192, 185, 172, 170, 199, 191]
-
-
 @solara.component
 def Page():
+
+    show_dashboard, set_show_dashboard = solara.use_state(False)
+    class_id_list = solara.use_reactive([None])
+    class_id = solara.use_reactive(None) # add class id here
+    if not show_dashboard: 
+        def callback():
+            set_show_dashboard(True)
+        TeacherCodeEntry(class_id_list, class_id, callback)
+        return
+    
     solara.Title("CosmicDS Dashboard")
     print(" ================== main page ================== ")
     
@@ -30,7 +36,7 @@ def Page():
     # - 185 (testing spring beta class)
     # - 172 (old outdated class - should show stuff but probably incorrect)
     # - 170 (outdated class - should show nothing)
-    class_id = solara.use_reactive(199) # add class id here
+    
     roster = solara.use_reactive(cast(Roster, None), on_change=lambda x: print("roster changed"))
     student_names = solara.use_reactive(None)
     dashboard_names = solara.use_reactive(None)#, on_change=on_change_names)

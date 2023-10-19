@@ -22,27 +22,24 @@ class QueryCosmicDSApi():
     def __init__(self, story = HUBBLE_ROUTE_PATH, class_id = None):
         self.class_id = class_id
         self.story = story
+        dotenv_path = Path(__file__).resolve().parent.parent.parent / '.env'
+        if dotenv_path.exists():
+            load_dotenv(dotenv_path=dotenv_path)
         self._request_session = self.request_session()
         pass
     
+    
     def get_env(self):
-        dotenv_path = Path(__file__).resolve().parent.parent.parent / '.env'
         api_key = os.getenv('CDS_API_KEY')
-        print(dotenv_path)
-        if api_key is not None:
-            print("Found API key in environment variables")
-
-        elif dotenv_path.exists():
-            print("Found .env file")
-            load_dotenv(dotenv_path=dotenv_path)
-            api_key = os.getenv('CDS_API_KEY')
-            if api_key is not None:
-                print("Found API key in .env file")
-
         if api_key is None:
             print("PLEASE SET CDS_API_KEY ENVIRONMENT VARIABLE")
     
         return api_key
+    
+    def in_dev_mode(self):
+        dev_mode = os.getenv('CDS_DEV_MODE')
+        api_key = self.get_env()
+        return (api_key is not None) and (dev_mode is not None)
     
     def request_session(self):
         """
@@ -210,3 +207,18 @@ class QueryCosmicDSApi():
         req = self.get(url)
         if req.status_code == 200:
             return {q['tag']:q for q in req.json()['questions']}
+        
+    def get_class_for_teacher(self,teacher_key = None):
+        endpoint = f"/dashboard-group-classes/{teacher_key}"
+        url = urljoin(self.url_head, endpoint)
+        self.teacher_classes_url = url 
+        print(url)
+        req = self.get(url)
+        if req.status_code == 404:
+            print(f"Teacher code {teacher_key} not found")
+            return { 'class_ids' : [] }
+        else:
+            return req.json()
+            
+        
+        

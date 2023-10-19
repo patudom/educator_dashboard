@@ -299,6 +299,8 @@ class Roster():
         if get_all:
             questions = self.get_questions_text()
             keys = questions.keys()
+            other_keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
+            keys = set(keys).union(other_keys)
         else:
             keys = set([c.split('.')[1] for c in self.questions().columns if '.' in c])
         
@@ -307,7 +309,8 @@ class Roster():
                 q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
             elif (k not in questions.keys()):
                 print(f'{k} not in question database')
-                q = {'text': 'Not in Question Database', 'shorthand': 'Not Available'}
+                nice_tag = ' '.join(k.replace('_', ' ').replace('-', ' ').split())
+                q = {'text': 'Not in Question Database', 'shorthand': f'Not in Database ({nice_tag})'}
             else:
                 q = questions[k]
             
