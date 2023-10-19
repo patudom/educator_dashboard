@@ -80,6 +80,15 @@ body {
     margin-bottom: 5px;
 }
 
+.my-cards {
+    max-width: 98%;
+    padding: 10px;
+}
+
+.v-dialog {
+    box-shadow: none;
+}
+
 .dialog-button {
     position:absolute;
     right: 1.5rem;

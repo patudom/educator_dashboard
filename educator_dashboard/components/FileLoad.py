@@ -175,7 +175,6 @@ def SetColumns(table, on_set = None):
     table = in_table.value
     
     if table is None:
-        solara.Markdown("Please load a table")
         return
     
     if on_set is None:

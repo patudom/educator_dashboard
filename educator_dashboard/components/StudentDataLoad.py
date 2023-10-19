@@ -71,7 +71,7 @@ def StudentLoadDialog(student_names = None, student_names_set = None, dialog_ope
     )
     comp = dialog if not no_dialog else solara.Div()
     with comp:
-        with solara.Card():
+        with solara.Card(classes=["my-cards"]):
             StudentDataLoadInterface(student_names, table_set = student_names_set)
             
             table_valid.set(validator(student_names.value))
