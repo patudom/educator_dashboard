@@ -73,9 +73,6 @@ def verify_table(df):
     
 @solara.component
 def CSVFileInfoToTable(file_info, on_table = None, display = True):
-    
-    use_first_row_as_header = solara.use_reactive(True)
-    
         
     if isinstance(file_info, solara.Reactive):
         file_info = file_info.value
@@ -100,12 +97,14 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
     
     if filename.endswith('.csv'):
         # read in the table assuming it has no header row
-        table = pd.read_csv(BytesIO(bytes_data), header=None, skip_blank_lines=True, quotechar='"', encoding='utf-8')
+        table_no_header = pd.read_csv(BytesIO(bytes_data), header=None, skip_blank_lines=True, quotechar='"', encoding='utf-8')
         # if the first row is a valid header row, read in the table again
-        if is_header_row(table.iloc[0].to_numpy()) and use_first_row_as_header.value:
-            table = pd.read_csv(BytesIO(bytes_data), header=0, skip_blank_lines=True, quotechar='"', encoding='utf-8')
-            if not verify_table(table):
-                use_first_row_as_header.set(False)
+        if is_header_row(table_no_header.iloc[0].to_numpy()):
+            table_with_header = pd.read_csv(BytesIO(bytes_data), header=0, skip_blank_lines=True, quotechar='"', encoding='utf-8')
+            if not verify_table(table_with_header):
+                table = table_no_header
+            else:
+                table = table_with_header
     else:
         ext = filename.split('.')[-1]
         solara.Error(f"The dashboard cannot read ${ext} files. Please convert your file to a CSV (comma-separate values file) and try again.")
