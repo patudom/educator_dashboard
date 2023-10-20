@@ -302,6 +302,11 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
     if not isinstance(student_id, solara.Reactive):
         student_id = solara.use_reactive(student_id)
 
+    solara.Markdown(r'''
+            * Click-and-drag to zoom in on a region within either plot.
+            * Double-click within the plot to zoom back out. 
+            * Hover over a point or bar to see the values and student ID(s).
+        ''')
 
     with solara.ColumnsResponsive(small=12, medium = [6,6], wrap=True, gutters=False, style="justify-content: start;"):
         with solara.Column():
