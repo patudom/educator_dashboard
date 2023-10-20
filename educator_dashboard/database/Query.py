@@ -6,6 +6,7 @@ import numpy as np
 from urllib.parse import urljoin
 from dotenv import load_dotenv
 from pathlib import Path  # python3 only
+from random import randint
 
 API_URL = "https://api.cosmicds.cfa.harvard.edu"
 HUBBLE_ROUTE_PATH = "hubbles_law"
@@ -22,6 +23,7 @@ class QueryCosmicDSApi():
     def __init__(self, story = HUBBLE_ROUTE_PATH, class_id = None):
         self.class_id = class_id
         self.story = story
+        self.qid = randint(0, 1000000)
         dotenv_path = Path(__file__).resolve().parent.parent.parent / '.env'
         if dotenv_path.exists():
             load_dotenv(dotenv_path=dotenv_path)
@@ -216,7 +218,7 @@ class QueryCosmicDSApi():
         req = self.get(url)
         if req.status_code == 404:
             print(f"Teacher code {teacher_key} not found")
-            return { 'class_ids' : [] }
+            return {}
         else:
             return req.json()
             

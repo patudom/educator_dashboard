@@ -143,7 +143,7 @@ def MultipleChoiceSummary(roster, stage_labels=[]):
         MultipleChoiceStageSummary(roster, stage = stage, label = label)
 
 @solara.component
-def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0, label = None):
+def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage = 0, label = None):
     
     if df is None:
         solara.Markdown("There are no completed multiple choice questions for this stage")
@@ -151,6 +151,11 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0, labe
     
     if isinstance(df, solara.Reactive):
         df = df.value
+    
+    if isinstance(roster, solara.Reactive):
+        roster = roster.value
+        if roster is None:
+            return
 
     dquest, set_dquest = solara.use_state('')
    
@@ -159,12 +164,12 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0, labe
         key = row['key']
         stage = row['stage']
         
-        qjson = Query.get_question(key)
+        # qjson = Query().get_question(key)
+        qjson = roster.get_question_text(key)
+        print(qjson)
         if qjson is not None:
-            q = qjson['question']['text']
+            q = qjson['text']
             set_dquest(q)
-        else:
-            set_dquest('Not in Database')
         
 
     
@@ -251,5 +256,5 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
             {'text': 'Tries', 'value': 'tries'},
             {'text': 'Score', 'value': 'score'},
         ]
-        MultipleChoiceQuestionSingleStage(df = df, headers = headers, stage = stage, label = label)
+        MultipleChoiceQuestionSingleStage(roster, df = df, headers = headers, stage = stage, label = label)
             

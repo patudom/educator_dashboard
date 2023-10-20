@@ -30,7 +30,7 @@ class Student():
 
 class Roster():
     
-    def __init__(self, class_id = None):
+    def __init__(self, class_id = None, query = None):
         
         self._mc_questions = None
         self._fr_questions = None
@@ -44,7 +44,12 @@ class Roster():
         self._refresh = False
         
         self.class_id = class_id
-        self.query = QueryCosmicDSApi(class_id = class_id, story=HUBBLE_ROUTE_PATH)
+        if query is None:
+            self.query = QueryCosmicDSApi(class_id = class_id, story=HUBBLE_ROUTE_PATH)
+        else:
+            self.query = query
+            query.class_id = class_id
+            query.story = HUBBLE_ROUTE_PATH
         self.data = None
         self.student_data = {}
         self.class_summary = None
