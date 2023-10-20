@@ -69,10 +69,8 @@ class Roster():
                 for key, value in scores.items():
                     if value['tries'] == 0:
                         count += 1
-                        print(value)
                         mc_scoring[stage][key]['score'] = 10
                         mc_scoring[stage][key]['tries'] = 1
-            print(count)
             roster[i]['story_state']['mc_scoring'] = mc_scoring
         return roster
     
