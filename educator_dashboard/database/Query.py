@@ -216,7 +216,7 @@ class QueryCosmicDSApi():
         req = self.get(url)
         if req.status_code == 404:
             print(f"Teacher code {teacher_key} not found")
-            return { 'class_ids' : [] }
+            return {}
         else:
             return req.json()
             

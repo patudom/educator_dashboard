@@ -1,4 +1,5 @@
 import solara
+import reacton.ipyvuetify as rv
 
 from ..database.class_report import Roster
 
@@ -41,4 +42,11 @@ def SetClass(class_id, roster, first_run = False, class_id_list = None):
                      If you are seeing this error please contact the CosmicDataStories team
                      """)
     else:
-        solara.Select(label="Class ID", values = class_id_list, value = class_id.value, on_value=on_value)
+        # solara.Select(label="Class ID", values = class_id_list, value = class_id.value, on_value=on_value)
+        rv.Select(label='Select item',
+                    items=class_id_list, 
+                    item_text = 'name',
+                    item_value = 'id',
+                    v_model=class_id.value, 
+                    on_v_model=on_value
+                    )
