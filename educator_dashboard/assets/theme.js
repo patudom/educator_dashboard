@@ -14,7 +14,7 @@ vuetifyThemes = {
         accent: "#FFD740" ,
         error: "#F06292" ,
         info: "#FF7043" ,
-        success: "#00E676" ,
+        success: "#388E3C " ,
         warning: "#DD2C00",
         cosmicRed: "#e60001",
         cosmicBlue: "#0E397E",
