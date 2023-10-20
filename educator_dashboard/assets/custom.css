@@ -5,7 +5,7 @@
     --accent-light: #FFD740 ;
     --error-light: #F06292 ;
     --info-light: #FF7043 ;
-    --success-light: #00E676 ;
+    --success-light: #388E3C  ;
     --warning-light: #DD2C00 ;
     
     /* define dark material desing them */
@@ -87,16 +87,6 @@ body {
 
 .v-dialog {
     box-shadow: none;
-}
-
-
-.v-alert.success--text.my-success {
-    color: #388E3C !important;
-    opacity: 1 !important;
-}
-.my-success .v-icon.success--text {
-    color: #388E3C !important;
-    opacity: 1 !important;
 }
 
 .my-success {
