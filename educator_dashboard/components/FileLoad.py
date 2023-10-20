@@ -105,6 +105,8 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
                 table = table_no_header
             else:
                 table = table_with_header
+        else:
+            table = table_no_header
     else:
         ext = filename.split('.')[-1]
         solara.Error(f"The dashboard cannot read ${ext} files. Please convert your file to a CSV (comma-separate values file) and try again.")
