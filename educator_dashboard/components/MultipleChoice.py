@@ -159,7 +159,8 @@ def MultipleChoiceQuestionSingleStage(df = None, headers = None, stage = 0, labe
         key = row['key']
         stage = row['stage']
         
-        qjson = Query.get_question(key)
+        qjson = Query().get_question(key)
+        print(qjson)
         if qjson is not None:
             q = qjson['question']['text']
             set_dquest(q)
