@@ -4,6 +4,7 @@ from io import BytesIO
 
 import pandas as pd
 
+import re
 
 @solara.component
 def TableLoad(file_info = None, load_complete = None, allow_excel = False):
@@ -24,7 +25,6 @@ def TableLoad(file_info = None, load_complete = None, allow_excel = False):
         if isCSV or (isExcel and allow_excel):
             file_info.set(file)
             set_valid_file(True)
-            set_msg(f"Successfully read in {filename}!")
         else:
             set_valid_file(False)
             set_msg(f"Failed to read {filename}. Please select a valid CSV file.")
@@ -42,6 +42,7 @@ def TableLoad(file_info = None, load_complete = None, allow_excel = False):
                         
             * Include a header row with column names 'student_id' and 'name'. 
             * To protect student privacy, this information remains on your computer and will NOT be uploaded to CosmicDS servers.
+            * You can load a single name file that includes students from multiple classes, and they will be applied when the relevant class is viewed. (If you use separate name files for each class, you will need to reload the file every time you toggle between classes).
         ''')
         if not load_complete.value:
             solara.FileDrop(
@@ -49,18 +50,30 @@ def TableLoad(file_info = None, load_complete = None, allow_excel = False):
                 lazy=False, # puts data in the [data] part of FileInfo
             )
         if load_complete.value and valid_file:
-            solara.Success(msg, dense=True, outlined=True, icon='mdi-file-check')
+            solara.Button("Clear data", on_click=on_click)
         elif load_complete.value and not valid_file:
             solara.Error(msg, dense=True, outlined=True, icon='mdi-file-alert')
-        
-        solara.Button("Clear", on_click=on_click, disabled=not load_complete.value)
+            solara.Button("Try another file", on_click=on_click)
+            
 
-    
-    
+def strip_non_alpha(string):
+    return (''.join([c for c in str(string) if c.isalpha()])).lower()
+
+def is_header_row(array):
+    return all([strip_non_alpha(c).isalpha() for c in array])
+
+def is_numeric_array(array):
+    return all((str(val).isnumeric() for val in array))
+
+def verify_table(df):
+    # check that the columns are 'student_id' and 'name'
+    cols = list(df.columns.to_numpy().astype(str))
+    cols = [c.strip() for c in cols]
+    return is_header_row(cols)
     
 @solara.component
-def TableDisplay(file_info, has_header = False, on_table = None):
-    
+def CSVFileInfoToTable(file_info, on_table = None, display = True):
+        
     if isinstance(file_info, solara.Reactive):
         file_info = file_info.value
     
@@ -74,54 +87,135 @@ def TableDisplay(file_info, has_header = False, on_table = None):
     
     filename = file_info['name']
     bytes_data = file_info['data']
+    # check for commas that are inbetween words enclosed in double quotes and remove that comma
+    # using regex and string methods
+    regex = r',(?!(?:[^"]*"[^"]*")*[^"]*$)'
+    matches = re.findall(regex, bytes_data.decode('utf-8'))
+    if len(matches) > 0:
+        solara.Warning("Some cells in your csv file contain commas, possibly in the form 'last name, first name.' If student names do not look right, you may need to remove extra commas and reload the file.", icon='mdi-traffic-cone', dense=True)
+    bytes_data = re.sub(regex, '', bytes_data.decode('utf-8')).encode('utf-8')
     
     if filename.endswith('.csv'):
-        try:
-            table = pd.read_csv(BytesIO(bytes_data), header=0 if has_header.value else None, skip_blank_lines=True)
-        except pd.errors.ParserError:
-            has_header.set(True)
-            table = pd.read_csv(BytesIO(bytes_data), header=0 if has_header.value else None, skip_blank_lines=True)
-        
-        table.columns = [f"Col{i}" if str(c).isdigit() else c for i,c in enumerate(table.columns)]
+        # read in the table assuming it has no header row
+        table_no_header = pd.read_csv(BytesIO(bytes_data), header=None, skip_blank_lines=True, quotechar='"', encoding='utf-8')
+        # if the first row is a valid header row, read in the table again
+        if is_header_row(table_no_header.iloc[0].to_numpy()):
+            table_with_header = pd.read_csv(BytesIO(bytes_data), header=0, skip_blank_lines=True, quotechar='"', encoding='utf-8')
+            if not verify_table(table_with_header):
+                print('header row is not valid. revert to no_header version')
+                table = table_no_header
+            else:
+                print('has good header row')
+                table = table_with_header
+        else:
+            print('no header row')
+            table = table_no_header
     else:
-        table = pd.read_excel(BytesIO(bytes_data))
+        ext = filename.split('.')[-1]
+        solara.Error(f"The dashboard cannot read ${ext} files. Please convert your file to a CSV (comma-separate values file) and try again.")
+        return
     
     do_on_table(table)
     
-    solara.DataFrame(table.head(5))
+    if display:
+        solara.DataFrame(table.head(5))
+
+
+def validate_column_choices(table, id_col, name_col):
+    if table is None:
+        return False
+    
+    if id_col == name_col:
+        print("id_col == name_col")
+        return False
+
+    if id_col not in table.columns:
+        print("id_col not in table.columns")
+        return False
+
+    if name_col not in table.columns:
+        print("name_col not in table.columns")
+        return False
+
+    if is_numeric_array(table[id_col]):
+        print("is_numeric_array(table[id_col])")
+        pass
+
+    return True
+
+def check_cols(table, cols, valid_id_cols):
+
+    if not ('student_id' in valid_id_cols):
+        return False
+    if not ('name' in cols):
+        return False
+    if not (len(valid_id_cols) == 1):
+        return False
+    if not (len(cols) == 2):
+        return False
+    if not is_numeric_array(table[valid_id_cols[0]].to_numpy()):
+        return False
+    print("check cols passed")
+    return True
+    
+    
 
 @solara.component
-def SetColumns(table, fixed_table = None, table_set = None):
-    
+def SetColumns(table, on_set = None):
+
     student_id_column = solara.use_reactive('student_id')
     name_column = solara.use_reactive('name')
-    table_set = solara.use_reactive(table_set)
+    cols_set = solara.use_reactive(False)
     
-    if table.value is None:
-        fixed_table.set(None)
+    def on_table_change(new_table):
+        print("table changed")
+        # reset this component when the table changes
+        cols_set.set(False)
+        student_id_column.set('student_id')
+        name_column.set('name')
+    
+    in_table = solara.use_reactive(table, on_change=on_table_change)
+    table = in_table.value
+    
+    if table is None:
+        return
+    
+    if on_set is None:
+        on_set = lambda x: None
+    
+    skip_setting = False
+
+
+    cols = list(table.columns.to_numpy().astype(str))
+    cols = [str(c).strip() for c in cols]
+    table.columns = cols
+
+    valid_id_cols = [c for c in cols if is_numeric_array(table[c])]
+    cols_are_valid = check_cols(table, cols, valid_id_cols)
+    if cols_are_valid:
+        skip_setting = True
+    else:
+        print("cols check failed")
+        solara.Warning('There is an issue with your column headers. Use these dropdown menus to specify the correct columns.', icon='mdi-traffic-cone', dense=True)
+        skip_setting = False
+
+    
+    if not skip_setting and len(cols) > 0:
+        solara.Markdown("Select column containing student IDs from dropdown list.")
+        solara.Select(label = 'Student ID column', values = valid_id_cols, value = student_id_column, dense=True, style="width: 40ch")
         
+        solara.Markdown("Select column containing names from dropdown list.")
+        solara.Select(label = 'Student name column', values = [c for c in cols if c != student_id_column.value], value = name_column, dense=True, style="width: 40ch")
+        
+        def on_click():
+            print('clicked')
+            cols_set.set(True)
+        solara.Button("Set columns", on_click = on_click)
 
-    if table.value is not None:
-
-        cols = list(table.value.columns.to_numpy().astype(str))
-        cols = [c.strip() for c in cols]
-        table.value.columns = cols
-
-
-        if 'student_id' not in cols:
-            if student_id_column.value not in cols:
-                solara.Markdown("File does not have a column named 'student_id'. Please select the column that contains student ids")
-            solara.Select(label = 'Select student ID column', values = cols, value = student_id_column, dense=True, style="width: 30ch")
-        if 'name' not in cols:
-            if name_column.value not in cols:
-                solara.Markdown("File does not have a column named 'name'. Please select the column that contains student names")
-            solara.Select(label = 'Select student name column', values = cols, value = name_column, dense=True, style="width: 30ch")
-
-        if student_id_column.value in cols and name_column.value in cols:
-            df = table.value[[student_id_column.value, name_column.value]]
-            df.columns = ['student_id', 'name']
-            table_set.set(df is not None)
-            fixed_table.set(df)
+    if (cols_are_valid or cols_set.value) and validate_column_choices(table, student_id_column.value, name_column.value):
+        df = table[[student_id_column.value, name_column.value]]
+        df.columns = ['student_id', 'name']
+        on_set(df)
+    elif cols_set.value:
+        solara.Error('Please select valid columns.', dense=True, outlined=True)
             
-    
-

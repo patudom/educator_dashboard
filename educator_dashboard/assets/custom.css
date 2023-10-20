@@ -5,7 +5,7 @@
     --accent-light: #FFD740 ;
     --error-light: #F06292 ;
     --info-light: #FF7043 ;
-    --success-light: #00E676 ;
+    --success-light: #388E3C  ;
     --warning-light: #DD2C00 ;
     
     /* define dark material desing them */
@@ -78,6 +78,27 @@ body {
     background-color: var(--md-blue-800) !important;
     color: white !important;
     margin-bottom: 5px;
+}
+
+.my-cards {
+    max-width: 98%;
+    padding: 10px;
+}
+
+.v-dialog {
+    box-shadow: none;
+}
+
+.my-success {
+    margin-block: 10px;
+}
+
+.dialog-button {
+    position:absolute;
+    right: 1.5rem;
+    bottom: 0.5rem;
+    background-color: var(--md-blue-800) !important;
+    color: white !important;
 }
 
 .col {
