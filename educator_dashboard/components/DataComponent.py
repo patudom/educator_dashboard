@@ -302,7 +302,7 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
     if not isinstance(student_id, solara.Reactive):
         student_id = solara.use_reactive(student_id)
 
-
+    solara.Markdown("Click-and drag to zoom in on a region of the plot. Double click to zoom out. Hover over a point to see the student's name.")
     with solara.ColumnsResponsive(small=12, medium = [6,6], wrap=True, gutters=False, style="justify-content: start;"):
         with solara.Column():
             with solara.Card(style='height: 95%'):
