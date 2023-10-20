@@ -10,19 +10,21 @@ import reacton.ipyvuetify as rv
 from ..database.class_report import Roster
 from typing import cast
 
+from ..database.Query import QueryCosmicDSApi
+
 
 from ..components.RefreshClass import RefreshClass
 
 @solara.component
 def Page():
-
+    query = QueryCosmicDSApi()
     show_dashboard, set_show_dashboard = solara.use_state(False)
     class_id_list = solara.use_reactive([None])
     class_id = solara.use_reactive(None) # add class id here
     if not show_dashboard: 
         def callback():
             set_show_dashboard(True)
-        TeacherCodeEntry(class_id_list, class_id, callback)
+        TeacherCodeEntry(class_id_list, class_id, callback, query = query)
         return
     
     solara.Title("CosmicDS Dashboard")
@@ -55,7 +57,7 @@ def Page():
 
 
         with solara.Column(gap="0px", classes=["my-column"]):
-            SetClass(class_id, roster, first_run, class_id_list)
+            SetClass(class_id, roster, first_run, class_id_list, query)
             StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
             DownloadReport(roster) 
                 

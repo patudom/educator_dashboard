@@ -3,15 +3,16 @@ from ..database.Query import QueryCosmicDSApi
 import json
 import reacton.ipyvuetify as rv
 @solara.component 
-def TeacherCodeEntry(class_id_list, class_id, callback):
+def TeacherCodeEntry(class_id_list, class_id, callback, query = None):
     print('================== TeacherCodeEntry ==================')
-    q = QueryCosmicDSApi()
+    if query is None:
+        query = QueryCosmicDSApi()
     code = solara.use_reactive('')
     class_id = solara.use_reactive(class_id)
     class_id_list = solara.use_reactive(class_id_list)
     proceed_to_dashboard = solara.use_reactive(False)
     
-    dev_mode = q.in_dev_mode()
+    dev_mode = query.in_dev_mode()
     if dev_mode:
         # class_id_list.set([199, 200, 195, 192, 184, 188, 190, 191, 170, 172])
         class_query_res = [
@@ -44,7 +45,7 @@ def TeacherCodeEntry(class_id_list, class_id, callback):
                              message = f'You entered {code.value}',
                              )
 
-        class_query_res = q.get_class_for_teacher(str(code.value))
+        class_query_res = query.get_class_for_teacher(str(code.value))
         class_query_res = class_query_res.get('classes', {})
         if code.value != '' and len(class_query_res) == 0:
             solara.Error(f'No classes found for code {code.value}')
