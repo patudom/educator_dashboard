@@ -69,7 +69,7 @@ def verify_table(df):
     # check that the columns are 'student_id' and 'name'
     cols = list(df.columns.to_numpy().astype(str))
     cols = [c.strip() for c in cols]
-    return ('student_id' in cols) and ('name' in cols)
+    return is_header_row(cols)
     
 @solara.component
 def CSVFileInfoToTable(file_info, on_table = None, display = True):
@@ -102,10 +102,13 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
         if is_header_row(table_no_header.iloc[0].to_numpy()):
             table_with_header = pd.read_csv(BytesIO(bytes_data), header=0, skip_blank_lines=True, quotechar='"', encoding='utf-8')
             if not verify_table(table_with_header):
+                print('header row is not valid. revert to no_header version')
                 table = table_no_header
             else:
+                print('has good header row')
                 table = table_with_header
         else:
+            print('no header row')
             table = table_no_header
     else:
         ext = filename.split('.')[-1]
