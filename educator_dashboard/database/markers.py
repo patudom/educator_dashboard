@@ -16,7 +16,7 @@ markers = {
      ],
      
  '5': [
-     'ran_var1', 'cla_res1', 'rel_age1', 'cla_age1', 'cla_age2', 'cla_age3', 'cla_age4', 'lea_unc1', 'mos_lik1', 'age_dis1', 'mos_lik2', 'mos_lik3', 'mos_lik4', 'con_int1', 'con_int2', 'con_int3', 'cla_dat1', 'tre_lin2c', 'bes_fit1c', 'you_age1c', 'cla_res1c', 'cla_age1c', 'age_dis1c', 'con_int2c', 'two_his1', 'two_his2', 'two_his3', 'two_his5', 'mor_dat1'
+     'ran_var1', 'cla_res1', 'rel_age1', 'cla_age1', 'cla_age2', 'cla_age3', 'cla_age4', 'lea_unc1', 'mos_lik1', 'age_dis1', 'mos_lik2', 'mos_lik3', 'mos_lik4', 'con_int1', 'con_int2', 'con_int3', 'cla_dat1', 'tre_lin2c', 'bes_fit1c', 'you_age1c', 'cla_res1c', 'cla_age1c', 'age_dis1c', 'con_int2c', 'two_his1', 'two_his2', 'two_his3', 'two_his3a', 'two_his5', 'mor_dat1'
      ],
      
  '6': [
