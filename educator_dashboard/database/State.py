@@ -40,7 +40,7 @@ class State:
         if str(stage) not in self.mc_scoring:
             return score, possible_score
         for key, value in self.mc_scoring[str(stage)].items():
-            score += value['score']
+            score += (value.get('score',0) or 0)
             
             possible_score += 10
         return score, possible_score
