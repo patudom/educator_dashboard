@@ -43,7 +43,7 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
     labels = {'age':'Age of Universe (Gyr)', 'student_id':'Student ID', 'h0':'Hubble Constant (km/s/Mpc)'}
 
     fig = px.bar(data_frame = df_agg, x = which, y='count', hover_data='student_id', labels = labels, barmode='overlay', opacity=1)
-    fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>')
+    fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>', width=0.8)
 
     if subset is None:
         main_color = subset_color
@@ -64,6 +64,7 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
         bar = go.Bar(x=df_agg_subset[which], y=df_agg_subset['count'],
                      name=subset_label, 
                      opacity=1, 
+                     width=0.8,
                      marker_color=subset_color,
                      hoverinfo='skip', 
                      customdata=df_agg_subset['student_id'])
