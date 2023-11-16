@@ -2,17 +2,17 @@ import solara
 
 from .ClassPlot import ClassPlot
 
-from pandas import DataFrame, to_datetime
+from pandas import DataFrame, to_datetime, Series
 
 
-from numpy import around
+from numpy import around, asarray
 
 from .TableComponents import DataTable
 from .AgeHistogram import AgeHoHistogram
 
 
 
-def get_class_subset(data, sid, ungroup = True):
+def get_class_subset(data, sid, class_data_students = None, ungroup = True):
     if isinstance(sid, solara.Reactive):
         sid = sid.value
     if sid is None:
@@ -22,13 +22,21 @@ def get_class_subset(data, sid, ungroup = True):
     if 'last_modified' not in data.columns:
         return [True for i in range(len(data))]
     
+    use_class_data_students = class_data_students is not None
+    
     # convert last_modified to datetime
     data['last_modified'] = to_datetime(data['last_modified'])
     data['student_id'] = data['student_id'].apply(str)
-
+    if not use_class_data_students:
+        class_data_students = data['student_id'].unique()
+    class_data_students = asarray(class_data_students).astype(str)
+    data['in_class'] = data['student_id'].isin(class_data_students)
     # group by student_id
     grouped = data.groupby('student_id')
-
+    # get the groups
+    groups = grouped.groups
+    in_class = asarray([g in class_data_students for g in groups])
+    
     # get people who completed and their times
     time = DataFrame(grouped['last_modified'].max())
     size = grouped.size()
@@ -37,13 +45,18 @@ def get_class_subset(data, sid, ungroup = True):
     else:
         complete = (size == 5)
     
-    before = time['last_modified'] <= time[time.index == sid]['last_modified'].max()
-    ten_earlist_completed = time[complete].sort_values('last_modified').head(10)
-    ten_earliest_mask = time.index.isin(ten_earlist_completed.index)
-    subset = (before & complete) | ten_earliest_mask | (time.index == sid)
+    if use_class_data_students:
+        subset = in_class | (time.index == sid)
+    else:
+        before = time['last_modified'] <= time[time.index == sid]['last_modified'].max()    
+        ten_earlist_completed = time[complete].sort_values('last_modified').head(10)
+        ten_earliest_mask = time.index.isin(ten_earlist_completed.index)
+        subset = (before & complete) | ten_earliest_mask | (time.index == sid)
+    
+    print(list(subset))
     
     if not ungroup:
-        return subset.to_list()
+        return list(subset)
 
     # put complete back into data
     subset = data['student_id'].isin(time[subset].index).to_list()
@@ -89,9 +102,18 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
     subset = None
     main_name = None
     subset_name = None
+    class_data_students = None
     if student_id.value is not None:
         
-        subset = get_class_subset(data, student_id)
+        idx = roster.student_ids.index(student_id.value)
+        if (idx is not None) and ('class_data_students' in roster.story_state):
+            class_data_students = roster.story_state['class_data_students'][idx]
+            # if len(class_data_students) == 0:
+            #     class_data_students = None
+        # solara.Markdown(f"{class_data_students}")
+        subset = get_class_subset(data, student_id, 
+                                  class_data_students = class_data_students, 
+                                  ungroup = True)
         main_name = f'Data not seen by {student_id.value}'
         subset_name = f'Data seen by {student_id.value}'
         
@@ -238,10 +260,20 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
     data['h0'] = data['h0'].apply(lambda x: around(x,0))
     data['age'] = data['age'].apply(lambda x: around(x,0))
     
+    class_data_students = None
 
     if sid is not None and sid.value is not None:
-            
-        subset = get_class_subset(data, sid, ungroup = False)
+        
+        idx = roster.student_ids.index(sid.value)
+        if (idx is not None) and ('class_data_students' in roster.story_state):
+            class_data_students = roster.story_state['class_data_students'][idx]
+            # if len(class_data_students) == 0:
+            #     class_data_students = None
+
+        # solara.Markdown(f"{class_data_students}")
+        subset = get_class_subset(data, sid, 
+                                  class_data_students = class_data_students, 
+                                  ungroup = False)
 
         AgeHoHistogram(data, 
                        subset = subset, 
