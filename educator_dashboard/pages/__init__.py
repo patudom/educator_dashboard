@@ -15,8 +15,11 @@ from ..database.Query import QueryCosmicDSApi
 
 from ..components.RefreshClass import RefreshClass
 
+from solara.lab import theme
+
 @solara.component
 def Page():
+    theme.dark = False
     query = QueryCosmicDSApi()
     show_dashboard, set_show_dashboard = solara.use_state(False)
     class_id_list = solara.use_reactive([None])
