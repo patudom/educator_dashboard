@@ -1,6 +1,6 @@
 
 vuetifyThemes = {
-    theme: {'light': true}, // this doesn't do anything. 
+    // themes: {'theme': 'light'}, // this doesn't do anything. 
     light: { // currently using this one
         // primary: colors.blue.darken3,
         // secondary: colors.cyan.darken4,
