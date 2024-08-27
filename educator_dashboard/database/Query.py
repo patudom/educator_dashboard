@@ -11,7 +11,15 @@ from random import randint
 API_URL = "https://api.cosmicds.cfa.harvard.edu"
 HUBBLE_ROUTE_PATH = "hubbles_law"
 
-from .State import State, StateList
+_stages = ['introduction',
+           'spectra_&_velocity', 
+           'distance_introduction', 
+           'distance_measurements', 
+           'explore_data', 
+           'class_results_and_uncertainty', 
+           'professional_data']
+
+
     
 class QueryCosmicDSApi():
     
@@ -68,7 +76,21 @@ class QueryCosmicDSApi():
     def get(self, url):
         response = self._request_session.get(url)
         return response
-        
+    
+    def get_stage(self, student_id, story = None, stage = None):
+        story = self.story or story
+        endpoint = f'stage-state/{student_id}/{story}/{stage}'
+        url = urljoin(self.url_head, endpoint)
+        self.stage_url = url
+        req = self.get(url)
+        return req.json()
+    
+    def get_stages(self, student_id, story = None):
+        story = self.story or story
+        stages = {}
+        for stage in _stages:
+            stages[stage] = self.get_stage(student_id, story = story, stage = stage)
+        return stages
         
     def get_roster(self, class_id = None, story = None):
         """

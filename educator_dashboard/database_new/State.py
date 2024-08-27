@@ -1,29 +1,26 @@
 
 import warnings
 warnings.filterwarnings('ignore') # ignore warnings
+stage_name_list = ['introduction','spectra_&_velocity', 'distance_introduction', 'distance_measurements', 'explore_data', 'class_results_and_uncertainty', 'professional_data']
+from .markers import stage_marker_counts
 
-from .markers import markers
+from numpy import nan, mean
 
-from numpy import nan
+
 class State:
-    markers = markers
+    # markers = markers
     
 
-    def __init__(self, story_state):
+    def __init__(self, story_state,):
         # list story keys
         self.name = story_state.get('name','') # string
         self.title = story_state.get('title','') # string
-        self.stages = {k:v.get('state',{}) for k,v in story_state['stages'].items()} #  dict_keys(['0', '1', '2', '3', '4', '5', '6'])
-        class_room_keys = ['id', 'code', 'name', 'active', 'created', 'updated', 'educator_id', 'asynchronous']
-        self.classroom = story_state.get('classroom',{k:None for k in class_room_keys})# dict_keys(['id', 'code', 'name', 'active', 'created', 'updated', 'educator_id', 'asynchronous'])
+        self.stages = {k: v['state'] for k, v in story_state['stages'].items()}
         self.responses = story_state.get('responses',{})
         self.mc_scoring = story_state.get('mc_scoring',{}) # dict_keys(['1', '3', '4', '5', '6'])
-        self.stage_index = story_state.get('stage_index',nan) # int
-        self.total_score = story_state.get('total_score',nan) #int
-        self.student_user = story_state.get('student_user',{}) # dict_keys(['id', 'ip', 'age', 'lat', 'lon', 'seed', 'dummy', 'email', 'gender', 'visits', 'password', 'username', 'verified', 'last_visit', 'institution', 'team_member', 'last_visit_ip', 'profile_created', 'verification_code'])
-        self.teacher_user = story_state.get('teacher_user',None) # None
-        self.max_stage_index = story_state.get('max_stage_index',0) # int
+        # self.stage_index = story_state.get('stage_index',nan) # int
         self.has_best_fit_galaxy = story_state.get('has_best_fit_galaxy',False) # bool
+        self.student_id = story_state.get('student_id',None) # string
         
         
     
@@ -34,12 +31,11 @@ class State:
                 possible_score += 10
         return possible_score
     
-    def stage_score(self, stage):
+    def get_stage_score(self):
         score = 0
         possible_score = 0
-        if str(stage) not in self.mc_scoring:
-            return score, possible_score
-        for key, value in self.mc_scoring[str(stage)].items():
+
+        for key, value in self.mc_scoring['scores'].items():
             if value is None:
                 score += 0
             else:
@@ -53,62 +49,79 @@ class State:
             possible_score += 10
         return score, possible_score
     
-
+    @property
+    def max_stage_index(self):
+        i = 0
+        for k, v in self.stages.items():
+            if v is not None:
+                i+=1
+        return i
+    
     @property
     def how_far(self):
-        stage_index = self.max_stage_index
-        if stage_index is nan:
+
+        if self.max_stage_index is nan:
             return {'string': 'No stage index', 'value':0.0}
-        stage_markers = self.markers.get(str(stage_index),None)
+        stage_name = stage_name_list[self.max_stage_index]
         
-        frac = self.stage_fraction_completed(stage_index)
-        # are we in slideshow stage
-        if stage_markers is None:
-            string_fmt =  "In Stage {} slideshow".format(stage_index)
-        else:
-            string_fmt = f"{frac:.0%} through Stage {stage_index}"
+        frac = self.stage_fraction_completed(stage_name)
+        string_fmt = f"{self.student_id} {frac:.0%} through Stage {stage_name}"
             
         return {'string': string_fmt, 'value':frac}
     
-    def stage_fraction_completed(self, stage):
-        if stage is None:
-            return 1.0
-        markers = self.markers[str(stage)]
-        
-        if markers is None:
-            return 1.0
-        current_stage_marker = self.stages[str(stage)]['marker']
-        total = len(markers)
-        if current_stage_marker not in markers:
+    @property
+    def stage_index(self):
+        return self.max_stage_index + 1
+    
+    def get_stage_index(self, s):
+        return stage_name_list.index(s) if s in stage_name_list else None
+    
+    def stage_fraction_completed(self, stage_name):
+        stage_index = self.get_stage_index(stage_name)
+        if stage_index is None:
             return nan
-        current = markers.index(current_stage_marker) + 1
-        frac = float(current) / float(total)
+        
+        num_markers = stage_marker_counts[stage_index]
+        
+        if num_markers == 0:
+            # print(f"{self.student_id} stage_fraction_completed: Stage {stage_name} has no markers")
+            return nan
+        if self.stages[stage_name] is None:
+            print(f"{self.student_id} stage_fraction_completed: Stage {stage_name} has no state")
+            if stage_marker_counts[stage_index] == 0:
+                return nan
+            else:
+                return 0.0
+        
+        current_stage_index = self.stages[stage_name].get('current_step', None)
+        
+        if current_stage_index is None:
+            return nan
+        current = current_stage_index + 1
+        frac = float(current) / float(num_markers)
         return frac
     
     def total_fraction_completed(self):
         total = []
         current = []
-        for key, stage in self.stages.items():
-            markers = self.markers.get(key,None)
-            if markers is not None:
-                total.append(len(markers))
-                if self.stage_index == int(key):
-                    if self.current_marker in markers:
-                        val = markers.index(self.current_marker) + 1
-                    else:
-                        val = nan
-                elif self.max_stage_index > int(key):
-                    # if true, then stage key is complete
-                    val = len(markers)
-                elif self.stage_index < int(key):
-                    # if false, then stage key is not complete
-                    val = 0 #markers.index(stage['marker']) + 1
-                else:
-                    val = 0
-
-                current.append(val)
-        # print(total, current)
-        if nan in current:
+        for k, stage in self.stages.items():
+            # stage_index = stage_name_list.index(k) if k in stage_name_list else None
+            # if stage_index is not None and stage is not None:
+            #     num_markers = stage_marker_counts[stage_index]
+            #     total.append(num_markers)
+            #     try:
+            #         current.append(stage['current_step']+1)
+            #     except KeyError:
+            #         # print(f"{self.student_id} total_fraction_completed: Stage {k} has no current_marker", stage)
+            #         current.append(num_markers)
+            # else:
+            #     # print(f"{self.student_id} total_fraction_completed: Stage {k} not in stage_name_list")
+            #     pass
+            frac = self.stage_fraction_completed(k)
+            current.append(frac if frac is not nan else 1.0)
+            total.append(1.0)
+        
+        if float(sum(total)) == 0.0:
             frac = nan
         else:
             frac = int(100 * float(sum(current)) / float(sum(total)))
@@ -119,24 +132,21 @@ class State:
         return self.get_possible_score()
     
     @property
-    def score(self):
-        return self.total_score / self.possible_score
-    
-    @property
     def story_score(self):
-        total = 0
-        for key, stage in self.stages.items():
-            score, possible = self.stage_score(key)
-            total += score
-        return total
+        score, _ = self.get_stage_score()
+        return score
     
     @property
     def current_marker(self):
-        return self.stages.get(str(self.stage_index),{}).get('marker','none')
+        key = stage_name_list[self.max_stage_index]
+        if self.stages[key] is None:
+            return nan
+        return self.stages[key].get('current_step',0)
     
     @property
     def max_marker(self):
-        return self.stages.get(str(self.max_stage_index),{}).get('marker','none')
+        return self.current_marker
+        # return self.stages.get(str(self.max_stage_index),{}).get('marker','none')
     
     @property
     def percent_completion(self):
