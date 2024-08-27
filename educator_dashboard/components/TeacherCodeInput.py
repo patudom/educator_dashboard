@@ -32,6 +32,7 @@ def TeacherCodeEntry(class_id_list, class_id, callback, query = None):
                 # {'id': 200, 'name': '200: sample_class_1'}, these were rolled into 199
                 {'id': 199, 'name': '199: Ed Dashboard Sample Class'},
                 {'id': 215, 'name': 'Solara Test Class'},
+                {'id': 216, 'name': 'Solara Test Class 2'},
                 # {'id': 197, 'name': '197: betaclass3'},
                 # {'id': 196, 'name': '196: pat-local-test'},
                 # {'id': 195, 'name': '195: 2023-07 Formative Class 6'},
@@ -49,7 +50,7 @@ def TeacherCodeEntry(class_id_list, class_id, callback, query = None):
                 # {'id': 177, 'name': '177: 2022-10-25 Formative Class 1'},         
              ]
         class_id_list.set(class_query_res)
-        class_id.set(199)
+        class_id.set(216)
         code.set('dev')
         solara.Markdown('In dev mode, so skipping code entry')
         proceed_to_dashboard.set(True)

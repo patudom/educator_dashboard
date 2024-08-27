@@ -80,13 +80,18 @@ def FreeResponseSummary(roster, stage_labels=[]):
     question_text = roster.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text'}}
     
     stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
+    if len(stages) == 0:
+        stages = list(filter(lambda s: s != 'student_id',fr_questions.keys()))
     
 
     with solara.Columns([5, 1], style={"height": "100%"}):
         with solara.Column():
             for stage in stages:
-                index = int(stage) - 1
-                label = stage_labels[index]
+                if str(stage).isnumeric():
+                    index = int(stage) - 1
+                    label = stage_labels[index]
+                else:
+                    label = stage
                 question_responses = roster.l2d(fr_questions[stage]) # {'key': ['response1', 'response2',...]}
                 with rv.Container(id=f"fr-summary-stage-{stage}"):
                     solara.Markdown(f"### Stage {stage}: {label}")
@@ -128,8 +133,11 @@ def FreeResponseQuestionSingleStudent(roster, sid = None, stage_labels=[]):
     if len(fr_questions) == 0:
         solara.Markdown("Student has not answered any free response questions yet.")
     for k, v in fr_questions.items():
-        index = int(k) - 1
-        label = stage_labels[index]
+        if str(k).isnumeric():
+            index = int(k) - 1
+            label = stage_labels[index]
+        else:
+            label = k
         solara.Markdown(f"### Stage {k}: {label}")
         for qkey, qval in v.items():
             question = question_text[qkey]['text']
