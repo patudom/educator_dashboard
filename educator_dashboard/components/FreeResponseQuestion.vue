@@ -126,7 +126,7 @@ export default {
 }
 .question {
   display: inline-block;
-  color: black;
+  /* color: black; */
 }
 
 .response-row {
@@ -150,7 +150,7 @@ export default {
 .name-item {
   display: inline-block;
   font-weight: bold;
-  color: var(--md-grey-900);
+  /* color: var(--md-grey-900); */
   padding-left: 0.5rem;
   margin-top: 1rem;
 

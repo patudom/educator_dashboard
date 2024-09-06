@@ -111,6 +111,7 @@ body {
 
 .vertical-tabs[aria-selected="true"] {
     background-color: var(--md-deep-orange-800) !important;
+    color: white;
 }
 
 .v-tabs--vertical .v-tabs-slider {
@@ -118,7 +119,7 @@ body {
 }
 
 .horizontal-tabs[aria-selected="true"] {
-    color: var(--md-blue-800) !important;
+    color: var(--md-blue-700) !important;
     font-weight: 800; 
 }
 
@@ -131,7 +132,7 @@ body {
 }
 
 .v-card__text {
-    color: black !important;
+    /* color: black !important; */
     padding-top: 0;
     padding-bottom: 16px;
 }

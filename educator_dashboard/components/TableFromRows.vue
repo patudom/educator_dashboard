@@ -96,12 +96,12 @@ export default {
 }
 
 #table-from-rows tbody tr {
-  background-color: white;
+  background-color: inherit;
 }
 
 #table-from-rows > table > tbody tr:hover {
   background-color: var(--md-grey-300);
-
+  color: black;
 }
 
 

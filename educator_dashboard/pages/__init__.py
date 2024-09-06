@@ -15,6 +15,8 @@ from ..database.Query import QueryCosmicDSApi
 
 from ..components.RefreshClass import RefreshClass
 
+from solara.lab import theme, ThemeToggle
+
 @solara.component
 def Page():
     query = QueryCosmicDSApi()
@@ -53,8 +55,10 @@ def Page():
         with rv.Html(tag="a", attributes={'href':"https://www.cosmicds.cfa.harvard.edu/", 'target':"_blank"}):
             solara.Image(image="static/assets/cosmicds_logo_transparent.png")
          
-        solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center', 'width': '100%'})
-
+        with rv.Col():
+            with rv.Row(style_="justify-content: center; align-items: center;"):
+                solara.Markdown(f"#{story_name} Educator Dashboard", style={'text-align': 'center'})
+                ThemeToggle(enable_auto=False)
 
         with solara.Column(gap="0px", classes=["my-column"]):
             SetClass(class_id, roster, first_run, class_id_list, query)

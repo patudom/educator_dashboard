@@ -14,7 +14,8 @@ from numpy import hstack, around
 
 @solara.component
 def MultipleChoiceStageSummary(roster, stage = None, label= None):
-    
+    print('================== MultipleChoiceStageSummary ==================')
+    print('stage:', stage)
     if isinstance(roster, solara.Reactive):
         roster = roster.value
         if roster is None:
@@ -126,7 +127,7 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
                 
 @solara.component
 def MultipleChoiceSummary(roster, stage_labels=[]):
-    
+    print('================ MultipleChoiceSummary ========')
     if isinstance(roster, solara.Reactive):
         roster = roster.value
         if roster is None:
@@ -136,10 +137,17 @@ def MultipleChoiceSummary(roster, stage_labels=[]):
     
     # mc_responses is a dict that looks like {'1': [{q1: {tries:0, choice: 0, score: 0}...}..]}
     stages = list(filter(lambda s: s.isdigit(),sorted(list(sorted(mc_responses.keys())))))
+    if len(stages) == 0:
+        stages = list(filter(lambda s: s != 'student_id',mc_responses.keys()))
     
     for stage in stages:
-        index = int(stage) - 1
-        label = stage_labels[index]
+        if str(stage).isnumeric():
+            index = int(stage) - 1
+            label = stage_labels[index]
+        else:
+            label = stage
+        # index = int(stage) - 1
+        # label = stage_labels[index]
         MultipleChoiceStageSummary(roster, stage = stage, label = label)
 
 @solara.component
@@ -237,8 +245,13 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
     
     dflist = []
     for stage, v in mc_questions.items():
-        index = int(stage) - 1
-        label = stage_labels[index]
+        # index = int(stage) - 1
+        # label = stage_labels[index]
+        if str(stage).isnumeric():
+            index = int(stage) - 1
+            label = stage_labels[index]
+        else:
+            label = stage
         
         for k in mc_keys[stage]:
             if k not in v.keys():
