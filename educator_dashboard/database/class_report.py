@@ -4,7 +4,6 @@ import pandas as pd
 from .nested_dataframe import flatten
 from .State import State, StateList
 from .Query import QueryCosmicDSApi
-from ..database_new.Query import QueryCosmicDSApi as NewQueryCosmicDSApi
 from ..database_new.State import State as NewState
 from ..database_new.State import StateList as NewStateList
 import time
