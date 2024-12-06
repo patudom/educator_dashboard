@@ -282,6 +282,7 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
 
         AgeHoHistogram(data, 
                        subset = subset, 
+                       selected = sid,
                        main_label = f'Data not seen by {sid.value}',
                        subset_label = f'Data seen by {sid.value}', 
                        subset_color = '#0097A7')
