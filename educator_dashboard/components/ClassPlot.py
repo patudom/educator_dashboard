@@ -1,5 +1,5 @@
 import solara
-
+from solara.lab.components import use_dark_effective
 import plotly.express as px
 import plotly.graph_objects as go
 
@@ -41,6 +41,18 @@ def ClassPlot(dataframe,
             ]
         }
     
+    if use_dark_effective():
+        plotly_theme = 'plotly_dark'
+        axes_color = "#efefef"
+        border_color = "#ccc"
+        bgcolor = "#333"
+        plot_bgcolor = "#111111"
+    else:
+        plotly_theme = 'simple_white'
+        axes_color = "black"
+        border_color = "#444"
+        bgcolor = "#efefef"
+        plot_bgcolor = "white"
     
     if x_col not in dataframe.columns:
         print(f"ClassPlot: {x_col} not in dataframe")
@@ -49,7 +61,7 @@ def ClassPlot(dataframe,
     
     labels =  {x_col: "{label} ({units})".format(**xy_label['x']),  
                y_col: "{label} ({units})".format(**xy_label['y'])}
-    fig = px.scatter(dataframe, x=x_col, y=y_col, custom_data = label_col, labels = labels)
+    fig = px.scatter(dataframe, x=x_col, y=y_col, custom_data = label_col, labels = labels, template=plotly_theme)
     
     if subset is None and selected.value is None:
         main_color = subset_color
@@ -60,9 +72,9 @@ def ClassPlot(dataframe,
         
 
     fig.update_traces(marker_color=main_color, marker_size = main_marker_size)
-    fig.update_layout(modebar = config, title="Class Hubble<br>Diagram", xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
-    fig.update_xaxes(linecolor='black')
-    fig.update_yaxes(linecolor='black')
+    fig.update_layout(modebar = config, title="Class Hubble<br>Diagram", xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor=plot_bgcolor)
+    fig.update_xaxes(linecolor=axes_color, showgrid=False, zeroline=False)
+    fig.update_yaxes(linecolor=axes_color, showgrid=False, zeroline=False)
     # add empty trace to show on legend
     fig.add_trace(go.Scatter(x=[None], y=[None], mode = 'markers', name = main_label, marker_color = main_color, marker_size = main_marker_size))
 
@@ -113,9 +125,9 @@ def ClassPlot(dataframe,
             y=1,
             xanchor="right",
             x=1,
-            bordercolor="#444",
+            bordercolor=border_color,
             borderwidth=0,
-            bgcolor='#efefef',
+            bgcolor=bgcolor,
             itemclick = False,
             itemdoubleclick = False,
             font=dict(size=11),

@@ -138,6 +138,7 @@ export default {
 
 .progress-table-row-selected {
   background-color: var(--md-amber-100) !important;
+  color: black;
 }
 
 .progress-table-progress {

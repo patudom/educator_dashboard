@@ -1,7 +1,7 @@
 import solara
 import plotly.express as px
 import plotly.graph_objects as go
-
+from solara.lab.components import use_dark_effective
 from collections import Counter
 
 from numpy import nanmin, nanmax, isnan
@@ -43,8 +43,23 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
         xmin, xmax = nanmin(df_agg[which]), nanmax(df_agg[which])
 
     labels = {'age':'Age of Universe (Gyr)', 'student_id':'Student', 'name': 'Student', 'h0':'Hubble Constant (km/s/Mpc)'}
+    
 
-    fig = px.bar(data_frame = df_agg, x = which, y='count', hover_data='name', labels = labels, barmode='overlay', opacity=1)
+    
+    if use_dark_effective():
+        plotly_theme = 'plotly_dark'
+        axes_color = "#efefef"
+        border_color = "#ccc"
+        bgcolor = "#333"
+        plot_bgcolor = "#111111"
+    else:
+        plotly_theme = 'simple_white'
+        axes_color = "black"
+        border_color = "#444"
+        bgcolor = "#efefef"
+        plot_bgcolor = "white"
+
+    fig = px.bar(data_frame = df_agg, x = which, y='count', hover_data='name', labels = labels, barmode='overlay', opacity=1, template=plotly_theme)
     fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>', width=0.8)
 
     if subset is None:
@@ -54,11 +69,11 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
     fig.update_traces(marker_color=main_color)
     fig.add_trace(go.Bar(x=[None], y=[None], name = main_label, marker_color = main_color))
     title = f'Class {which.capitalize()}<br>Distribution' if title is None else title
-    fig.update_layout(showlegend=True, title_text=title, xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor="white")
+    fig.update_layout(showlegend=True, title_text=title, xaxis_showgrid=False, yaxis_showgrid=False, plot_bgcolor=plot_bgcolor)
     # show only integers on y-axis
-    fig.update_yaxes(tick0=0, dtick=1, linecolor="black")
+    fig.update_yaxes(tick0=0, dtick=1, linecolor=axes_color)
     # show ticks every 1
-    fig.update_xaxes(range=[xmin-1.5, xmax+1.5], linecolor="black")
+    fig.update_xaxes(range=[xmin-1.5, xmax+1.5], linecolor=axes_color)
     
     if subset is not None:
         data_subset = data[subset]
@@ -82,9 +97,9 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
             y=1,
             xanchor="right",
             x=1,
-            bordercolor="#444",
+            bordercolor=border_color,
             borderwidth=0,
-            bgcolor='#efefef',
+            bgcolor=bgcolor,
             itemclick = False,
             itemdoubleclick = False,
             font=dict(size=11),

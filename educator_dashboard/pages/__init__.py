@@ -6,7 +6,7 @@ from ..components.SetClass import SetClass
 from ..components.StudentDataLoad import StudentNameLoad
 from ..components.ReportDownload import DownloadReport
 import reacton.ipyvuetify as rv
-
+from solara.lab.components import use_dark_effective
 from ..database.class_report import Roster
 from typing import cast
 
@@ -48,12 +48,13 @@ def Page():
     are_names_set = solara.use_reactive(False)
     
     story_name = "HubbleDS"
-    
+
 
     with solara.Columns([1, 9, 3], classes=["my-column"]):
         # solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
         with rv.Html(tag="a", attributes={'href':"https://www.cosmicds.cfa.harvard.edu/", 'target':"_blank"}):
-            solara.Image(image="static/assets/cosmicds_logo_transparent.png")
+            solara.Image(image="https://github.com/cosmicds/cds-website/blob/main/public/logos/cosmicds_logo_for_dark_backgrounds.png?raw=True", classes=["ma-2"])
+            
          
         with rv.Col():
             with rv.Row(style_="justify-content: center; align-items: center;"):
@@ -65,7 +66,7 @@ def Page():
             StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
             DownloadReport(roster) 
                 
-            RefreshClass(rate_minutes=20./60., roster = roster, student_names = dashboard_names.value,
+            RefreshClass(rate_minutes=60., roster = roster, student_names = dashboard_names.value,
                          show_refresh_button=False, stop_start_button=False, refresh_button_text=None,
                          # show button to manually refresh and to start/stop autorefresh. no text cuz icon_only is set
                          refresh_button_color='primary', start_button_color='#777', stop_button_color='#ccc', 

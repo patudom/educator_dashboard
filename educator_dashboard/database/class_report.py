@@ -103,9 +103,12 @@ class Roster():
             self.roster[i]['student_id'] = student['student_id']
             self.roster[i]['story_state']['student_id'] = student['student_id']
             # rename story_state.free_response to story_state.responses
-            self.roster[i]['story_state']['responses'] = student['story_state']['free_responses']
+            free_responses = student['story_state']['free_responses']['responses']
+            free_responses = {key: value['response'] for key, value in free_responses.items()}
+            self.roster[i]['story_state']['responses'] = {'all_stages': free_responses}
             self.roster[i]['story_state'].pop('free_responses')
-    
+            # [s['responses'] for s in self.story_state['responses']]
+            # breakpoint()
     def include_stages(self):
         for i, student in enumerate(self.roster):
             stages = self.query.get_stages(student['student_id'])
