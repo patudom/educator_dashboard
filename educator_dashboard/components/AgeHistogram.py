@@ -22,7 +22,7 @@ def aggregrate(dataframe, col):
 
 
 @solara.component
-def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main_label = None, subset_color = '#0097A7', main_color = '#BBBBBB', title = None):
+def AgeHoHistogram(data, selected = solara.Reactive(None), which = 'age', subset = None, subset_label = None, main_label = None, subset_color = '#0097A7', main_color = '#BBBBBB', title = None):
     # subset is boolean array which take subset of data
     
     # manual aggregation. instead use pandas groupby and agg
@@ -33,6 +33,7 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
     def name_agg(names):
         return '<br>'+ '<br>'.join(names)
     
+    subset = None
 
     df_agg = data.groupby(which, as_index=False).agg(count=(which,'size'), student_id = ('student_id', sids_agg), name = ('name', name_agg))
     # add single valued column
@@ -58,6 +59,10 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
         border_color = "#444"
         bgcolor = "#efefef"
         plot_bgcolor = "white"
+        
+    if subset is None:
+        main_label = "Full Class"
+        main_color = subset_color
 
     fig = px.bar(data_frame = df_agg, x = which, y='count', hover_data='name', labels = labels, barmode='overlay', opacity=1, template=plotly_theme)
     fig.update_traces(hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>', width=0.8)
@@ -75,6 +80,8 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
     # show ticks every 1
     fig.update_xaxes(range=[xmin-1.5, xmax+1.5], linecolor=axes_color)
     
+    
+    
     if subset is not None:
         data_subset = data[subset]
         df_agg_subset = data_subset.groupby(which, as_index=False).agg(count=(which,'size'), student_id = ('student_id', sids_agg))
@@ -86,8 +93,24 @@ def AgeHoHistogram(data, which = 'age', subset = None, subset_label = None, main
                      hoverinfo='skip', 
                      customdata=df_agg_subset['student_id'])
         bar.hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>'
+
+
+    if selected.value is not None:
+        data_subset = data[data['student_id']==str(selected.value)]
+        if len(data_subset) > 0:
+            df_agg_subset = data_subset.groupby(which, as_index=False).agg(count=(which,'size'), student_id = ('student_id', sids_agg))
+            bar = go.Bar(x=df_agg_subset[which], y=df_agg_subset['count'],
+                        name=str(selected.value), 
+                        opacity=1, 
+                        width=0.8,
+                        marker_color='#FF8A65',
+                        hoverinfo='skip', 
+                        customdata=df_agg_subset['student_id'])
+            bar.hovertemplate = labels[which] + ': %{x}<br>' + 'count=%{y}<br>' + labels['student_id'] + ': %{customdata}' + '<extra></extra>'
         
-        fig.add_trace(bar)
+            fig.add_trace(bar)
+
+        
         # show legend
     # fig.update_layout(showlegend=True)
     fig.update_layout(

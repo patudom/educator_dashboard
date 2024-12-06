@@ -20,6 +20,7 @@ def ClassPlot(dataframe,
             main_color='#BBBBBB',
               ):
     
+    subset = None
     
     print('Generating Class Plot')
     
