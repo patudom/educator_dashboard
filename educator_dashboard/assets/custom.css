@@ -75,6 +75,9 @@ body {
 
 }
 
+div#app {
+}
+
 .my-buttons {
     width: 100%;
     background-color: var(--md-blue-800) !important;

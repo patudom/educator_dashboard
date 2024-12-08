@@ -21,8 +21,8 @@ from solara.lab import theme, ThemeToggle
 def Page():
     query = QueryCosmicDSApi()
     show_dashboard, set_show_dashboard = solara.use_state(False)
-    class_id_list = solara.use_reactive([None])
-    class_id = solara.use_reactive(None) # add class id here
+    class_id_list = solara.use_reactive([None]) # list of valid class id's for the current teacher
+    class_id = solara.use_reactive(None) # current class id being viewed
     if not show_dashboard: 
         def callback():
             set_show_dashboard(True)
@@ -50,7 +50,7 @@ def Page():
     story_name = "HubbleDS"
 
 
-    with solara.Columns([1, 9, 3], classes=["my-column"]):
+    with solara.Columns([1, 9, 3], classes=["my-column", "px-4", "pt-2"]):
         # solara.Image("https://github.com/cosmicds/cds-website/raw/main/public/cosmicds_logo_transparent_for_light_backgrounds.png")
         with rv.Html(tag="a", attributes={'href':"https://www.cosmicds.cfa.harvard.edu/", 'target':"_blank"}):
             solara.Image(image="https://github.com/cosmicds/cds-website/blob/main/public/logos/cosmicds_logo_for_dark_backgrounds.png?raw=True", classes=["ma-2"])
@@ -66,7 +66,7 @@ def Page():
             StudentNameLoad(roster, student_names, names_set=are_names_set, on_update=dashboard_names.set)
             DownloadReport(roster) 
                 
-            RefreshClass(rate_minutes=60., roster = roster, student_names = dashboard_names.value,
+            RefreshClass(rate_minutes=20./60., roster = roster, student_names = dashboard_names.value,
                          show_refresh_button=False, stop_start_button=False, refresh_button_text=None,
                          # show button to manually refresh and to start/stop autorefresh. no text cuz icon_only is set
                          refresh_button_color='primary', start_button_color='#777', stop_button_color='#ccc', 
