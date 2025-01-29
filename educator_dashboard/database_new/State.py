@@ -5,8 +5,6 @@ from .markers import stage_marker_counts
 
 from numpy import nan, mean
 
-from .StateModels import StoryState
-
 class State:
     # markers = markers
     
