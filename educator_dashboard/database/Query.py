@@ -175,7 +175,7 @@ class QueryCosmicDSApi():
             return None
         
         if student_ids is None:
-            filter_fun = lambda m: m['class_id'] == class_id
+            filter_fun = lambda m: m['class_id'] == class_id and m['student_id'] in student_id
             measurements = [m for m in self.get_all_data(story = story, transpose = False)['measurements'] if filter_fun(m)]
             # check that there are measurements for every student_id   
         else:
