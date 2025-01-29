@@ -25,7 +25,6 @@ class State:
         self.max_stage_index = story_state.get('max_stage_index',0) # int
         self.has_best_fit_galaxy = story_state.get('has_best_fit_galaxy',False) # bool
         
-        
     
     def get_possible_score(self):
         possible_score = 0

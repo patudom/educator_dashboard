@@ -27,6 +27,7 @@ class QueryCosmicDSApi():
     querystring = {"":""}
     payload = ""
     headers = {"authority": "api.cosmicds.cfa.harvard.edu"}
+    _stage_keys = None
     
     def __init__(self, story = HUBBLE_ROUTE_PATH, class_id = None):
         self.class_id = class_id
@@ -78,6 +79,7 @@ class QueryCosmicDSApi():
         return response
     
     def get_stage(self, student_id, story = None, stage = None):
+        # Solara API endpoint
         story = self.story or story
         endpoint = f'stage-state/{student_id}/{story}/{stage}'
         url = urljoin(self.url_head, endpoint)
@@ -86,16 +88,39 @@ class QueryCosmicDSApi():
         return req.json()
     
     def get_stages(self, student_id, story = None):
+        # Solara API endpoint
         story = self.story or story
         stages = {}
-        for stage in _stages:
-            stages[stage] = self.get_stage(student_id, story = story, stage = stage)
+        
+        stage_keys = self.get_stages_for_story(story)
+        for stage_index, stage_name in stage_keys.items():
+            stage = self.get_stage(student_id, story = story, stage = stage_name)
+            if stage['state'] is None:
+                stage['state'] = {'index': stage_index}
+            if stage['state'] is not None:
+                stage['state']['index'] = stage_index
+                stages[stage_name] = stage
         return stages
+    
+    def get_stages_for_story(self, story = None):
+        # Solara API endpoint
+        if self._stage_keys is not None:
+            return self._stage_keys
+        story = self.story or story
+        endpoint = f'stages/{story}'
+        url = urljoin(self.url_head, endpoint)
+        self.stages_url = url
+        req = self.get(url)
+        js = req.json()
+        if js:
+            self._stage_keys = { stage['stage_index']: stage['stage_name'] for stage in js['stages']}
+        return self._stage_keys
         
     def get_roster(self, class_id = None, story = None):
         """
         Returns the Roster for a given class_id and story
         returns the student information and the story state
+        Returns a different structure depending on if jupyter or solara version
         """
         class_id = self.class_id or class_id
         story = self.story or story

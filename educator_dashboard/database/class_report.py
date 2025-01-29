@@ -93,8 +93,20 @@ class Roster():
         if self.class_id is None:
             return False
         if self.class_id >= 215:
+            print("Using new database")
             return True
         return False
+    
+    @staticmethod
+    def dict_by_stage(data):
+        stages = set([value['stage'] for value in data.values() if 'stage' in value.keys()])
+        if len(stages) == 0:
+            print('No stages found')
+            return data
+        new_data = {}
+        for stage in stages:
+            new_data[stage] = {key: value for key, value in data.items() if value['stage'] == stage}
+        return new_data
 
     def fix_new_story_state(self):
         for i, student in enumerate(self.roster):
@@ -102,12 +114,18 @@ class Roster():
             self.roster[i]['story_state'] = student['story_state']['story']
             self.roster[i]['student_id'] = student['student_id']
             self.roster[i]['story_state']['student_id'] = student['student_id']
-            # rename story_state.free_response to story_state.responses
-            free_responses = student['story_state']['free_responses']['responses']
-            free_responses = {key: value['response'] for key, value in free_responses.items()}
-            self.roster[i]['story_state']['responses'] = {'all_stages': free_responses}
+
+            free_responses = student['story_state']['free_responses'].pop('responses')
+            responses = self.dict_by_stage(free_responses)
+            responses = {stage_key: {q_key: q_value.get('response', '') for q_key, q_value in stage_value.items()} for stage_key, stage_value in responses.items() }
+            self.roster[i]['story_state']['responses'] = responses
             self.roster[i]['story_state'].pop('free_responses')
-            # [s['responses'] for s in self.story_state['responses']]
+
+            mc_scoring = self.roster[i]['story_state']['mc_scoring'].pop('scores')
+            self.roster[i]['story_state']['mc_scoring'] = self.dict_by_stage(mc_scoring)
+
+            
+            
             # breakpoint()
     def include_stages(self):
         for i, student in enumerate(self.roster):
@@ -133,7 +151,7 @@ class Roster():
             self.last_modified = {}
             self.stage_index = 0
             return
-        self.roster = self.fix_mc_scoring(self.roster)
+        # self.roster = self.fix_mc_scoring(self.roster)
         keys = self.roster[0].keys()
         new_out = l2d(self.roster)
         keys = new_out.keys()
@@ -242,7 +260,7 @@ class Roster():
     
     def get_student_by_id(self, student_id):
         if student_id not in self.student_ids:
-            print(f'{student_id} not in roster')
+            # print(f'{student_id} not in roster')
             return None
         return [student for student in self.roster if student['student_id'] == student_id][0]
     
@@ -301,9 +319,14 @@ class Roster():
             return self._fr_questions
         
         if len(self.roster) > 0:
+            # if self.new_db:
+                
+            #     out = l2d(self.story_state['responses'])
+            print(self.story_state['responses'])
             out = l2d(self.story_state['responses'])
             out.update({'student_id':self.student_ids})
             self._fr_questions = out
+            # print(out)
             return out
         else:
             return {'student_id': self.student_ids}
@@ -438,8 +461,8 @@ class Roster():
             index = self.student_ids.index(sid) if sid in self.student_ids else None
             if index is not None:
                 return self.roster[index]['student'].get('name', str(sid))
-            else:
-                print(f'{sid} not in roster')
+            # else:
+            #     print(f'{sid} not in roster')
         
         return str(sid)
     

@@ -26,7 +26,7 @@
           <div 
             :class="[getStepClass(step), 'meter']"
             :style="{ width: getStepProgress(step) }"
-            ></div>
+            > {{ getStepProgress(step) }} </div>
   </div>
 
     </td>
