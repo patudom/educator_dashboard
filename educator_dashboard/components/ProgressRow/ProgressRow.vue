@@ -26,7 +26,8 @@
           <div 
             :class="[getStepClass(step), 'meter']"
             :style="{ width: getStepProgress(step) }"
-            > {{ getStepProgress(step) }} </div>
+            >  </div>
+          <div class="step-label" >{{ getStepProgress(step) }}</div>
   </div>
 
     </td>
@@ -164,6 +165,13 @@ export default {
   margin-block: auto;
   min-width: 5px;
   height: 100%;
+}
+
+.step-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
 }
 
 .completed {
