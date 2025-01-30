@@ -4,7 +4,7 @@ warnings.filterwarnings('ignore') # ignore warnings
 
 from .markers import markers
 
-from numpy import nan
+from numpy import nan, isnan
 
 from ..logging import logger
 
@@ -59,7 +59,7 @@ class State:
     @property
     def how_far(self):
         stage_index = self.max_stage_index
-        if stage_index is nan:
+        if isnan(stage_index):
             return {'string': 'No stage index', 'value':0.0}
         stage_markers = self.markers.get(str(stage_index),None)
         
