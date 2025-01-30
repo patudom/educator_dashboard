@@ -110,17 +110,13 @@ def FreeResponseSummary(roster, stage_labels=[]):
 @solara.component
 def FreeResponseQuestionSingleStudent(roster, sid = None, stage_labels=[]):
     
-    if sid is None:
-        return 
-        
+    sid = solara.use_reactive(sid)
+    roster = solara.use_reactive(roster).value
     
-    if not isinstance(sid, solara.Reactive):
-        sid = solara.use_reactive(sid)
+    if sid.value is None or roster is None:
+        return
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
+    
     
     # grab index for student    
     idx = roster.student_ids.index(sid.value)

@@ -19,12 +19,12 @@ def StudentProgressRow(progress,
     
     student_id = progress['student_id']
     
-    if student_id is None:
-        selected = solara.use_reactive(False)
-    elif selected_id is None:
-        selected_id = solara.use_reactive(None)
-    else:
-        selected = solara.use_reactive(str(selected_id.value) == str(int(student_id)))
+    selected_id = solara.use_reactive(selected_id)
+    selected = solara.use_reactive(
+        (student_id is not None) and
+        str(selected_id.value) == str(int(student_id)) 
+        )
+    
 
     student_data = {
         'ID': progress['student_id'],

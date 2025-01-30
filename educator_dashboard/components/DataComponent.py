@@ -77,19 +77,16 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
     
     logger.debug('Displaying data summary')
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-    if roster is None:
-        return
+    roster = solara.use_reactive(roster).value
     
     data = roster.get_class_data(df=True)
     # add names
     data['name'] = [roster.get_student_name(int(sid)) for sid in data['student_id']]
     
-    if data is None:
-        return
-    
     student_id = solara.use_reactive(student_id)
+    
+    if data is None or roster is None:
+        return
     
     if on_student_id is None:
         on_student_id = student_id.set
@@ -207,13 +204,13 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
             
 @solara.component
 def StudentAgeHubble(roster = None, sid = None, allow_id_set = True):
+    
+    roster = solara.use_reactive(roster).value
 
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
+    sid = solara.use_reactive(sid)
+    
     if roster is None:
         return
-    
-    sid = solara.use_reactive(sid)
     
     dataframe = roster.get_class_data(df = True)
     if len(dataframe) == 0:
@@ -333,13 +330,12 @@ def StudentStats(roster):
 @solara.component
 def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
+    roster = solara.use_reactive(roster).value
+    student_id = solara.use_reactive(student_id)
+    
     if roster is None:
         return
-
-    if not isinstance(student_id, solara.Reactive):
-        student_id = solara.use_reactive(student_id)
+        
 
     solara.Markdown(r'''
             * Click-and-drag to zoom in on a region within either plot.

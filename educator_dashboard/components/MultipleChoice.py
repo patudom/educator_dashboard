@@ -19,17 +19,16 @@ from ..logging import logger
 def MultipleChoiceStageSummary(roster, stage = None, label= None):
     logger.debug('================== MultipleChoiceStageSummary ==================')
     logger.debug(f'stage: {stage}')
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
+    
+    roster = solara.use_reactive(roster).value
     
     selected_question = solara.use_reactive('')
     
-    mc_responses = roster.multiple_choice_questions()
-        
-    if stage is None:
+    if roster is None or stage is None:
         return
+    
+    mc_responses = roster.multiple_choice_questions()
+
     
 
     flat_mc_responses = {}
@@ -131,11 +130,12 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
 @solara.component
 def MultipleChoiceSummary(roster, stage_labels=[]):
     logger.debug('================ MultipleChoiceSummary ========')
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
-        
+    
+    roster = solara.use_reactive(roster).value
+    
+    if roster is None:
+        return
+    
     mc_responses = roster.multiple_choice_questions()
     
     # mc_responses is a dict that looks like {'1': [{q1: {tries:0, choice: 0, score: 0}...}..]}
@@ -156,19 +156,21 @@ def MultipleChoiceSummary(roster, stage_labels=[]):
 @solara.component
 def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage = 0, label = None):
     
+    roster = solara.use_reactive(roster).value
+    dquest, set_dquest = solara.use_state('')
+    
+    if roster is None:
+        return
+
+    
     if df is None:
         solara.Markdown("There are no completed multiple choice questions for this stage")
         return
     
     if isinstance(df, solara.Reactive):
         df = df.value
+        
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
-
-    dquest, set_dquest = solara.use_state('')
    
     
     def row_action(row):
@@ -230,16 +232,12 @@ def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage =
 @solara.component
 def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
     
-    if not isinstance(sid, solara.Reactive):
-        sid = solara.use_reactive(sid)
+    sid = solara.use_reactive(sid)
+    roster = solara.use_reactive(roster).value
 
-    if sid.value is None:
+    if sid.value is None or roster is None:
         return
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
  
     idx = roster.student_ids.index(sid.value)
     mc_questions = roster.roster[idx]['story_state']['mc_scoring']
