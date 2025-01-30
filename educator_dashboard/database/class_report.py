@@ -16,6 +16,8 @@ from .utils import l2d, convert_column_of_dates_to_datetime, get_or_none
 
 from typing import List, Dict, cast
 
+from ..logging import logger
+
 class Student():
     
     student_id = None
@@ -51,6 +53,12 @@ class Roster():
         self._refresh = False
         
         self.class_id = class_id
+        logger.info(f"Creating roster for {class_id}")
+        
+        self.new_db = class_id >= 215 if class_id is not None else False
+        if self.new_db:
+            logger.info("Using new database scheme")
+        
         if query is None:
             self.query = QueryCosmicDSApi(class_id = class_id, story=HUBBLE_ROUTE_PATH)
         else:
@@ -88,20 +96,13 @@ class Roster():
             roster[i]['story_state']['mc_scoring'] = mc_scoring
         return roster
     
-    @property
-    def new_db(self):
-        if self.class_id is None:
-            return False
-        if self.class_id >= 215:
-            print("Using new database")
-            return True
-        return False
+    
     
     @staticmethod
     def dict_by_stage(data):
         stages = set([value['stage'] for value in data.values() if 'stage' in value.keys()])
         if len(stages) == 0:
-            print('No stages found')
+            logger.debug('No stages found')
             return data
         new_data = {}
         for stage in stages:
@@ -135,7 +136,7 @@ class Roster():
             
     
     def grab_data(self):
-        print('Getting roster')
+        logger.debug('Getting roster')
         self.roster = self.query.get_roster()
         if self.class_id is not None and self.new_db:
             self.fix_new_story_state()
@@ -161,7 +162,7 @@ class Roster():
             elif isinstance(new_out[key],list):
                 new_out[key] = {key:new_out[key]}
             else:
-                print(key, type(new_out[key][0]))
+                logger.debug(f"for {key} new_out[key] as type: {type(new_out[key][0])}")
                 
         
         self.student_id = cast(Dict, new_out['student_id']) # {'student_id': []}
@@ -175,7 +176,7 @@ class Roster():
             if isinstance(stage, dict) and ('state' in stage.keys()):
                 return stage['state']
             else:
-                print(f'no state in class {self.class_id}')
+                logger.debug(f'no state in class {self.class_id}')
                 return {'stage':{}, 'marker':None, 'responses':[], 'mc_scores':[], 'total_score':0, 'state':{}, 'title': None}
         for key in sorted(keys):
             self.stages.append([getstate(s)  for s in l2d(self.story_state['stages'])[key]])
@@ -260,7 +261,7 @@ class Roster():
     
     def get_student_by_id(self, student_id):
         if student_id not in self.student_ids:
-            # print(f'{student_id} not in roster')
+            # logger.debug(f'{student_id} not in roster')
             return None
         return [student for student in self.roster if student['student_id'] == student_id][0]
     
@@ -322,11 +323,11 @@ class Roster():
             # if self.new_db:
                 
             #     out = l2d(self.story_state['responses'])
-            print(self.story_state['responses'])
+            logger.debug(self.story_state['responses'])
             out = l2d(self.story_state['responses'])
             out.update({'student_id':self.student_ids})
             self._fr_questions = out
-            # print(out)
+            # logger.debug(out)
             return out
         else:
             return {'student_id': self.student_ids}
@@ -349,7 +350,7 @@ class Roster():
     def get_questions_text(self):
         qs = self.query.get_questions()
         if qs is None:
-            print("""No questions found. Trying again after a moment.""")
+            logger.debug("""No questions found. Trying again after a moment.""")
             # wait 1 second
             time.sleep(1)
             qs = self.query.get_questions()
@@ -364,7 +365,7 @@ class Roster():
         if get_all:
             questions = self.get_questions_text()
             if questions is None:
-                print('No questions found')
+                logger.debug('No questions found')
                 return self._question_keys
             
             keys = questions.keys()
@@ -377,7 +378,7 @@ class Roster():
             if testing:
                 q = {'text': 'Fake Long '+k, 'shorthand': 'Fake Short '+k}
             elif (k not in questions.keys()):
-                print(f'{k} not in question database')
+                logger.debug(f'{k} not in question database')
                 nice_tag = ' '.join(k.replace('_', ' ').replace('-', ' ').split())
                 q = {'text': 'Not in Question Database', 'shorthand': f'Not in Database ({nice_tag})'}
             else:
@@ -398,7 +399,7 @@ class Roster():
         if key in self.question_keys().keys():
             return self.question_keys()[key]
         else:
-            print(f'{key} not in question database')
+            logger.debug(f'{key} not in question database')
             return {'text': 'Not in Question Database', 'shorttext': 'Not Available', 'nicetag': key}
                 
     def mc_question_keys(self): 
@@ -462,7 +463,7 @@ class Roster():
             if index is not None:
                 return self.roster[index]['student'].get('name', str(sid))
             # else:
-            #     print(f'{sid} not in roster')
+            #     logger.debug(f'{sid} not in roster')
         
         return str(sid)
     
@@ -625,12 +626,12 @@ class Roster():
     
     def refresh_data(self):
         self._refresh = True
-        print('****** Refreshing data ******')
-        print(' >>> Grabbing class states')
+        logger.debug('****** Refreshing data ******')
+        logger.debug(' >>> Grabbing class states')
         self.grab_data()
-        print(' >>> Getting questions')
+        logger.debug(' >>> Getting questions')
         self.question_keys()
-        print(' >>> Getting class data')
+        logger.debug(' >>> Getting class data')
         self.get_class_data()
         self._refresh = False
     
@@ -650,13 +651,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     if args.class_id is None:
-        print('Please provide a class id')
+        logger.debug('Please provide a class id')
         exit()
     
     roster = Roster(class_id = args.class_id)
     df = roster.report()#rgs.class_id)
     if df is None:
-        print('No data found for class')
+        logger.debug('No data found for class')
         exit()
     df.to_excel(f'{args.class_id}_class_progress.xlsx')
     

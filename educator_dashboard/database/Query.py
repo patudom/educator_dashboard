@@ -19,6 +19,7 @@ _stages = ['introduction',
            'class_results_and_uncertainty', 
            'professional_data']
 
+from ..logging import logger
 
     
 class QueryCosmicDSApi():
@@ -43,7 +44,7 @@ class QueryCosmicDSApi():
     def get_env(self):
         api_key = os.getenv('CDS_API_KEY')
         if api_key is None:
-            print("PLEASE SET CDS_API_KEY ENVIRONMENT VARIABLE")
+            logger.error("PLEASE SET CDS_API_KEY ENVIRONMENT VARIABLE")
     
         return api_key
     
@@ -146,7 +147,7 @@ class QueryCosmicDSApi():
         try:
             return req.json()
         except json.JSONDecodeError:
-            print(req.text)
+            logger.debug(req.text)
             return None
     
     def get_class_data(self, class_id = None, student_ids = None, story = None):
@@ -168,7 +169,7 @@ class QueryCosmicDSApi():
         # try:
         #     return self.l2d(req.json()['measurements'])
         # except json.JSONDecodeError:
-        #     print(req.text)
+        #     logger.debug(req.text)
         #     return None
         
         if (class_id is None) and (student_ids is None):
@@ -187,7 +188,7 @@ class QueryCosmicDSApi():
             return self.l2d(measurements)
         else:
             missing_students = [student['student_id'] for student in roster if student['student_id'] not in [m['student_id'] for m in measurements]]
-            print(f"Missing data for students: {missing_students}")
+            logger.info(f"Missing data for students: {missing_students}")
             new_measurements = []
             for student_id in missing_students:
                 new_measurements +=  self.get_student_data(student_id)['measurements']
@@ -197,7 +198,7 @@ class QueryCosmicDSApi():
             for m in new_measurements:
                 m['class_id'] = class_id
                 m['student'] = {'flagged': True}
-            # print(new_measurements)
+            # logger.debug(new_measurements)
             return self.l2d(measurements + new_measurements)
 
     def get_student_summary(self, class_id = None):
@@ -240,10 +241,10 @@ class QueryCosmicDSApi():
         endpoint = f'/question/{question_tag}'
         url = urljoin(self.url_head, endpoint)
         self.question_url = url
-        print(url)
+        logger.debug(url)
         req = self.get(url)
         if req.status_code == 404:
-            print(f"Question {question_tag} not found")
+            logger.error(f"Question {question_tag} not found in database")
             return None
         return req.json()
     
@@ -252,7 +253,7 @@ class QueryCosmicDSApi():
         endpoint = f'questions/{story}'
         url = urljoin(self.url_head, endpoint)
         self.questions_url = url
-        print(url)
+        logger.debug(url)
         req = self.get(url)
         if req.status_code == 200:
             return {q['tag']:q for q in req.json()['questions']}
@@ -261,10 +262,10 @@ class QueryCosmicDSApi():
         endpoint = f"/dashboard-group-classes/{teacher_key}"
         url = urljoin(self.url_head, endpoint)
         self.teacher_classes_url = url 
-        print(url)
+        logger.debug(url)
         req = self.get(url)
         if req.status_code == 404:
-            print(f"Teacher code {teacher_key} not found")
+            logger.debug(f"Teacher code {teacher_key} not found")
             return {}
         else:
             return req.json()

@@ -17,6 +17,9 @@ from ..components.RefreshClass import RefreshClass
 
 from solara.lab import theme, ThemeToggle
 
+from ..logging import logger
+
+
 @solara.component
 def Page():
     query = QueryCosmicDSApi()
@@ -30,7 +33,7 @@ def Page():
         return
     
     solara.Title("CosmicDS Dashboard")
-    print(" ================== main page ================== ")
+    logger.debug(" ================== main page ================== ")
     
     # for testing use 
     # - 199 (test class for dashboard refresh)
@@ -41,7 +44,7 @@ def Page():
     # - 172 (old outdated class - should show stuff but probably incorrect)
     # - 170 (outdated class - should show nothing)
     
-    roster = solara.use_reactive(cast(Roster, None), on_change=lambda x: print("roster changed"))
+    roster = solara.use_reactive(cast(Roster, None), on_change=lambda x: logger.info("roster changed"))
     student_names = solara.use_reactive(None)
     dashboard_names = solara.use_reactive(None)#, on_change=on_change_names)
     first_run = solara.use_reactive(True)

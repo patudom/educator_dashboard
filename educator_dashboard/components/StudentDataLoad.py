@@ -8,6 +8,8 @@ import copy
 
 from functools import partial
 
+from ..logging import logger
+
 @solara.component
 def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = None):
     
@@ -20,14 +22,14 @@ def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = 
     
     def on_clear(value):
         if not value:
-            print('clearing values')
+            logger.debug('clearing values')
             table.set(None)
             table_set.set(False)
             name_dataframe.set(None)
             file_info.set(None)
             
     def on_name_dataframe_set(df):
-        print("setting table")
+        logger.debug("setting table")
         # table_set.set(df is not None)
         name_dataframe.set(df)
 
@@ -95,15 +97,15 @@ def StudentLoadDialog(student_names = None, student_names_set = None, dialog_ope
 
 
 def validate_table(table, required_sids):
-        print('validating table')
+        logger.debug('validating table')
         if isinstance(table, solara.Reactive):
             table = table.value
             
         if table is None:
-            print("table is none")
+            logger.debug("table is none")
             return False, 0
         if 'student_id' not in table.columns:
-            print("no student id column")
+            logger.debug("no student id column")
             return False, 0
         if 'name' not in table.columns:
             return False, 0
@@ -113,15 +115,15 @@ def validate_table(table, required_sids):
         present = all([r in sids for r in required_sids])
         
         missing = [r for r in required_sids if r not in sids]
-        print("missing ids", missing)
+        logger.debug("missing ids", missing)
         return present, missing
 
 @solara.component
 def StudentNameLoad(roster, student_names = None, names_set = None, on_update = lambda x: None, use_dialog = True):
-    print("student name load component")
+    logger.debug("student name load component")
     roster = solara.use_reactive(roster)
     def on_change(val):
-        print("student names changed to {}".format(val))
+        logger.debug("student names changed to {}".format(val))
     student_names = solara.use_reactive(student_names, on_change = on_change)
     student_names_set = solara.use_reactive(names_set)
   
@@ -129,7 +131,7 @@ def StudentNameLoad(roster, student_names = None, names_set = None, on_update = 
     StudentLoadDialog(student_names, student_names_set = student_names_set, no_dialog = not use_dialog, validator = validator)
     r = copy.copy(roster.value)
     if (student_names.value is not None) and (not student_names_set.value):
-        print("updating student names")
+        logger.debug("updating student names")
         student_names_dict = {row['student_id']: row['name'] for _, row in student_names.value.iterrows()}
         r.set_student_names(student_names_dict)
         r.short_report(refresh = True)

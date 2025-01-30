@@ -50,7 +50,7 @@ class _vSimpleRepeater(v.VuetifyTemplate):
     # this emits events ['simple-repeat:reset', 'simple-repeat:pause', 'simple-repeat:unpause', 'simple-repeat:done']
     
     def vue_on_refresh(self, *args, **kwargs):
-        # print(f"vue_on_refresh: args {args}, kwargs {kwargs}")
+        # logger.debug(f"vue_on_refresh: args {args}, kwargs {kwargs}")
         for callback in self.callbacks:
             callback.on_click()
     

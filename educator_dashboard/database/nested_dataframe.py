@@ -1,11 +1,15 @@
 from pandas import DataFrame, concat, Series, isna
+
+from ..logging import logger
+
+
 DEBUG = False
 def __debug_print__(*args):
     """
     Print debug messages
     """
     if DEBUG:
-        print(*args)
+        logger.debug(*args)
 
 def __expand_subdict__(df_col):
     """
@@ -129,7 +133,7 @@ def get_colspec_from_wildcard(df, column_specifier, delimiter = '.'):
     arr = []
     
     def replace_wildcard(df, arr, column_specifier, delimiter = '.'):
-        # debug_print('in function',column_specifier)
+        # debug_logger.debug('in function',column_specifier)
         if '*' not in column_specifier:
             arr.append(column_specifier)
         
@@ -145,7 +149,7 @@ def get_colspec_from_wildcard(df, column_specifier, delimiter = '.'):
                 children = get_column(df, parent, delimiter).columns.str.replace('{}.'.format(parent),'')
             __debug_print__(parent, children)
             
-            # debug_print(column_specifier, parent, children)
+            # debug_logger.debug(column_specifier, parent, children)
             
             # get the names of the columns that match the wildcard
             new_column_specs = [column_specifier.replace('*', str(child), 1) for child in children]

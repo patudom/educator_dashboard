@@ -2,9 +2,12 @@ import solara
 from ..database.Query import QueryCosmicDSApi
 import json
 import reacton.ipyvuetify as rv
+
+from ..logging import logger
+
 @solara.component 
 def TeacherCodeEntry(class_id_list, class_id, callback, query = None):
-    print('================== TeacherCodeEntry ==================')
+    logger.debug('================== TeacherCodeEntry ==================')
     if query is None:
         query = QueryCosmicDSApi()
     code = solara.use_reactive('')
@@ -89,6 +92,6 @@ def TeacherCodeEntry(class_id_list, class_id, callback, query = None):
         
         
         if class_id.value is not None:
-            print(f'class id is {class_id.value}')
+            logger.debug(f'class id is {class_id.value}')
             solara.Button(label="Continue to Dashboard", classes=["my-buttons"], on_click=callback, disabled=(not proceed_to_dashboard.value))
 

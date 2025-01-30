@@ -12,10 +12,13 @@ from .TableComponents import DataTable
 
 from numpy import hstack, around
 
+from ..logging import logger
+
+
 @solara.component
 def MultipleChoiceStageSummary(roster, stage = None, label= None):
-    print('================== MultipleChoiceStageSummary ==================')
-    print('stage:', stage)
+    logger.debug('================== MultipleChoiceStageSummary ==================')
+    logger.debug(f'stage: {stage}')
     if isinstance(roster, solara.Reactive):
         roster = roster.value
         if roster is None:
@@ -127,7 +130,7 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
                 
 @solara.component
 def MultipleChoiceSummary(roster, stage_labels=[]):
-    print('================ MultipleChoiceSummary ========')
+    logger.debug('================ MultipleChoiceSummary ========')
     if isinstance(roster, solara.Reactive):
         roster = roster.value
         if roster is None:
@@ -174,7 +177,7 @@ def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage =
         
         # qjson = Query().get_question(key)
         qjson = roster.get_question_text(key)
-        print(qjson)
+        logger.debug(qjson)
         if qjson is not None:
             q = qjson['text']
             set_dquest(q)

@@ -10,6 +10,7 @@ from numpy import around, asarray
 from .TableComponents import DataTable
 from .AgeHistogram import AgeHoHistogram
 
+from ..logging import logger
 
 
 def get_class_subset(data, sid, class_data_students = None, ungroup = True):
@@ -53,7 +54,7 @@ def get_class_subset(data, sid, class_data_students = None, ungroup = True):
         ten_earliest_mask = time.index.isin(ten_earlist_completed.index)
         subset = (before & complete) | ten_earliest_mask | (time.index == sid)
     
-    print(list(subset))
+    logger.debug(f"The class subset is: {list(subset)}")
     
     if not ungroup:
         return list(subset)
@@ -74,7 +75,7 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
     Display a summary of the data
     """
     
-    print('Displaying data summary')
+    logger.debug('Displaying data summary')
     
     if isinstance(roster, solara.Reactive):
         roster = roster.value
@@ -94,7 +95,7 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
         on_student_id = student_id.set
     
     def on_plot_click(points):
-        print("DataSummary: ClassPlot clicked")
+        logger.debug("DataSummary: ClassPlot clicked")
         if points is not None:
             selected_index = points['points']['point_indexes'][0]
             on_student_id(data.iloc[selected_index].student_id)
@@ -166,12 +167,12 @@ def StudentMeasurementTable(roster = None, sid = None, headers = None, show_clas
 
     if isinstance(headers, list):
         if isinstance(headers[0], dict) and {'text','value'}.issubset(headers[0].keys()):
-            print('Good heaaders')
+            logger.debug('Good heaaders')
         elif isinstance(headers[0], str):
             headers = [{'text': h, 'value': h} for h in headers]
         else:
-            print('StudentMeasurementTable: headers is a list but not of the form [{"text": "header", "value": "col_name"}, ...]')
-            print('defaulting to displaying all columns  with their column names')
+            logger.error('StudentMeasurementTable: headers is a list but not of the form [{"text": "header", "value": "col_name"}, ...]')
+            logger.error('defaulting to displaying all columns  with their column names')
             headers = [{'text': h, 'value': h} for h in dataframe.columns]
     elif isinstance(headers, dict):
         headers = [{'text': v, 'value': k} for k,v in headers.items()]
@@ -187,7 +188,7 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
     Display a single student's data
     """
     
-    print('Displaying single students data')
+    logger.debug('Displaying single students data')
     
     if isinstance(roster, solara.Reactive):
         roster = roster.value
@@ -240,7 +241,7 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
     Display a single student's data
     """
     
-    print('Displaying single students data')
+    logger.debug('Displaying single students data')
     
     if isinstance(roster, solara.Reactive):
         roster = roster.value

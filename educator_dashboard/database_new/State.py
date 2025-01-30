@@ -56,8 +56,8 @@ class State:
             if len(self.stages[k].keys()) == 1:
                 continue
             i = max(i, self.stages[k].get('index',0))
-        print(f"Max stage index: {i}")
-        print(names)
+        # logger.debug(f"Max stage index: {i}")
+        # logger.debug(names)
         return i
     
     @property
@@ -83,7 +83,7 @@ class State:
             return None
         
         if stage_name not in self.stages:
-            print(f"Stage {stage_name} not in stages")
+            logger.debug(f"Stage {stage_name} not in stages")
             return None
         
         if stage_name in self.stages.keys():

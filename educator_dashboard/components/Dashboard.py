@@ -5,13 +5,15 @@ from .StudentProgress import StudentProgressTable
 from .ResponsesComponents import StudentQuestionsSummary
 from .ResponsesComponents import IndividualStudentResponses
 
+from ..logging import logger
+
 from solara.alias import rv
 
 import inspect
 def print_function_name(func):
     def wrapper(*args, **kwargs):
         calling_function_name = inspect.stack()[1][3]
-        print(f"Calling  {func.__name__} from {calling_function_name}")
+        logger.debug(f"Calling  {func.__name__} from {calling_function_name}")
         return func(*args, **kwargs)
     return wrapper
 
@@ -28,7 +30,7 @@ def initStudentID(student_id, roster):
 
 @solara.component
 def Dashboard(roster, student_names = None, add_names = False): 
-    print(" ========= dashboard component =========")
+    logger.info(" ========= dashboard component =========")
     roster = solara.use_reactive(roster)
     
     if roster.value is None:
@@ -40,7 +42,7 @@ def Dashboard(roster, student_names = None, add_names = False):
     sub_tab_index = solara.use_reactive(0)
     def on_sid_set(value):
         if value is not None:
-            print(f"Setting student_id to {value}")
+            logger.info(f"Setting student_id to {value}")
             show_student_tab.set(1)
     student_id = solara.use_reactive(None, on_change=print_function_name(on_sid_set))
     

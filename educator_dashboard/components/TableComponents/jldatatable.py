@@ -6,6 +6,8 @@ import ipyvuetify as v
 from traitlets import Unicode, List, Dict, Int, Bool, Instance, Any
 import os
 
+from ...logging import logger
+
 # stolen from solara/datatypes.py (thanks Maarten!)
 import dataclasses
 def _ensure_dict(d):
@@ -111,7 +113,7 @@ def DataTableWithRowClick(headers = None, items = None, df = None, item_key = No
     item_key = item_key or 'id'
     
     def on_click(data):
-        # print(data)
+        # logger.debug(data)
         on_row_click(data)
         
     table = DataTableHighlight(headers=headers, 

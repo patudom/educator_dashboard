@@ -3,6 +3,8 @@ from solara.lab.components import use_dark_effective
 import plotly.express as px
 import plotly.graph_objects as go
 
+from ..logging import logger
+
 @solara.component
 def ClassPlot(dataframe, 
             x_col = "est_dist_value", 
@@ -22,7 +24,7 @@ def ClassPlot(dataframe,
     
     subset = None
     
-    print('Generating Class Plot')
+    logger.debug('Generating Class Plot')
     
     if select_on is None:
         select_on = "student_id"
@@ -56,7 +58,7 @@ def ClassPlot(dataframe,
         plot_bgcolor = "white"
     
     if x_col not in dataframe.columns:
-        print(f"ClassPlot: {x_col} not in dataframe")
+        logger.debug(f"ClassPlot: {x_col} not in dataframe")
         solara.Markdown(f"**{x_col}** not in dataframe")
         return
     
@@ -95,7 +97,7 @@ def ClassPlot(dataframe,
         
     
     if subset is not None:
-        print('Adding seen trace')
+        logger.debug('Adding seen trace')
         sub_data = dataframe[subset]
         hovertemplate = '<b>%{customdata}</b><br>' + xlabel + '<br>' + ylabel
         fig.add_trace(go.Scatter(x= sub_data[x_col], y= sub_data[y_col], mode = 'markers',
@@ -107,7 +109,7 @@ def ClassPlot(dataframe,
                                             marker_color = subset_color))
         
     if selected.value is not None:    
-        print('Adding student trace')
+        logger.debug('Adding student trace')
         stud_data = dataframe[dataframe[select_on] == str(selected.value)]
 
         hovertemplate = '<b>%{customdata}</b><br>' + xlabel + '<br>' + ylabel

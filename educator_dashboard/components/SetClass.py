@@ -5,26 +5,28 @@ from ..database.class_report import Roster
 
 from ..database.Query import QueryCosmicDSApi as Query
 
+from ..logging import logger
+
 @solara.component
 def SetClass(class_id, roster, first_run = False, class_id_list = None, query = None):
     
-    print('in SetClass')
+    logger.debug('in SetClass')
     class_id_list = solara.reactive(class_id_list).value
     
     def on_value(value):
-        print("SetClass: on_value", value)
+        logger.debug(f"SetClass: on_value {value}")
         if value is None:
-            print("SetClass: class_id is None")
+            logger.debug("SetClass: class_id is None")
             class_id.set(None)
             roster.set(None)
         elif first_run.value or (class_id.value != value):
-            print("SetClass: class id", value)
+            logger.debug(f"SetClass: class id {value}")
             class_id.set(int(value))
             roster.set(Roster(int(value), query = query))
 
     
     if first_run.value and class_id.value is not None:
-        print("SetClass: first run", )
+        logger.debug("SetClass: first run")
         on_value(class_id.value)
         first_run.set(False)
         

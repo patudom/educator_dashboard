@@ -5,6 +5,9 @@ warnings.filterwarnings('ignore') # ignore warnings
 from .markers import markers
 
 from numpy import nan
+
+from ..logging import logger
+
 class State:
     markers = markers
     
@@ -106,7 +109,7 @@ class State:
                     val = 0
 
                 current.append(val)
-        # print(total, current)
+        # logger.debug(total, current)
         if nan in current:
             frac = nan
         else:
