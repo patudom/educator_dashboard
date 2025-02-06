@@ -64,7 +64,10 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
     tries_1d = Series(tries_1d).dropna()
     
     with solara.GridFixed(columns=1, justify_items='stretch', align_items='start') as main:
-        solara.Markdown(f"### Stage {stage}: {label}")
+        if roster.new_db:
+            solara.Markdown(f"### Stage: {label}")
+        else:
+            solara.Markdown(f"### Stage {stage}: {label}")
 
         # Table of questions with average #of tries across whole space
         with solara.Column():
@@ -139,16 +142,21 @@ def MultipleChoiceSummary(roster, stage_labels=[]):
     mc_responses = roster.multiple_choice_questions()
     
     # mc_responses is a dict that looks like {'1': [{q1: {tries:0, choice: 0, score: 0}...}..]}
-    stages = list(filter(lambda s: s.isdigit(),sorted(list(sorted(mc_responses.keys())))))
-    if len(stages) == 0:
-        stages = list(filter(lambda s: s != 'student_id',mc_responses.keys()))
+    if not roster.new_db:
+        stages = list(filter(lambda s: s.isdigit(),sorted(list(sorted(mc_responses.keys())))))
+        if len(stages) == 0:
+            stages = list(filter(lambda s: s != 'student_id',mc_responses.keys()))
+    else:
+        get_index = roster.new_story_state.stage_name_to_index[0]
+        stages = filter(lambda x: x!='student_id', mc_responses.keys())
+        stages = sorted(stages, key = get_index )
     
     for stage in stages:
         if str(stage).isnumeric():
             index = int(stage) - 1
             label = stage_labels[index]
         else:
-            label = stage
+            label = str(stage).replace('_', ' ').capitalize()
         # index = int(stage) - 1
         # label = stage_labels[index]
         MultipleChoiceStageSummary(roster, stage = stage, label = label)
@@ -213,7 +221,7 @@ def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage =
                         - Completed {} out of {} multiple choice questions
                         - Multiple Choice Score: {}/{}
                         - Took on average {} tries to complete the multiple choice questions
-                        """.format(stage, label,  completed, total, points, total_points, avg_tries))    
+                        """.format('' if roster.new_db else stage, label,  completed, total, points, total_points, avg_tries))    
         
     with solara.Row():
         with solara.Columns([1,1]):
@@ -252,7 +260,7 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
             index = int(stage) - 1
             label = stage_labels[index]
         else:
-            label = stage
+            label = str(stage).replace('_', ' ').capitalize()
         
         for k in mc_keys[stage]:
             if k not in v.keys():

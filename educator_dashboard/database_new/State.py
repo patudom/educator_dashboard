@@ -5,6 +5,8 @@ from .markers import stage_marker_counts
 
 from numpy import nan, mean
 
+from ..logging import logger
+
 class State:
     # markers = markers
     
@@ -48,6 +50,11 @@ class State:
             possible_score += 10
         return score, possible_score
     
+    def stage_name_to_index(self, name):
+        d = {v:k for k, v in self.stage_map.items()}
+        return d.get(name, None)
+    
+    # furthest stage reached by student
     @property
     def max_stage_index(self):
         i = 0
@@ -65,7 +72,10 @@ class State:
 
         if self.max_stage_index is nan:
             return {'string': 'No stage index', 'value':0.0}
-        stage_name = self.stage_map[self.max_stage_index]
+        if self.max_stage_index in self.stage_map.keys():
+            stage_name = self.stage_map[self.max_stage_index]
+        else:
+            stage_name = self.stage_map[1] # 1 is the key name
         
         frac = self.stage_fraction_completed(stage_name)
         string_fmt = f"{frac:.0%} through Stage {stage_name}"
@@ -120,9 +130,10 @@ class State:
             total += score
         return total
     
+    # current stage student is in
     @property
     def current_stage_index(self):
-        if self.last_route is None or self.last_route == '':    
+        if self.last_route is None or self.last_route == '' or self.last_route == '/':    
             return 0
         else:
             val = ''.join([c for c in self.last_route if c.isdigit()])
@@ -131,6 +142,7 @@ class State:
             except:
                 raise ValueError(f"Could not convert {val} to an integer")    
     
+    # the current location of the student
     @property
     def current_marker(self):
         if self.current_stage_index in self.stage_map.keys():
@@ -141,10 +153,18 @@ class State:
         else:
             return nan
     
+    # the maximum position reached by the student
     @property
     def max_marker(self):
-        return self.current_marker
-        # return self.stages.get(str(self.max_stage_index),{}).get('marker','none')
+        if self.max_stage_index in self.stage_map.keys():
+            key = self.stage_map[self.max_stage_index]
+            if key not in self.stages or 'max_step' not in self.stages[key]:
+                return nan
+            return self.stages[key].get('max_step',0)
+        elif self.max_stage_index == 0:
+            return 1
+        else:
+            return nan
     
     @property
     def percent_completion(self):

@@ -80,10 +80,15 @@ def FreeResponseSummary(roster, stage_labels=[]):
     
     question_text = roster.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text'}}
     
-    stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
-    if len(stages) == 0:
-        stages = list(filter(lambda s: s != 'student_id',fr_questions.keys()))
-    
+    if not roster.new_db:
+        stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
+        if len(stages) == 0:
+            stages = list(filter(lambda s: s != 'student_id',fr_questions.keys()))
+    else:
+        get_index = roster.new_story_state.stage_name_to_index[0]
+        stages = filter(lambda x: x!='student_id', fr_questions.keys())
+        stages = sorted(stages, key = get_index )
+        
 
     with solara.Columns([5, 1], style={"height": "100%"}):
         with solara.Column():
@@ -92,10 +97,13 @@ def FreeResponseSummary(roster, stage_labels=[]):
                     index = int(stage) - 1
                     label = stage_labels[index]
                 else:
-                    label = stage
+                    label = str(stage).replace('_', ' ').capitalize()
                 question_responses = roster.l2d(fr_questions[stage]) # {'key': ['response1', 'response2',...]}
                 with rv.Container(id=f"fr-summary-stage-{stage}"):
-                    solara.Markdown(f"### Stage {stage}: {label}")
+                    if roster.new_db:
+                        solara.Markdown(f"### Stage: {label}")
+                    else:
+                        solara.Markdown(f"### Stage {stage}: {label}")
                     FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.student_names, hideShortQuestion=True)
         with solara.Column():
             with rv.NavigationDrawer(permanent=True, right=True, clipped=True):
@@ -135,7 +143,10 @@ def FreeResponseQuestionSingleStudent(roster, sid = None, stage_labels=[]):
             label = stage_labels[index]
         else:
             label = k
-        solara.Markdown(f"### Stage {k}: {label}")
+        if roster.new_db:
+            solara.Markdown(f"### Stage: {label}")
+        else:
+            solara.Markdown(f"### Stage {k}: {label}")
         for qkey, qval in v.items():
             question = question_text[qkey]['text']
             shortquestion = question_text[qkey]['shorttext']
