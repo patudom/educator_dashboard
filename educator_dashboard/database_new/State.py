@@ -50,6 +50,10 @@ class State:
             possible_score += 10
         return score, possible_score
     
+    @property
+    def stage_names(self):
+        return list(self.stages.keys())
+    
     def stage_name_to_index(self, name):
         d = {v:k for k, v in self.stage_map.items()}
         return d.get(name, None)
@@ -66,6 +70,8 @@ class State:
         # logger.debug(f"Max stage index: {i}")
         # logger.debug(names)
         return i
+    
+    
     
     @property
     def how_far(self):

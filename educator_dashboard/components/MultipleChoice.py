@@ -147,9 +147,8 @@ def MultipleChoiceSummary(roster, stage_labels=[]):
         if len(stages) == 0:
             stages = list(filter(lambda s: s != 'student_id',mc_responses.keys()))
     else:
-        get_index = roster.new_story_state.stage_name_to_index[0]
         stages = filter(lambda x: x!='student_id', mc_responses.keys())
-        stages = sorted(stages, key = get_index )
+        stages = sorted(stages, key = roster.get_stage_index )
     
     for stage in stages:
         if str(stage).isnumeric():

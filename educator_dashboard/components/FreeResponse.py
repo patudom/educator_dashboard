@@ -85,9 +85,8 @@ def FreeResponseSummary(roster, stage_labels=[]):
         if len(stages) == 0:
             stages = list(filter(lambda s: s != 'student_id',fr_questions.keys()))
     else:
-        get_index = roster.new_story_state.stage_name_to_index[0]
         stages = filter(lambda x: x!='student_id', fr_questions.keys())
-        stages = sorted(stages, key = get_index )
+        stages = sorted(stages, key = roster.get_stage_index )
         
 
     with solara.Columns([5, 1], style={"height": "100%"}):

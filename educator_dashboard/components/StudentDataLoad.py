@@ -134,7 +134,8 @@ def StudentNameLoad(roster, student_names = None, names_set = None, on_update = 
         logger.debug("updating student names")
         student_names_dict = {row['student_id']: row['name'] for _, row in student_names.value.iterrows()}
         r.set_student_names(student_names_dict)
-        r.short_report(refresh = True)
+        # r.short_report(refresh = True)
+        r.refresh()
         roster.set(r)
         student_names_set.set(True)
         on_update(student_names.value)
