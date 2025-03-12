@@ -1,5 +1,6 @@
 import solara
 from solara.lab import Tabs, Tab
+from typing import Optional
 
 from .ClassProgress import ClassProgress
 from .StudentProgress import StudentProgressTable
@@ -7,6 +8,8 @@ from .ResponsesComponents import StudentQuestionsSummary
 from .ResponsesComponents import IndividualStudentResponses
 
 from ..logging import logger
+from ..class_report import Roster
+from solara.reactive import Reactive
 
 from solara.alias import rv
 
@@ -30,7 +33,7 @@ def initStudentID(student_id, roster):
 
 
 @solara.component
-def Dashboard(roster, student_names = None, add_names = False): 
+def Dashboard(roster: Reactive[Roster] | Roster, student_names = None, add_names = False): 
     logger.info(" ========= dashboard component =========")
     roster = solara.use_reactive(roster)
     

@@ -1,14 +1,16 @@
 import solara
 import reacton.ipyvuetify as rv
+from typing import Optional
 
 from ..class_report import Roster
+from solara.reactive import Reactive
 
 from ..database.Query import QueryCosmicDSApi as Query
 
 from ..logging import logger
 
 @solara.component
-def SetClass(class_id, roster, first_run = False, class_id_list = None, query = None):
+def SetClass(class_id, roster: Reactive[Roster], first_run: Reactive[bool] = Reactive(False), class_id_list = None, query = None):
     
     logger.debug('in SetClass')
     class_id_list = solara.reactive(class_id_list).value

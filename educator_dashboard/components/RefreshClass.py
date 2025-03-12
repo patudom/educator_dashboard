@@ -1,14 +1,18 @@
 import solara
+from typing import Optional
 
 from .Repeater import Repeater
 
 from ..logging import logger
+from ..class_report import Roster
+from solara.reactive import Reactive
 
+from typing import Optional, Callable
 
 @solara.component
 def RefreshClass(rate_minutes = 5, 
-                on_refresh = None, 
-                roster = None, 
+                on_refresh: Optional[Callable] = None, # type: ignore
+                roster: Reactive[Roster] = None,  # type: ignore
                 student_names = None,
                 show_refresh_button = True,
                 stop_start_button = True,

@@ -2,11 +2,14 @@ import solara
 from ..database.Query import QueryCosmicDSApi
 import json
 import reacton.ipyvuetify as rv
+from typing import Optional
 
 from ..logging import logger
+from ..class_report import Roster
+from solara.reactive import Reactive
 
 @solara.component 
-def TeacherCodeEntry(class_id_list, class_id, callback, query = None):
+def TeacherCodeEntry(class_id_list, class_id, callback, query = None, roster: Reactive[Roster] | Roster = None):
     logger.debug('================== TeacherCodeEntry ==================')
     if query is None:
         query = QueryCosmicDSApi()

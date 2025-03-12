@@ -11,6 +11,9 @@ from .TableComponents import DataTable
 from .AgeHistogram import AgeHoHistogram
 
 from ..logging import logger
+from ..class_report import Roster
+from solara.reactive import Reactive
+from typing import Optional
 
 
 def get_class_subset(data, sid, class_data_students = None, ungroup = True):
@@ -70,7 +73,7 @@ def get_class_subset(data, sid, class_data_students = None, ungroup = True):
 
 
 @solara.component
-def DataSummary(roster = None, student_id = None, on_student_id = None, allow_click = True):
+def DataSummary(roster: Reactive[Roster] | Roster = None, student_id = None, on_student_id = None, allow_click = True):
     """
     Display a summary of the data
     """
@@ -143,7 +146,7 @@ def slope2age(h0):
 
     
 @solara.component
-def StudentMeasurementTable(roster = None, sid = None, headers = None, show_class = False, show_index = False):
+def StudentMeasurementTable(roster: Reactive[Roster] | Roster = None, sid = None, headers = None, show_class = False, show_index = False):
     
     roster = solara.use_reactive(roster)
     roster = roster.value
@@ -180,7 +183,7 @@ def StudentMeasurementTable(roster = None, sid = None, headers = None, show_clas
     DataTable(df = dataframe, headers = headers, class_ = "student-measurement-table", show_index=show_index)
 
 @solara.component
-def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_display = None, on_sid = None, allow_id_set = True):
+def StudentData(roster: Reactive[Roster] | Roster = None, id_col = 'student_id',  sid = None, cols_to_display = None, on_sid = None, allow_id_set = True):
     """
     Display a single student's data
     """
@@ -203,7 +206,7 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
         StudentMeasurementTable(roster, sid, headers = cols_to_display)
             
 @solara.component
-def StudentAgeHubble(roster = None, sid = None, allow_id_set = True):
+def StudentAgeHubble(roster: Reactive[Roster] | Roster = None, sid = None, allow_id_set = True):
     
     roster = solara.use_reactive(roster).value
 
@@ -233,7 +236,7 @@ def StudentAgeHubble(roster = None, sid = None, allow_id_set = True):
                         """)
 
 @solara.component
-def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
+def DataHistogram(roster: Reactive[Roster] | Roster = None, id_col = 'student_id',  sid = None):
     """
     Display a single student's data
     """
@@ -288,7 +291,7 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
         AgeHoHistogram(data)
 
 @solara.component
-def StudentStats(roster):
+def StudentStats(roster: Reactive[Roster] | Roster):
     """
     Display statistics about the class
     """
@@ -328,7 +331,7 @@ def StudentStats(roster):
 
 
 @solara.component
-def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
+def StudentDataSummary(roster: Reactive[Roster] | Roster = None, student_id = None, allow_sid_set = True):
     
     roster = solara.use_reactive(roster).value
     student_id = solara.use_reactive(student_id)
@@ -370,10 +373,10 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
                 with solara.Card(style='height: 90%'):
                     StudentAgeHubble(roster, sid = student_id)
 
-        
-                          
-                          
 
-        
-          
+
+
+
+
+
 

@@ -31,4 +31,4 @@ def setup_logger(name, level=logging.DEBUG):
 
 
 logger = setup_logger('EducatorDashboard')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)

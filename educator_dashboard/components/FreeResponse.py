@@ -1,6 +1,9 @@
 import solara
 from pathlib import Path
 from solara.alias import rv
+from ..class_report import Roster
+from solara.reactive import Reactive
+from typing import Optional
 
 ## discriminate between blank answers from not reached vs not done
 ## free question row
@@ -69,7 +72,7 @@ def FreeResponseQuestionResponseSummary(question_responses, question_text, names
 
 
 @solara.component
-def FreeResponseSummary(roster, stage_labels=[]):
+def FreeResponseSummary(roster: Reactive[Roster] | Roster, stage_labels=[]):
     
     if isinstance(roster, solara.Reactive):
         roster = roster.value
@@ -115,7 +118,7 @@ def FreeResponseSummary(roster, stage_labels=[]):
         
 
 @solara.component
-def FreeResponseQuestionSingleStudent(roster, sid = None, stage_labels=[]):
+def FreeResponseQuestionSingleStudent(roster: Reactive[Roster] | Roster, sid = None, stage_labels=[]):
     
     sid = solara.use_reactive(sid)
     roster = solara.use_reactive(roster).value
@@ -156,4 +159,3 @@ def FreeResponseQuestionSingleStudent(roster, sid = None, stage_labels=[]):
                                 hideShortQuestion = True,
                                 hideName = True
                                 )
-        

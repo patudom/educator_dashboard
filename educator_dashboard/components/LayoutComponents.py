@@ -1,9 +1,12 @@
 import solara
+from ..class_report import Roster
+from solara.reactive import Reactive
+from typing import Optional
 
 import reacton.ipyvuetify as rv
 
 @solara.component
-def ScrollY(children = [], class_='', style_={}, height='100%'):
+def ScrollY(children = [], class_='', style_={}, height='100%', roster: Reactive[Roster] | Roster = None):
     
     css = {'height': height, 'overflow-y': 'auto'}
     if isinstance(style_, dict):

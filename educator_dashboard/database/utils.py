@@ -1,10 +1,11 @@
 import numpy as np
+from typing import List, Dict, TypeVar, cast
 
-from typing import List, Dict
+# Create generic type variables for dictionary keys and values
+K = TypeVar('K')
+V = TypeVar('V')
 
-
-
-def list_of_dicts_to_dict_of_lists(list_of_dicts: List[Dict], fill_val = None) -> Dict:
+def list_of_dicts_to_dict_of_lists(list_of_dicts: List[Dict[K, V]], fill_val = None) -> Dict[K, List[V]]:
         """
         convert list of dictionaries to a dictionary of lists
         
@@ -21,8 +22,6 @@ def list_of_dicts_to_dict_of_lists(list_of_dicts: List[Dict], fill_val = None) -
         Examples:
         >>> l2d([{'a': 1, 'b': 2}, {'a': 3, 'b': 4}])
         {'a': array([1, 3]), 'b': array([2, 4])}
-        
-        
         """
         # keys = list_of_dicts[0].keys()
         keys = []
@@ -31,9 +30,9 @@ def list_of_dicts_to_dict_of_lists(list_of_dicts: List[Dict], fill_val = None) -
                 keys.extend([k for k in d.keys() if (k not in keys) and (k is not None)])
         
         dict_of_lists = {k: [o[k] if (hasattr(o,'keys') and (k in o.keys())) else fill_val for o in list_of_dicts] for k in keys}
-        return dict_of_lists
+        return cast(Dict[K, List[V]], dict_of_lists)
     
-def l2d(list_of_dicts: List[Dict], fill_val = None) -> Dict:
+def l2d(list_of_dicts: List[Dict[K, V]], fill_val = None) -> Dict[K, List[V]]:
     """
         convert list of dictionaries to a dictionary of lists
         

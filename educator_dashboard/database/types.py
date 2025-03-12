@@ -20,6 +20,7 @@ from .old_types import (
     StudentInfo,
     StudentEntry,
     ProcessedStage,
+    StudentEntryList,
 )
 
 # Import shared interface

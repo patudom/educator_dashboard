@@ -1,4 +1,8 @@
 import solara
+from solara.lab import Tab, Tabs
+from typing import Optional
+from ..class_report import Roster
+from solara.reactive import Reactive
 
 from .FreeResponse import FreeResponseQuestionSingleStudent, FreeResponseSummary
 from .MultipleChoice import MultipleChoiceQuestionSingleStudent, MultipleChoiceSummary
@@ -9,7 +13,7 @@ from .LayoutComponents import ScrollY
 ## TODO: split summary into stages like the inidividual student responses
 
 @solara.component
-def IndividualStudentResponses(roster, sid=None, stage_labels=[], which_tab = 0):
+def IndividualStudentResponses(roster: Reactive[Roster] | Roster, sid: Reactive[Optional[int]]=Reactive(None), stage_labels=[], which_tab = 0):
     """
     Show response detail for each student
     sid is the currently selected student
@@ -27,21 +31,21 @@ def IndividualStudentResponses(roster, sid=None, stage_labels=[], which_tab = 0)
     
     
     # multiple choice questions
-    with solara.lab.Tabs(value = which_tab):
-        with solara.lab.Tab("Multiple Choice", classes=["horizontal-tabs"]):
+    with Tabs(value = which_tab):
+        with Tab("Multiple Choice", classes=["horizontal-tabs"]):
             with ScrollY(height='40vh'):
                 MultipleChoiceQuestionSingleStudent(roster, sid = sid, stage_labels=stage_labels)
             
-        with solara.lab.Tab("Free Response", classes=["horizontal-tabs"]):
+        with Tab("Free Response", classes=["horizontal-tabs"]):
             with ScrollY(height='40vh'):
                 FreeResponseQuestionSingleStudent(roster, sid = sid, stage_labels=stage_labels)
         
-        with solara.lab.Tab("Data", classes=["horizontal-tabs"]):
+        with Tab("Data", classes=["horizontal-tabs"]):
             StudentDataSummary(roster, student_id = sid.value, allow_sid_set=False)
 
 
 @solara.component
-def StudentQuestionsSummary(roster, sid = None, stage_labels=[], which_tab = 0):
+def StudentQuestionsSummary(roster: Reactive[Roster] | Roster, sid = None, stage_labels=[], which_tab = 0):
     which_tab = solara.use_reactive(which_tab)
     if isinstance(roster, solara.Reactive):
         roster = roster.value
@@ -49,16 +53,16 @@ def StudentQuestionsSummary(roster, sid = None, stage_labels=[], which_tab = 0):
             return
     
     
-    with solara.lab.Tabs(value = which_tab):
-        with solara.lab.Tab("Multiple Choice", classes=["horizontal-tabs"]):
+    with Tabs(value = which_tab):
+        with Tab("Multiple Choice", classes=["horizontal-tabs"]):
             # if not empty_class:
             solara.Markdown(f"####  Click any row for more detailed question information.")
             with ScrollY(height='40vh'):
                 MultipleChoiceSummary(roster, stage_labels=stage_labels)
             
-        with solara.lab.Tab("Free Response", classes=["horizontal-tabs"]):
+        with Tab("Free Response", classes=["horizontal-tabs"]):
             with ScrollY(height='40vh'):
                 FreeResponseSummary(roster, stage_labels=stage_labels)
         
-        with solara.lab.Tab("Data", classes=["horizontal-tabs"]):
+        with Tab("Data", classes=["horizontal-tabs"]):
             StudentDataSummary(roster, student_id = None, allow_sid_set=False)

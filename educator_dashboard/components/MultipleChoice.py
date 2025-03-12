@@ -13,10 +13,13 @@ from .TableComponents import DataTable
 from numpy import hstack, around
 
 from ..logging import logger
+from ..class_report import Roster
+from solara.reactive import Reactive
+from typing import Optional
 
 
 @solara.component
-def MultipleChoiceStageSummary(roster, stage = None, label= None):
+def MultipleChoiceStageSummary(roster: Reactive[Roster] | Roster, stage = None, label= None):
     logger.debug('================== MultipleChoiceStageSummary ==================')
     logger.debug(f'stage: {stage}')
     
@@ -131,7 +134,7 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
 
                 
 @solara.component
-def MultipleChoiceSummary(roster, stage_labels=[]):
+def MultipleChoiceSummary(roster: Reactive[Roster] | Roster, stage_labels=[]):
     logger.debug('================ MultipleChoiceSummary ========')
     
     roster = solara.use_reactive(roster).value
@@ -161,7 +164,7 @@ def MultipleChoiceSummary(roster, stage_labels=[]):
         MultipleChoiceStageSummary(roster, stage = stage, label = label)
 
 @solara.component
-def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage = 0, label = None):
+def MultipleChoiceQuestionSingleStage(roster: Reactive[Roster] | Roster, df = None, headers = None, stage = 0, label = None):
     
     roster = solara.use_reactive(roster).value
     dquest, set_dquest = solara.use_state('')
@@ -237,7 +240,7 @@ def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage =
         
     
 @solara.component
-def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
+def MultipleChoiceQuestionSingleStudent(roster: Reactive[Roster] | Roster, sid = None, stage_labels = []):
     
     sid = solara.use_reactive(sid)
     roster = solara.use_reactive(roster).value
@@ -278,4 +281,4 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
             {'text': 'Score', 'value': 'score'},
         ]
         MultipleChoiceQuestionSingleStage(roster, df = df, headers = headers, stage = stage, label = label)
-            
+
