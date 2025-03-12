@@ -7,7 +7,7 @@ from ..components.StudentDataLoad import StudentNameLoad
 from ..components.ReportDownload import DownloadReport
 import reacton.ipyvuetify as rv
 from solara.lab.components import use_dark_effective
-from ..database.class_report import Roster
+from ..class_report import Roster
 from typing import cast
 
 from ..database.Query import QueryCosmicDSApi

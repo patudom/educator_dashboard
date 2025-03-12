@@ -1,7 +1,7 @@
 import solara
 import reacton.ipyvuetify as rv
 
-from ..database.class_report import Roster
+from ..class_report import Roster
 
 from ..database.Query import QueryCosmicDSApi as Query
 
