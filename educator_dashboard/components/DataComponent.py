@@ -106,8 +106,8 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
     if student_id.value is not None:
         
         idx = roster.student_ids.index(student_id.value)
-        if (idx is not None) and ('class_data_students' in roster.story_state):
-            class_data_students = roster.story_state['class_data_students'][idx]
+        if (idx is not None) and ('class_data_students' in roster.roster[idx]['story_state']):
+            class_data_students = roster.roster[idx]['story_state']['class_data_students']
             # if len(class_data_students) == 0:
             #     class_data_students = None
         # solara.Markdown(f"{class_data_students}")
@@ -268,8 +268,8 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
     if sid is not None and sid.value is not None:
         
         idx = roster.student_ids.index(sid.value)
-        if (idx is not None) and ('class_data_students' in roster.story_state):
-            class_data_students = roster.story_state['class_data_students'][idx]
+        if (idx is not None) and ('class_data_students' in roster.roster[idx]['story_state']):
+            class_data_students = roster.roster[idx]['story_state']['class_data_students']
             # if len(class_data_students) == 0:
             #     class_data_students = None
 
