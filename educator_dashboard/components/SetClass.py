@@ -40,7 +40,7 @@ def SetClass(class_id, roster: Reactive[Roster], first_run: Reactive[bool] = Rea
         warning_text = """There was a problem with this class. Look at the python output to see what. We currently can't handle class ids below 183.
         This will be fixed in the future as we turn away from the old class_report code.            
             """
-        solara.Markdown(warning_text, color='warning', style="font-size: 2em" )
+        solara.Markdown(warning_text, style="color: var(--warning); font-size: 2em" )
     
     if class_id_list is None:
         solara.Error("""Manual entry of the class ID is no longer supported. 
