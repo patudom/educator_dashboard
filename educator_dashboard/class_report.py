@@ -21,7 +21,10 @@ from .database.types import (
     RosterAttributes,
     ProcessedState as ImportedProcessedState,
     OldStudentStoryState,
-    StudentEntryList
+    StudentEntryList,
+    MCScore,
+    EmptyScoreOrResponse,
+    FreeResponses,
 )
 from .database_new.types import (
     NewStudentStoryState,
@@ -230,7 +233,7 @@ class Roster():
                 logger.debug(f"for {key} new_out[key] as type: {type(new_out[key][0])}")
                 
         self.student_id = cast(StudentIDList, new_out['student_id'])
-        self.story_name = new_out['story_name'].get('story_name')[0]
+        self.story_name = new_out['story_name'].get('story_name')[0] # type: ignore
         self._story_state = cast(Dict, new_out['story_state']) # Listed version of OldStudentStoryState (each key is a list)
         
         # Process stages
@@ -265,14 +268,14 @@ class Roster():
     def l2d(self, list_of_dicts, fill_val = None):
         return l2d(list_of_dicts, fill_val)
     
-    def get_class_data(self, refresh = False, df = False):
+    def get_class_data(self, refresh: bool = False, df: bool = False) -> Union[Dict, pd.DataFrame]:
         if self.data is None or self._refresh or refresh:
             res = self.query.get_class_data(class_id = self.class_id)
             self.data = res if res is not None else {'student_id':[]}
             if len(self.student_data) == 0:
                 groupdf = pd.DataFrame(self.data).groupby('student_id')
                 for student_id in groupdf.groups.keys():
-                    self.student_data[student_id] = groupdf.get_group(student_id).to_dict(orient='records')
+                    self.student_data[cast(int, student_id)] = groupdf.get_group(student_id).to_dict(orient='records')
         if df:
             return pd.DataFrame(self.data)
         return self.data
@@ -375,7 +378,7 @@ class Roster():
             return pd.DataFrame()
     
     
-    def multiple_choice_questions(self):
+    def multiple_choice_questions(self) -> Dict[str, List[MCScore]] | EmptyScoreOrResponse:
         if (self._mc_questions is not None) and (not self._refresh):
             return self._mc_questions
         if len(self.roster) > 0:
@@ -387,7 +390,7 @@ class Roster():
             return {'student_id': self.student_ids}
         
     
-    def free_response_questions(self):
+    def free_response_questions(self) -> Dict[str, List[FreeResponses]] | EmptyScoreOrResponse :
         if (self._fr_questions) is not None and (not self._refresh):
             return self._fr_questions
         

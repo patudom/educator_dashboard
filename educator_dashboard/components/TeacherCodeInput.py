@@ -40,7 +40,7 @@ def TeacherCodeEntry(class_id_list, class_id, callback, query = None, roster: Re
                 {'id': 215, 'name': '215: Solara Test Class'},
                 {'id': 216, 'name': '216: Lewis Class'},
                 {'id': 282, 'name': '282: Lewis Test Class'},
-                {'id': 286, 'name': '282: Lewis Empty Class'}, 
+                {'id': 286, 'name': '286: Lewis Empty Class'}, 
                 # {'id': 197, 'name': '197: betaclass3'},
                 # {'id': 196, 'name': '196: pat-local-test'},
                 # {'id': 195, 'name': '195: 2023-07 Formative Class 6'},

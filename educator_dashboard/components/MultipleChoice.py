@@ -54,7 +54,7 @@ def MultipleChoiceStageSummary(roster: Reactive[Roster] | Roster, stage = None, 
             flat_mc_responses[k]['tries'] = [None] * len(roster.student_ids)
             flat_mc_responses[k]['choice'] = [None] * len(roster.student_ids)
             flat_mc_responses[k]['score'] = [None] * len(roster.student_ids)
-    
+    import pandas as pd
     summary_stats = DataFrame(flat_mc_responses).T
     tries = summary_stats['tries']
     # N = tries.aggregate(len)
@@ -130,7 +130,7 @@ def MultipleChoiceStageSummary(roster: Reactive[Roster] | Roster, stage = None, 
                         headers = [{'text': 'Student ID', 'value': 'student_id'}, {'text': 'Tries', 'value': 'rounded_tries'}]
                     DataTable(df = df, headers = headers, item_key = 'student_id', class_ = "mc-question-students-table")
         rv.Divider()
-    return main
+    return
 
                 
 @solara.component
@@ -164,7 +164,7 @@ def MultipleChoiceSummary(roster: Reactive[Roster] | Roster, stage_labels=[]):
         MultipleChoiceStageSummary(roster, stage = stage, label = label)
 
 @solara.component
-def MultipleChoiceQuestionSingleStage(roster: Reactive[Roster] | Roster, df = None, headers = None, stage = 0, label = None):
+def MultipleChoiceQuestionSingleStage(roster: Reactive[Roster] | Roster, df = None, headers = None, stage: int | str = 0, label = None):
     
     roster = solara.use_reactive(roster).value
     dquest, set_dquest = solara.use_state('')

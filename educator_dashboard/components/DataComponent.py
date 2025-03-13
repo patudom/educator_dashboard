@@ -13,7 +13,7 @@ from .AgeHistogram import AgeHoHistogram
 from ..logging import logger
 from ..class_report import Roster
 from solara.reactive import Reactive
-from typing import Optional
+from typing import Optional, cast
 
 
 def get_class_subset(data, sid, class_data_students = None, ungroup = True):
@@ -82,7 +82,7 @@ def DataSummary(roster: Reactive[Roster] | Roster = None, student_id = None, on_
     
     roster = solara.use_reactive(roster).value
     
-    data = roster.get_class_data(df=True)
+    data = cast(DataFrame, roster.get_class_data(df=True))
     # add names
     data['name'] = [roster.get_student_name(int(sid)) for sid in data['student_id']]
     
@@ -248,7 +248,7 @@ def DataHistogram(roster: Reactive[Roster] | Roster = None, id_col = 'student_id
     if roster is None:
         return
     
-    dataframe = roster.get_class_data(df = True)
+    dataframe = cast(DataFrame,roster.get_class_data(df = True))
     if len(dataframe) == 0:
         solara.Markdown("There is no data for this class")
         return

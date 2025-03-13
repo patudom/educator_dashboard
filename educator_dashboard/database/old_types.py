@@ -80,7 +80,7 @@ class MCScore(ProcessedMCScore):
     pass
 
 
-class MCScoring(TypedDict):
+class EmptyScoreOrResponse(TypedDict):
     """Type for multiple-choice scoring data"""
     # The keys are question IDs
     # Nested dictionary structure: {stage: {question_id: MCScore}}

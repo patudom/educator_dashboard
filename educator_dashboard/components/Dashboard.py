@@ -55,7 +55,7 @@ def Dashboard(roster: Reactive[Roster] | Roster, student_names = None, add_names
     if add_names:
         roster.value.set_student_names({row['student_id']: row['name'] for _, row in student_names.value.iterrows()})
         # roster.value.short_report(refresh = True)
-        roster.value.refresh()
+        roster.value.refresh_data()
         # roster.set(roster.value)
     
     # a non-displaying component to 

@@ -14,7 +14,7 @@ from .old_types import (
     ClassInfo,
     ProcessedMCScore,
     MCScore,
-    MCScoring,
+    EmptyScoreOrResponse,
     FreeResponses,
     OldStudentStoryState,
     StudentInfo,

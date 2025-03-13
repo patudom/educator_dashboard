@@ -9,6 +9,8 @@ import copy
 from functools import partial
 
 from ..logging import logger
+from ..class_report import Roster
+from typing import Union, Optional
 
 @solara.component
 def StudentDataLoadInterface(name_dataframe = None, on_load = None, table_set = None):
@@ -119,7 +121,7 @@ def validate_table(table, required_sids):
         return present, missing
 
 @solara.component
-def StudentNameLoad(roster, student_names = None, names_set = None, on_update = lambda x: None, use_dialog = True):
+def StudentNameLoad(roster: Union[solara.Reactive[Roster], Roster], student_names = None, names_set = None, on_update = lambda x: None, use_dialog = True):
     logger.debug("student name load component")
     roster = solara.use_reactive(roster)
     def on_change(val):
@@ -135,7 +137,7 @@ def StudentNameLoad(roster, student_names = None, names_set = None, on_update = 
         student_names_dict = {row['student_id']: row['name'] for _, row in student_names.value.iterrows()}
         r.set_student_names(student_names_dict)
         # r.short_report(refresh = True)
-        r.refresh()
+        r.refresh_data()
         roster.set(r)
         student_names_set.set(True)
         on_update(student_names.value)
