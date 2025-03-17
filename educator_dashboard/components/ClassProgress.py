@@ -21,6 +21,6 @@ def ClassProgress(roster: Reactive[Roster]):
         percent_complete = roster.value.progress_summary['percent_story_complete']
         pmin =min(percent_complete)
         pmax = max(percent_complete)
-        solara.Markdown (f"<pre> Least Progress: {pmin:.0f}%      Most Progress: {pmax:.0f}% </pre>")
+        solara.Markdown (f"<pre>Least Progress: {pmin:.0f}%\nMost Progress: {pmax:.0f}% </pre>")
     else:
         solara.Markdown(f"### Error: There are no students in the class {roster.value.class_id}")

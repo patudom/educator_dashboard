@@ -85,6 +85,11 @@ div#app {
     margin-bottom: 5px;
 }
 
+.my-buttons.student-name-button {
+    width: auto;
+    min-width: 200px;
+}
+
 .my-cards {
     max-width: 98%;
     padding: 10px;

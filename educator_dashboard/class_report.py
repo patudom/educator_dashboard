@@ -9,7 +9,7 @@ HUBBLE_ROUTE_PATH = "hubbles_law"
 import astropy.units as u
 from math import nan
 
-from .database.utils import l2d, convert_column_of_dates_to_datetime, get_or_none
+from .utils import l2d, convert_column_of_dates_to_datetime, get_or_none
 
 from typing import List, Dict, cast, Optional, Any, Union, TypeVar, overload, TYPE_CHECKING, TypedDict
 from .database.types import (
