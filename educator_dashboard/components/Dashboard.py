@@ -106,7 +106,7 @@ def Dashboard(roster: Reactive[Roster] | Roster, student_names = None, add_names
                 # solara.Markdown (f"{student_names.value}")
                 StudentNameLoad(roster, student_names, names_set=are_names_set)
                 DownloadReport(roster) 
-            StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='35vh')
+            StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='50vh')
 
         with solara.Card(elevation=4):
             solara.Markdown(f"##Student Responses and Data")
