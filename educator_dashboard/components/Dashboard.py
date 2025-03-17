@@ -103,7 +103,7 @@ def Dashboard(roster: Reactive[Roster] | Roster, student_names = None, add_names
                 solara.Markdown (f"## Class Progress")
                 ClassProgress(roster)
                 rv.Spacer(style_="flex-grow: 1;")
-                solara.Markdown (f"{student_names.value}")
+                # solara.Markdown (f"{student_names.value}")
                 StudentNameLoad(roster, student_names, names_set=are_names_set)
                 DownloadReport(roster) 
             StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='35vh')
