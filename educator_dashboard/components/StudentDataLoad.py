@@ -117,7 +117,7 @@ def validate_table(table, required_sids):
         present = all([r in sids for r in required_sids])
         
         missing = [r for r in required_sids if r not in sids]
-        logger.debug("missing ids", missing)
+        logger.debug(f"missing ids {missing}")
         return present, missing
 
 @solara.component

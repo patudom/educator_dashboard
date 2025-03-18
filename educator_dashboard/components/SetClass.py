@@ -49,10 +49,11 @@ def SetClass(class_id, roster: Reactive[Roster], first_run: Reactive[bool] = Rea
                      """)
     else:
         # solara.Select(label="Class ID", values = class_id_list, value = class_id.value, on_value=on_value)
-        rv.Select(label='Select item',
-                    items=class_id_list, 
-                    item_text = 'name',
-                    item_value = 'id',
-                    v_model=class_id.value, 
-                    on_v_model=on_value
-                    )
+        if len(class_id_list) > 0:
+            rv.Select(label='Select item',
+                        items=class_id_list, 
+                        item_text = 'name',
+                        item_value = 'id',
+                        v_model=class_id.value, 
+                        on_v_model=on_value
+                        )

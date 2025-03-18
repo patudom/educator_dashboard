@@ -16,7 +16,9 @@ from .components.RefreshClass import RefreshClass
 
 
 @solara.component
-def EducatorDashboard(educator_code = None):
+def EducatorDashboard(url_params = {}, class_list = []):
+    query = QueryCosmicDSApi()
+    
     router = solara.use_router()
     if router.search is not None:
         url_params = {x.split("=")[0]: x.split("=")[1] for x in router.search.split("&")}
@@ -24,8 +26,13 @@ def EducatorDashboard(educator_code = None):
         url_params = {}
     
     url_id = int(url_params["id"]) if "id" in url_params else None
+    
+    
+    class_id = solara.use_reactive(url_id)
+    class_id_list = solara.use_reactive(class_list)
+    
 
-    query = QueryCosmicDSApi()
+    
     
     # What to show and when
     # No educator code
@@ -35,49 +42,7 @@ def EducatorDashboard(educator_code = None):
     #  - if no class id provided: show first class for educator code
     #  - if class id provided: show class if it exists for educator code
     
-    if educator_code is None and query.in_dev_mode():
-        
-        educator_code = "test"
-        class_id_list = solara.use_reactive(class_query_res)  # [int]
-        class_id = solara.use_reactive(url_id)
-        
-        solara.Warning(f"Running in dev mode with class_id {url_id}")
-        
-    elif educator_code is None:
-        solara.Error("No educator code provided", color="error")
-        return
     
-    else: # educator_code provided
-        class_list = query.get_class_for_teacher(educator_code) 
-        class_id_list = solara.use_reactive(cast(List[Dict[str, Any]], class_list['classes']))
-        
-        # if no classes are found for the educator code, show an error message
-        if len(class_list['classes']) == 0:
-            educator_info = query.get_teacher_info(educator_code)['educator']
-            with solara.Card():
-                solara.Error(f"No classes found for educator code: {educator_code}", color="error")
-                solara.Markdown(f"""
-                            No classes found for educator code: {educator_code}\n
-                            Educator Info: \n
-                            - Name: {educator_info['first_name']} {educator_info['last_name']} \n
-                            - id: {educator_info['id']}\n
-                            - Email: {educator_info['email']}"""
-                            )
-                solara.Text(f"{class_list}")
-            return
-        
-        
-        # go to provided class id else the first class id
-        if any(url_id == x.get('id', -999) for x in class_id_list.value):
-            class_id = solara.use_reactive(url_id)  # add class id here
-        else:
-            class_id = solara.use_reactive(class_id_list.value[0]['id'])  # set to None if not found
-            if (url_id is not None):
-                solara.Error(f"Invalid class id {url_id} provided for educator code: {educator_code}", color="error")
-                return
-            else:
-                solara.Warning(f"No class id provided. Using first class found for educator code: {educator_code}", color="error")
-        
     
     
 
