@@ -5,6 +5,7 @@ from ..educator_dashboard import EducatorDashboard
 from ..components.TeacherCodeInput import class_query_res
 
 
+
 @solara.component
 def ValidateEducatorCode(educator_code, class_id, dev_mode=False):
     query = QueryCosmicDSApi()
@@ -61,7 +62,7 @@ def Page():
     class_list = []
     if educator_code is not None:
         class_list = query.get_class_for_teacher(educator_code)['classes']
-    
+    solara.lab.ThemeToggle()
     ValidateEducatorCode(educator_code, url_params.get("id"), query.in_dev_mode())
     if educator_code is None and query.in_dev_mode():
         class_list = class_query_res

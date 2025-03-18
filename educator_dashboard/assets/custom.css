@@ -60,6 +60,7 @@
     width: 400px;
 }
 
+
 .mc-question-summary-table .v-data-table__selected {
     background: var(--md-amber-100) !important;
     color: black;
@@ -71,39 +72,36 @@
 
 }
 
-body {
 
+.cds-dashboard {
+/* wrapper for specificity */
 }
-
-div#app {
-}
-
-.my-buttons {
+.cds-dashboard .my-buttons {
     width: 100%;
     background-color: var(--md-blue-800) !important;
     color: white !important;
     margin-bottom: 5px;
 }
 
-.my-buttons.student-name-button {
+.cds-dashboard .my-buttons.student-name-button {
     width: auto;
     min-width: 200px;
 }
 
-.my-cards {
+.cds-dashboard .my-cards {
     max-width: 98%;
     padding: 10px;
 }
 
-.v-dialog {
+.cds-dashboard .v-dialog {
     box-shadow: none;
 }
 
-.my-success {
+.cds-dashboard .my-success {
     margin-block: 10px;
 }
 
-.dialog-button {
+.cds-dashboard .dialog-button {
     position:absolute;
     right: 1.5rem;
     bottom: 0.5rem;
@@ -111,80 +109,87 @@ div#app {
     color: white !important;
 }
 
-.col {
+.cds-dashboard .col {
     padding-block: 0;
 }
 
-.vertical-tabs {
+.cds-dashboard .vertical-tabs {
     width: 100%;
 }
 
-.vertical-tabs[aria-selected="true"] {
+.cds-dashboard .vertical-tabs[aria-selected="true"] {
     background-color: var(--md-deep-orange-800) !important;
     color: white;
 }
 
-.v-tabs--vertical .v-tabs-slider {
+.cds-dashboard .v-tabs--vertical .v-tabs-slider {
     color:  var(--md-deep-orange-800);
 }
 
-.horizontal-tabs[aria-selected="true"] {
+.cds-dashboard .horizontal-tabs[aria-selected="true"] {
     color: var(--md-blue-700) !important;
     font-weight: 800; 
 }
 
-.v-btn__content {
+.cds-dashboard .v-btn__content {
     font-size: small;
 }
 
-.v-btn--contained {
+.cds-dashboard .v-btn--contained {
     padding-block: 0;
 }
 
-.v-card__text {
+.cds-dashboard .v-card__text {
     /* color: black !important; */
     padding-top: 0;
     padding-bottom: 16px;
 }
 
-.info-text{
+.cds-dashboard .info-text{
     padding: 0.5rem;
 }
 
-.v-expansion-panel-header {
+.cds-dashboard .v-expansion-panel-header {
     padding-left: 1rem;
     padding-top: 0;
     padding-bottom: 0;
 }
 
 /* Disable plotly tools */
-.modebar {
+.cds-dashboard .modebar {
     display: none !important;
 }   
 
-#click-any-row-for-more-detailed-question-information {
+.cds-dashboard #click-any-row-for-more-detailed-question-information {
     padding-left: 0.625rem;  /* 10px @ 16px/rem */
 }
-#select-a-student-from-the-table-above-to-see-their-responses {
+.cds-dashboard #select-a-student-from-the-table-above-to-see-their-responses {
     padding-left: 0.625rem;   
 }
 
-.solara-markdown {
+.cds-dashboard .solara-markdown {
     padding-left: 0.5rem;
     padding-top: 0.5rem;
 }
 
+.theme--dark .cds-dashboard #table-from-rows tbody tr:not(:hover) {
+    background-color: #1e1e1e;
+}
+
+.theme--light .cds-dashboard #table-from-rows tbody tr:not(:hover) {
+    background-color: white;
+}
 /* make vertical tabs horizontal on tall screns */
 /* 1130 to account for plot legend overlap */
 @media (max-width: 1130px) {
-    .v-tabs--vertical {
+    .cds-dashboard .v-tabs--vertical {
         display: block;
     }
     
-    .v-tabs--vertical > .v-tabs-bar > .v-slide-group__wrapper {
+    .cds-dashboard .v-tabs--vertical > .v-tabs-bar > .v-slide-group__wrapper {
         flex: 0 1 auto;
     }
-    .v-tabs--vertical>.v-tabs-bar .v-tabs-bar__content {
+    .cds-dashboard .v-tabs--vertical>.v-tabs-bar .v-tabs-bar__content {
         flex-direction: row
     }
 

@@ -96,7 +96,6 @@ export default {
 }
 
 #table-from-rows tbody tr {
-  background-color: inherit;
 }
 
 #table-from-rows > table > tbody tr:hover {
