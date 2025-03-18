@@ -3,7 +3,7 @@ from solara.lab.components import use_dark_effective
 import plotly.express as px
 import plotly.graph_objects as go
 
-from ..logging import logger
+from ..logger_setup import logger
 
 @solara.component
 def ClassPlot(dataframe, 

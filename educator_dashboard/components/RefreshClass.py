@@ -3,7 +3,7 @@ from typing import Optional
 
 from .Repeater import Repeater
 
-from ..logging import logger
+from ..logger_setup import logger
 from ..class_report import Roster
 from solara.reactive import Reactive
 

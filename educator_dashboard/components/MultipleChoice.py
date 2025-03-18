@@ -12,7 +12,7 @@ from .TableComponents import DataTable
 
 from numpy import hstack, around
 
-from ..logging import logger
+from ..logger_setup import logger
 from ..class_report import Roster
 from solara.reactive import Reactive
 from typing import Optional

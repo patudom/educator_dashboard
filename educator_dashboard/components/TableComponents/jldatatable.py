@@ -6,7 +6,7 @@ import ipyvuetify as v
 from traitlets import Unicode, List, Dict, Int, Bool, Instance, Any
 import os
 
-from ...logging import logger
+from ...logger_setup import logger
 
 # stolen from solara/datatypes.py (thanks Maarten!)
 import dataclasses

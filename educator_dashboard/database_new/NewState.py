@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Union, Any
 
 from .types import ProcessedStage, ProcessedMCScore
 
-from ..logging import logger
+from ..logger_setup import logger
 
 class State:
     # markers = markers

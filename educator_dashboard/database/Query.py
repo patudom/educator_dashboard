@@ -19,7 +19,7 @@ _stages = ['introduction',
            'class_results_and_uncertainty', 
            'professional_data']
 
-from ..logging import logger
+from ..logger_setup import logger
 
     
 class QueryCosmicDSApi():

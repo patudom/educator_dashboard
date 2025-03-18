@@ -13,7 +13,7 @@ from .old_types import (
     StateInterface
 )
 
-from ..logging import logger
+from ..logger_setup import logger
 
 # 
 class State:

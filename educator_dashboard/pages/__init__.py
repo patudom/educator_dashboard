@@ -17,7 +17,7 @@ from ..components.RefreshClass import RefreshClass
 
 from solara.lab import theme, ThemeToggle
 
-from ..logging import logger
+from ..logger_setup import logger
 
 
 @solara.component

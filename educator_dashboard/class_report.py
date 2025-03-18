@@ -37,7 +37,7 @@ from .database_new.types import (
 
 from .cr_types import HubbleData, ProgressSummary, QuestionInfo, MeasurementStatus
 
-from .logging import logger
+from .logger_setup import logger
 
 class Student():
     

@@ -4,7 +4,7 @@ import json
 import reacton.ipyvuetify as rv
 from typing import Optional
 
-from ..logging import logger
+from ..logger_setup import logger
 from ..class_report import Roster
 from solara.reactive import Reactive
 

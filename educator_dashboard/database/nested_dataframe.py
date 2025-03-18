@@ -1,6 +1,6 @@
 from pandas import DataFrame, concat, Series, isna
 
-from ..logging import logger
+from ..logger_setup import logger
 
 
 DEBUG = False

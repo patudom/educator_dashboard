@@ -10,7 +10,7 @@ from numpy import around, asarray
 from .TableComponents import DataTable
 from .AgeHistogram import AgeHoHistogram
 
-from ..logging import logger
+from ..logger_setup import logger
 from ..class_report import Roster
 from solara.reactive import Reactive
 from typing import Optional, cast

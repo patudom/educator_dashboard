@@ -7,7 +7,7 @@ from solara.reactive import Reactive
 
 from ..database.Query import QueryCosmicDSApi as Query
 
-from ..logging import logger
+from ..logger_setup import logger
 
 @solara.component
 def SetClass(class_id, roster: Reactive[Roster], first_run: Reactive[bool] = Reactive(False), class_id_list = None, query = None):

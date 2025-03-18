@@ -8,7 +8,7 @@ import copy
 
 from functools import partial
 
-from ..logging import logger
+from ..logger_setup import logger
 from ..class_report import Roster
 from typing import Union, Optional
 

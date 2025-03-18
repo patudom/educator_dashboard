@@ -10,7 +10,7 @@ from .StudentDataLoad import StudentNameLoad
 from .ReportDownload import DownloadReport
 
 
-from ..logging import logger
+from ..logger_setup import logger
 from ..class_report import Roster
 from solara.reactive import Reactive
 

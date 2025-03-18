@@ -6,7 +6,7 @@ import pandas as pd
 
 import re
 
-from ..logging import logger
+from ..logger_setup import logger
 
 
 @solara.component
