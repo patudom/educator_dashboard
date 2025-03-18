@@ -259,7 +259,7 @@ class QueryCosmicDSApi():
             return {q['tag']:q for q in req.json()['questions']}
         
     def get_class_for_teacher(self,teacher_key = None):
-        endpoint = f"/dashboard-group-classes/{teacher_key}"
+        endpoint = f"/educator-classes/{teacher_key}"
         url = urljoin(self.url_head, endpoint)
         self.teacher_classes_url = url 
         logger.debug(url)
@@ -269,6 +269,20 @@ class QueryCosmicDSApi():
             return {}
         else:
             return req.json()
-            
+        
+    
+    def get_teacher_info(self, teacher_key = None):
+        endpoint = f"/educators/{teacher_key}"
+        url = urljoin(self.url_head, endpoint)
+        self.teacher_info_url = url 
+        logger.debug(url)
+        req = self.get(url)
+        if req.status_code == 404:
+            logger.debug(f"Teacher code {teacher_key} not found")
+            return {}
+        else:
+            return req.json()
+    
+    
         
         
