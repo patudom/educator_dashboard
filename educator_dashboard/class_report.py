@@ -131,7 +131,7 @@ class Roster():
             return data
         new_data = {}
         for stage in stages:
-            new_data[stage] = {key: value for key, value in data.items() if value['stage'] == stage}
+            new_data[stage] = {key: value for key, value in data.items() if 'stage' in value and value['stage'] == stage}
         return new_data
 
     def fix_new_story_state(self, roster: List[NewRosterEntry]) -> List[OldRosterEntry]:
