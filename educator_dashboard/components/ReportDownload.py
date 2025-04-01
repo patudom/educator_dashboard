@@ -1,7 +1,9 @@
 import solara
+from ..class_report import Roster
+from solara.reactive import Reactive
 
 @solara.component
-def DownloadReport(roster):
+def DownloadReport(roster: Reactive[Roster]):
     roster = solara.use_reactive(roster)
     # if len(roster.value.roster) == 0:
     #     return

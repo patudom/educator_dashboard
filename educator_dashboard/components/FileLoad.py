@@ -6,6 +6,9 @@ import pandas as pd
 
 import re
 
+from ..logger_setup import logger
+
+
 @solara.component
 def TableLoad(file_info = None, load_complete = None, allow_excel = False):
     
@@ -80,7 +83,7 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
     if isinstance(on_table, solara.Reactive):
         do_on_table = on_table.set
     else:
-        do_on_table = on_table
+        do_on_table = on_table if on_table is not None else lambda x: None
     
     if file_info is None:
         return
@@ -102,20 +105,22 @@ def CSVFileInfoToTable(file_info, on_table = None, display = True):
         if is_header_row(table_no_header.iloc[0].to_numpy()):
             table_with_header = pd.read_csv(BytesIO(bytes_data), header=0, skip_blank_lines=True, quotechar='"', encoding='utf-8')
             if not verify_table(table_with_header):
-                print('header row is not valid. revert to no_header version')
+                logger.error('header row is not valid. revert to no_header version')
                 table = table_no_header
             else:
-                print('has good header row')
+                logger.info('has good header row')
                 table = table_with_header
         else:
-            print('no header row')
+            logger.info('no header row')
             table = table_no_header
     else:
         ext = filename.split('.')[-1]
+        logger.error(f"The dashboard cannot read ${ext} files.")
         solara.Error(f"The dashboard cannot read ${ext} files. Please convert your file to a CSV (comma-separate values file) and try again.")
         return
     
     do_on_table(table)
+    logger.info("File successfully uploaded")
     
     if display:
         solara.DataFrame(table.head(5))
@@ -126,19 +131,19 @@ def validate_column_choices(table, id_col, name_col):
         return False
     
     if id_col == name_col:
-        print("id_col == name_col")
+        logger.error("id_col == name_col")
         return False
 
     if id_col not in table.columns:
-        print("id_col not in table.columns")
+        logger.error("id_col not in table.columns")
         return False
 
     if name_col not in table.columns:
-        print("name_col not in table.columns")
+        logger.error("name_col not in table.columns")
         return False
 
     if is_numeric_array(table[id_col]):
-        print("is_numeric_array(table[id_col])")
+        logger.error("is_numeric_array(table[id_col])")
         pass
 
     return True
@@ -155,7 +160,7 @@ def check_cols(table, cols, valid_id_cols):
         return False
     if not is_numeric_array(table[valid_id_cols[0]].to_numpy()):
         return False
-    print("check cols passed")
+    logger.debug("check cols passed")
     return True
     
     
@@ -168,7 +173,7 @@ def SetColumns(table, on_set = None):
     cols_set = solara.use_reactive(False)
     
     def on_table_change(new_table):
-        print("table changed")
+        logger.debug("table changed")
         # reset this component when the table changes
         cols_set.set(False)
         student_id_column.set('student_id')
@@ -195,7 +200,7 @@ def SetColumns(table, on_set = None):
     if cols_are_valid:
         skip_setting = True
     else:
-        print("cols check failed")
+        logger.error("cols check failed")
         solara.Warning('There is an issue with your column headers. Use these dropdown menus to specify the correct columns.', icon='mdi-traffic-cone', dense=True)
         skip_setting = False
 
@@ -208,7 +213,7 @@ def SetColumns(table, on_set = None):
         solara.Select(label = 'Student name column', values = [c for c in cols if c != student_id_column.value], value = name_column, dense=True, style="width: 40ch")
         
         def on_click():
-            print('clicked')
+            logger.debug('clicked')
             cols_set.set(True)
         solara.Button("Set columns", on_click = on_click)
 

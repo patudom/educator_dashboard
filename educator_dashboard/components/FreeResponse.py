@@ -1,6 +1,9 @@
 import solara
-
+from pathlib import Path
 from solara.alias import rv
+from ..class_report import Roster
+from solara.reactive import Reactive
+from typing import Optional
 
 ## discriminate between blank answers from not reached vs not done
 ## free question row
@@ -15,6 +18,7 @@ def FreeResponseQuestion(question='', shortquestion='', responses=[], names = []
         'responses': ['','','']
     }
     """
+
 
 
 @solara.component
@@ -68,7 +72,7 @@ def FreeResponseQuestionResponseSummary(question_responses, question_text, names
 
 
 @solara.component
-def FreeResponseSummary(roster, stage_labels=[]):
+def FreeResponseSummary(roster: Reactive[Roster] | Roster, stage_labels=[]):
     
     if isinstance(roster, solara.Reactive):
         roster = roster.value
@@ -79,10 +83,14 @@ def FreeResponseSummary(roster, stage_labels=[]):
     
     question_text = roster.question_keys() # {'key': {'text': 'question text', 'shorttext': 'short question text'}}
     
-    stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
-    if len(stages) == 0:
-        stages = list(filter(lambda s: s != 'student_id',fr_questions.keys()))
-    
+    if not roster.new_db:
+        stages = list(filter(lambda s: s.isdigit(),sorted(fr_questions.keys())))
+        if len(stages) == 0:
+            stages = list(filter(lambda s: s != 'student_id',fr_questions.keys()))
+    else:
+        stages = filter(lambda x: x!='student_id', fr_questions.keys())
+        stages = sorted(stages, key = roster.get_stage_index )
+        
 
     with solara.Columns([5, 1], style={"height": "100%"}):
         with solara.Column():
@@ -91,10 +99,13 @@ def FreeResponseSummary(roster, stage_labels=[]):
                     index = int(stage) - 1
                     label = stage_labels[index]
                 else:
-                    label = stage
+                    label = str(stage).replace('_', ' ').capitalize()
                 question_responses = roster.l2d(fr_questions[stage]) # {'key': ['response1', 'response2',...]}
                 with rv.Container(id=f"fr-summary-stage-{stage}"):
-                    solara.Markdown(f"### Stage {stage}: {label}")
+                    if roster.new_db:
+                        solara.Markdown(f"### Stage: {label}")
+                    else:
+                        solara.Markdown(f"### Stage {stage}: {label}")
                     FreeResponseQuestionResponseSummary(question_responses, question_text, names = roster.student_names, hideShortQuestion=True)
         with solara.Column():
             with rv.NavigationDrawer(permanent=True, right=True, clipped=True):
@@ -107,19 +118,15 @@ def FreeResponseSummary(roster, stage_labels=[]):
         
 
 @solara.component
-def FreeResponseQuestionSingleStudent(roster, sid = None, stage_labels=[]):
+def FreeResponseQuestionSingleStudent(roster: Reactive[Roster] | Roster, sid = None, stage_labels=[]):
     
-    if sid is None:
-        return 
-        
+    sid = solara.use_reactive(sid)
+    roster = solara.use_reactive(roster).value
     
-    if not isinstance(sid, solara.Reactive):
-        sid = solara.use_reactive(sid)
+    if sid.value is None or roster is None:
+        return
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
+    
     
     # grab index for student    
     idx = roster.student_ids.index(sid.value)
@@ -138,7 +145,10 @@ def FreeResponseQuestionSingleStudent(roster, sid = None, stage_labels=[]):
             label = stage_labels[index]
         else:
             label = k
-        solara.Markdown(f"### Stage {k}: {label}")
+        if roster.new_db:
+            solara.Markdown(f"### Stage: {label}")
+        else:
+            solara.Markdown(f"### Stage {k}: {label}")
         for qkey, qval in v.items():
             question = question_text[qkey]['text']
             shortquestion = question_text[qkey]['shorttext']
@@ -149,4 +159,3 @@ def FreeResponseQuestionSingleStudent(roster, sid = None, stage_labels=[]):
                                 hideShortQuestion = True,
                                 hideName = True
                                 )
-        

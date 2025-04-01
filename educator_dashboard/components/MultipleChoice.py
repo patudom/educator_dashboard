@@ -12,21 +12,26 @@ from .TableComponents import DataTable
 
 from numpy import hstack, around
 
+from ..logger_setup import logger
+from ..class_report import Roster
+from solara.reactive import Reactive
+from typing import Optional
+
+
 @solara.component
-def MultipleChoiceStageSummary(roster, stage = None, label= None):
-    print('================== MultipleChoiceStageSummary ==================')
-    print('stage:', stage)
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
+def MultipleChoiceStageSummary(roster: Reactive[Roster] | Roster, stage = None, label= None):
+    logger.debug('================== MultipleChoiceStageSummary ==================')
+    logger.debug(f'stage: {stage}')
+    
+    roster = solara.use_reactive(roster).value
     
     selected_question = solara.use_reactive('')
     
-    mc_responses = roster.multiple_choice_questions()
-        
-    if stage is None:
+    if roster is None or stage is None:
         return
+    
+    mc_responses = roster.multiple_choice_questions()
+
     
 
     flat_mc_responses = {}
@@ -49,7 +54,7 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
             flat_mc_responses[k]['tries'] = [None] * len(roster.student_ids)
             flat_mc_responses[k]['choice'] = [None] * len(roster.student_ids)
             flat_mc_responses[k]['score'] = [None] * len(roster.student_ids)
-    
+    import pandas as pd
     summary_stats = DataFrame(flat_mc_responses).T
     tries = summary_stats['tries']
     # N = tries.aggregate(len)
@@ -62,7 +67,10 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
     tries_1d = Series(tries_1d).dropna()
     
     with solara.GridFixed(columns=1, justify_items='stretch', align_items='start') as main:
-        solara.Markdown(f"### Stage {stage}: {label}")
+        if roster.new_db:
+            solara.Markdown(f"### Stage: {label}")
+        else:
+            solara.Markdown(f"### Stage {stage}: {label}")
 
         # Table of questions with average #of tries across whole space
         with solara.Column():
@@ -122,36 +130,48 @@ def MultipleChoiceStageSummary(roster, stage = None, label= None):
                         headers = [{'text': 'Student ID', 'value': 'student_id'}, {'text': 'Tries', 'value': 'rounded_tries'}]
                     DataTable(df = df, headers = headers, item_key = 'student_id', class_ = "mc-question-students-table")
         rv.Divider()
-    return main
+    return
 
                 
 @solara.component
-def MultipleChoiceSummary(roster, stage_labels=[]):
-    print('================ MultipleChoiceSummary ========')
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
-        
+def MultipleChoiceSummary(roster: Reactive[Roster] | Roster, stage_labels=[]):
+    logger.debug('================ MultipleChoiceSummary ========')
+    
+    roster = solara.use_reactive(roster).value
+    
+    if roster is None:
+        return
+    
     mc_responses = roster.multiple_choice_questions()
     
     # mc_responses is a dict that looks like {'1': [{q1: {tries:0, choice: 0, score: 0}...}..]}
-    stages = list(filter(lambda s: s.isdigit(),sorted(list(sorted(mc_responses.keys())))))
-    if len(stages) == 0:
-        stages = list(filter(lambda s: s != 'student_id',mc_responses.keys()))
+    if not roster.new_db:
+        stages = list(filter(lambda s: s.isdigit(),sorted(list(sorted(mc_responses.keys())))))
+        if len(stages) == 0:
+            stages = list(filter(lambda s: s != 'student_id',mc_responses.keys()))
+    else:
+        stages = filter(lambda x: x!='student_id', mc_responses.keys())
+        stages = sorted(stages, key = roster.get_stage_index )
     
     for stage in stages:
         if str(stage).isnumeric():
             index = int(stage) - 1
             label = stage_labels[index]
         else:
-            label = stage
+            label = str(stage).replace('_', ' ').capitalize()
         # index = int(stage) - 1
         # label = stage_labels[index]
         MultipleChoiceStageSummary(roster, stage = stage, label = label)
 
 @solara.component
-def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage = 0, label = None):
+def MultipleChoiceQuestionSingleStage(roster: Reactive[Roster] | Roster, df = None, headers = None, stage: int | str = 0, label = None):
+    
+    roster = solara.use_reactive(roster).value
+    dquest, set_dquest = solara.use_state('')
+    
+    if roster is None:
+        return
+
     
     if df is None:
         solara.Markdown("There are no completed multiple choice questions for this stage")
@@ -159,13 +179,8 @@ def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage =
     
     if isinstance(df, solara.Reactive):
         df = df.value
+        
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
-
-    dquest, set_dquest = solara.use_state('')
    
     
     def row_action(row):
@@ -174,7 +189,7 @@ def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage =
         
         # qjson = Query().get_question(key)
         qjson = roster.get_question_text(key)
-        print(qjson)
+        logger.debug(qjson)
         if qjson is not None:
             q = qjson['text']
             set_dquest(q)
@@ -208,7 +223,7 @@ def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage =
                         - Completed {} out of {} multiple choice questions
                         - Multiple Choice Score: {}/{}
                         - Took on average {} tries to complete the multiple choice questions
-                        """.format(stage, label,  completed, total, points, total_points, avg_tries))    
+                        """.format('' if roster.new_db else stage, label,  completed, total, points, total_points, avg_tries))    
         
     with solara.Row():
         with solara.Columns([1,1]):
@@ -225,18 +240,14 @@ def MultipleChoiceQuestionSingleStage(roster, df = None, headers = None, stage =
         
     
 @solara.component
-def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
+def MultipleChoiceQuestionSingleStudent(roster: Reactive[Roster] | Roster, sid = None, stage_labels = []):
     
-    if not isinstance(sid, solara.Reactive):
-        sid = solara.use_reactive(sid)
+    sid = solara.use_reactive(sid)
+    roster = solara.use_reactive(roster).value
 
-    if sid.value is None:
+    if sid.value is None or roster is None:
         return
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-        if roster is None:
-            return
  
     idx = roster.student_ids.index(sid.value)
     mc_questions = roster.roster[idx]['story_state']['mc_scoring']
@@ -251,7 +262,7 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
             index = int(stage) - 1
             label = stage_labels[index]
         else:
-            label = stage
+            label = str(stage).replace('_', ' ').capitalize()
         
         for k in mc_keys[stage]:
             if k not in v.keys():
@@ -270,4 +281,4 @@ def MultipleChoiceQuestionSingleStudent(roster, sid = None, stage_labels = []):
             {'text': 'Score', 'value': 'score'},
         ]
         MultipleChoiceQuestionSingleStage(roster, df = df, headers = headers, stage = stage, label = label)
-            
+

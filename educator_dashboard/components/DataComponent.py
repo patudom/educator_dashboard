@@ -10,6 +10,10 @@ from numpy import around, asarray
 from .TableComponents import DataTable
 from .AgeHistogram import AgeHoHistogram
 
+from ..logger_setup import logger
+from ..class_report import Roster
+from solara.reactive import Reactive
+from typing import Optional, cast
 
 
 def get_class_subset(data, sid, class_data_students = None, ungroup = True):
@@ -53,7 +57,7 @@ def get_class_subset(data, sid, class_data_students = None, ungroup = True):
         ten_earliest_mask = time.index.isin(ten_earlist_completed.index)
         subset = (before & complete) | ten_earliest_mask | (time.index == sid)
     
-    print(list(subset))
+    logger.debug(f"The class subset is: {list(subset)}")
     
     if not ungroup:
         return list(subset)
@@ -69,32 +73,29 @@ def get_class_subset(data, sid, class_data_students = None, ungroup = True):
 
 
 @solara.component
-def DataSummary(roster = None, student_id = None, on_student_id = None, allow_click = True):
+def DataSummary(roster: Reactive[Roster] | Roster = None, student_id = None, on_student_id = None, allow_click = True):
     """
     Display a summary of the data
     """
     
-    print('Displaying data summary')
+    logger.debug('Displaying data summary')
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
-    if roster is None:
-        return
+    roster = solara.use_reactive(roster).value
     
-    data = roster.get_class_data(df=True)
+    data = cast(DataFrame, roster.get_class_data(df=True))
     # add names
     data['name'] = [roster.get_student_name(int(sid)) for sid in data['student_id']]
     
-    if data is None:
-        return
-    
     student_id = solara.use_reactive(student_id)
+    
+    if data is None or roster is None:
+        return
     
     if on_student_id is None:
         on_student_id = student_id.set
     
     def on_plot_click(points):
-        print("DataSummary: ClassPlot clicked")
+        logger.debug("DataSummary: ClassPlot clicked")
         if points is not None:
             selected_index = points['points']['point_indexes'][0]
             on_student_id(data.iloc[selected_index].student_id)
@@ -108,8 +109,8 @@ def DataSummary(roster = None, student_id = None, on_student_id = None, allow_cl
     if student_id.value is not None:
         
         idx = roster.student_ids.index(student_id.value)
-        if (idx is not None) and ('class_data_students' in roster.story_state):
-            class_data_students = roster.story_state['class_data_students'][idx]
+        if (idx is not None) and ('class_data_students' in roster.roster[idx]['story_state']):
+            class_data_students = roster.roster[idx]['story_state']['class_data_students']
             # if len(class_data_students) == 0:
             #     class_data_students = None
         # solara.Markdown(f"{class_data_students}")
@@ -145,7 +146,7 @@ def slope2age(h0):
 
     
 @solara.component
-def StudentMeasurementTable(roster = None, sid = None, headers = None, show_class = False, show_index = False):
+def StudentMeasurementTable(roster: Reactive[Roster] | Roster = None, sid = None, headers = None, show_class = False, show_index = False):
     
     roster = solara.use_reactive(roster)
     roster = roster.value
@@ -166,12 +167,12 @@ def StudentMeasurementTable(roster = None, sid = None, headers = None, show_clas
 
     if isinstance(headers, list):
         if isinstance(headers[0], dict) and {'text','value'}.issubset(headers[0].keys()):
-            print('Good heaaders')
+            logger.debug('Good heaaders')
         elif isinstance(headers[0], str):
             headers = [{'text': h, 'value': h} for h in headers]
         else:
-            print('StudentMeasurementTable: headers is a list but not of the form [{"text": "header", "value": "col_name"}, ...]')
-            print('defaulting to displaying all columns  with their column names')
+            logger.error('StudentMeasurementTable: headers is a list but not of the form [{"text": "header", "value": "col_name"}, ...]')
+            logger.error('defaulting to displaying all columns  with their column names')
             headers = [{'text': h, 'value': h} for h in dataframe.columns]
     elif isinstance(headers, dict):
         headers = [{'text': v, 'value': k} for k,v in headers.items()]
@@ -182,12 +183,12 @@ def StudentMeasurementTable(roster = None, sid = None, headers = None, show_clas
     DataTable(df = dataframe, headers = headers, class_ = "student-measurement-table", show_index=show_index)
 
 @solara.component
-def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_display = None, on_sid = None, allow_id_set = True):
+def StudentData(roster: Reactive[Roster] | Roster = None, id_col = 'student_id',  sid = None, cols_to_display = None, on_sid = None, allow_id_set = True):
     """
     Display a single student's data
     """
     
-    print('Displaying single students data')
+    logger.debug('Displaying single students data')
     
     if isinstance(roster, solara.Reactive):
         roster = roster.value
@@ -205,14 +206,14 @@ def StudentData(roster = None, id_col = 'student_id',  sid = None, cols_to_displ
         StudentMeasurementTable(roster, sid, headers = cols_to_display)
             
 @solara.component
-def StudentAgeHubble(roster = None, sid = None, allow_id_set = True):
+def StudentAgeHubble(roster: Reactive[Roster] | Roster = None, sid = None, allow_id_set = True):
+    
+    roster = solara.use_reactive(roster).value
 
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
+    sid = solara.use_reactive(sid)
+    
     if roster is None:
         return
-    
-    sid = solara.use_reactive(sid)
     
     dataframe = roster.get_class_data(df = True)
     if len(dataframe) == 0:
@@ -235,19 +236,19 @@ def StudentAgeHubble(roster = None, sid = None, allow_id_set = True):
                         """)
 
 @solara.component
-def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
+def DataHistogram(roster: Reactive[Roster] | Roster = None, id_col = 'student_id',  sid = None):
     """
     Display a single student's data
     """
     
-    print('Displaying single students data')
+    logger.debug('Displaying single students data')
     
     if isinstance(roster, solara.Reactive):
         roster = roster.value
     if roster is None:
         return
     
-    dataframe = roster.get_class_data(df = True)
+    dataframe = cast(DataFrame,roster.get_class_data(df = True))
     if len(dataframe) == 0:
         solara.Markdown("There is no data for this class")
         return
@@ -270,8 +271,8 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
     if sid is not None and sid.value is not None:
         
         idx = roster.student_ids.index(sid.value)
-        if (idx is not None) and ('class_data_students' in roster.story_state):
-            class_data_students = roster.story_state['class_data_students'][idx]
+        if (idx is not None) and ('class_data_students' in roster.roster[idx]['story_state']):
+            class_data_students = roster.roster[idx]['story_state']['class_data_students']
             # if len(class_data_students) == 0:
             #     class_data_students = None
 
@@ -282,6 +283,7 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
 
         AgeHoHistogram(data, 
                        subset = subset, 
+                       selected = sid,
                        main_label = f'Data not seen by {sid.value}',
                        subset_label = f'Data seen by {sid.value}', 
                        subset_color = '#0097A7')
@@ -289,7 +291,7 @@ def DataHistogram(roster = None, id_col = 'student_id',  sid = None):
         AgeHoHistogram(data)
 
 @solara.component
-def StudentStats(roster):
+def StudentStats(roster: Reactive[Roster] | Roster):
     """
     Display statistics about the class
     """
@@ -329,15 +331,14 @@ def StudentStats(roster):
 
 
 @solara.component
-def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
+def StudentDataSummary(roster: Reactive[Roster] | Roster = None, student_id = None, allow_sid_set = True):
     
-    if isinstance(roster, solara.Reactive):
-        roster = roster.value
+    roster = solara.use_reactive(roster).value
+    student_id = solara.use_reactive(student_id)
+    
     if roster is None:
         return
-
-    if not isinstance(student_id, solara.Reactive):
-        student_id = solara.use_reactive(student_id)
+        
 
     solara.Markdown(r'''
             * Click-and-drag to zoom in on a region within either plot.
@@ -372,10 +373,10 @@ def StudentDataSummary(roster = None, student_id = None, allow_sid_set = True):
                 with solara.Card(style='height: 90%'):
                     StudentAgeHubble(roster, sid = student_id)
 
-        
-                          
-                          
 
-        
-          
+
+
+
+
+
 

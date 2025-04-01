@@ -26,7 +26,8 @@
           <div 
             :class="[getStepClass(step), 'meter']"
             :style="{ width: getStepProgress(step) }"
-            ></div>
+            >  </div>
+          <div class="step-label" >{{ getStepProgress(step) }}</div>
   </div>
 
     </td>
@@ -138,6 +139,7 @@ export default {
 
 .progress-table-row-selected {
   background-color: var(--md-amber-100) !important;
+  color: black;
 }
 
 .progress-table-progress {
@@ -163,6 +165,13 @@ export default {
   margin-block: auto;
   min-width: 5px;
   height: 100%;
+}
+
+.step-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
 }
 
 .completed {

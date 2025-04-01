@@ -1,14 +1,18 @@
-
 import solara
 from pandas import DataFrame
+from ..class_report import Roster
+from solara.reactive import Reactive
+from typing import Optional
 
 from .TableFromRows import TableFromRows
 from .ProgressRow import ProgressRow
 
+from typing import Optional, List, cast
+
 @solara.component
 def StudentProgressRow(progress,
                     on_selected_id = None,
-                    selected_id = None
+                    selected_id: Optional[int] = None # type: ignore 
                     ):
     """
     progress should be a dictionary with the following keys:
@@ -17,14 +21,14 @@ def StudentProgressRow(progress,
     """
     
     
-    student_id = progress['student_id']
+    student_id = cast(int, progress['student_id'])
     
-    if student_id is None:
-        selected = solara.use_reactive(False)
-    elif selected_id is None:
-        selected_id = solara.use_reactive(None)
-    else:
-        selected = solara.use_reactive(str(selected_id.value) == str(int(student_id)))
+    selected_id: Reactive[int | None] = solara.use_reactive(selected_id)  # type: ignore
+    selected = solara.use_reactive(
+        (student_id is not None) and
+        str(selected_id.value) == str(int(student_id)) 
+        )
+    
 
     student_data = {
         'ID': progress['student_id'],
@@ -52,7 +56,7 @@ def StudentProgressRow(progress,
 
 
 @solara.component
-def StudentProgressTable(roster = None, 
+def StudentProgressTable(roster: Optional[Reactive[Roster] | Roster] = None, 
                          progress_data = None, 
                          student_id = None, 
                          on_student_id = None, 
@@ -73,11 +77,12 @@ def StudentProgressTable(roster = None,
     
     """
     
-    roster = solara.use_reactive(roster)
+    roster = solara.use_reactive(roster) # type: ignore
     data = roster.value.short_report()
     
     if data is None:
-        return solara.Error(label="No data available. Please contact the CosmicDS team for help.", outlined=True, text = True)
+        solara.Error(label="No data available. Please contact the CosmicDS team for help.", outlined=True, text = True)
+        return
     
     
     # make sure we have a dataframe
@@ -119,7 +124,6 @@ def StudentProgressTable(roster = None,
             StudentProgressRow(progress = student_progress,
                                 selected_id = student_id,
                                 on_selected_id = on_student_id_wrapper,
-                                ) 
+                                )
 
-    
-    
+

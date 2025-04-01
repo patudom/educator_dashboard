@@ -19,6 +19,7 @@ _stages = ['introduction',
            'class_results_and_uncertainty', 
            'professional_data']
 
+from ..logger_setup import logger
 
     
 class QueryCosmicDSApi():
@@ -27,6 +28,7 @@ class QueryCosmicDSApi():
     querystring = {"":""}
     payload = ""
     headers = {"authority": "api.cosmicds.cfa.harvard.edu"}
+    _stage_keys = None
     
     def __init__(self, story = HUBBLE_ROUTE_PATH, class_id = None):
         self.class_id = class_id
@@ -42,7 +44,7 @@ class QueryCosmicDSApi():
     def get_env(self):
         api_key = os.getenv('CDS_API_KEY')
         if api_key is None:
-            print("PLEASE SET CDS_API_KEY ENVIRONMENT VARIABLE")
+            logger.error("PLEASE SET CDS_API_KEY ENVIRONMENT VARIABLE")
     
         return api_key
     
@@ -78,6 +80,7 @@ class QueryCosmicDSApi():
         return response
     
     def get_stage(self, student_id, story = None, stage = None):
+        # Solara API endpoint
         story = self.story or story
         endpoint = f'stage-state/{student_id}/{story}/{stage}'
         url = urljoin(self.url_head, endpoint)
@@ -86,16 +89,39 @@ class QueryCosmicDSApi():
         return req.json()
     
     def get_stages(self, student_id, story = None):
+        # Solara API endpoint
         story = self.story or story
         stages = {}
-        for stage in _stages:
-            stages[stage] = self.get_stage(student_id, story = story, stage = stage)
+        
+        stage_keys = self.get_stages_for_story(story)
+        for stage_index, stage_name in stage_keys.items():
+            stage = self.get_stage(student_id, story = story, stage = stage_name)
+            if stage['state'] is None:
+                stage['state'] = {'index': stage_index}
+            if stage['state'] is not None:
+                stage['state']['index'] = stage_index
+                stages[stage_name] = stage
         return stages
+    
+    def get_stages_for_story(self, story = None):
+        # Solara API endpoint
+        if self._stage_keys is not None:
+            return self._stage_keys
+        story = self.story or story
+        endpoint = f'stages/{story}'
+        url = urljoin(self.url_head, endpoint)
+        self.stages_url = url
+        req = self.get(url)
+        js = req.json()
+        if js:
+            self._stage_keys = { stage['stage_index']: stage['stage_name'] for stage in js['stages']}
+        return self._stage_keys
         
     def get_roster(self, class_id = None, story = None):
         """
         Returns the Roster for a given class_id and story
         returns the student information and the story state
+        Returns a different structure depending on if jupyter or solara version
         """
         class_id = self.class_id or class_id
         story = self.story or story
@@ -121,7 +147,7 @@ class QueryCosmicDSApi():
         try:
             return req.json()
         except json.JSONDecodeError:
-            print(req.text)
+            logger.debug(req.text)
             return None
     
     def get_class_data(self, class_id = None, student_ids = None, story = None):
@@ -143,14 +169,14 @@ class QueryCosmicDSApi():
         # try:
         #     return self.l2d(req.json()['measurements'])
         # except json.JSONDecodeError:
-        #     print(req.text)
+        #     logger.debug(req.text)
         #     return None
         
         if (class_id is None) and (student_ids is None):
             return None
         
         if student_ids is None:
-            filter_fun = lambda m: m['class_id'] == class_id
+            filter_fun = lambda m: m['class_id'] == class_id and m['student_id'] in student_id
             measurements = [m for m in self.get_all_data(story = story, transpose = False)['measurements'] if filter_fun(m)]
             # check that there are measurements for every student_id   
         else:
@@ -162,7 +188,7 @@ class QueryCosmicDSApi():
             return self.l2d(measurements)
         else:
             missing_students = [student['student_id'] for student in roster if student['student_id'] not in [m['student_id'] for m in measurements]]
-            print(f"Missing data for students: {missing_students}")
+            logger.info(f"Missing data for students: {missing_students}")
             new_measurements = []
             for student_id in missing_students:
                 new_measurements +=  self.get_student_data(student_id)['measurements']
@@ -172,7 +198,7 @@ class QueryCosmicDSApi():
             for m in new_measurements:
                 m['class_id'] = class_id
                 m['student'] = {'flagged': True}
-            # print(new_measurements)
+            # logger.debug(new_measurements)
             return self.l2d(measurements + new_measurements)
 
     def get_student_summary(self, class_id = None):
@@ -215,10 +241,10 @@ class QueryCosmicDSApi():
         endpoint = f'/question/{question_tag}'
         url = urljoin(self.url_head, endpoint)
         self.question_url = url
-        print(url)
+        logger.debug(url)
         req = self.get(url)
         if req.status_code == 404:
-            print(f"Question {question_tag} not found")
+            logger.error(f"Question {question_tag} not found in database")
             return None
         return req.json()
     
@@ -227,22 +253,36 @@ class QueryCosmicDSApi():
         endpoint = f'questions/{story}'
         url = urljoin(self.url_head, endpoint)
         self.questions_url = url
-        print(url)
+        logger.debug(url)
         req = self.get(url)
         if req.status_code == 200:
             return {q['tag']:q for q in req.json()['questions']}
         
     def get_class_for_teacher(self,teacher_key = None):
-        endpoint = f"/dashboard-group-classes/{teacher_key}"
+        endpoint = f"/educator-classes/{teacher_key}"
         url = urljoin(self.url_head, endpoint)
         self.teacher_classes_url = url 
-        print(url)
+        logger.debug(url)
         req = self.get(url)
         if req.status_code == 404:
-            print(f"Teacher code {teacher_key} not found")
+            logger.debug(f"Teacher code {teacher_key} not found")
+            return {'classes': []}
+        else:
+            return req.json()
+        
+    
+    def get_teacher_info(self, teacher_key = None):
+        endpoint = f"/educators/{teacher_key}"
+        url = urljoin(self.url_head, endpoint)
+        self.teacher_info_url = url 
+        logger.debug(url)
+        req = self.get(url)
+        if req.status_code == 404:
+            logger.debug(f"Teacher code {teacher_key} not found")
             return {}
         else:
             return req.json()
-            
+    
+    
         
         

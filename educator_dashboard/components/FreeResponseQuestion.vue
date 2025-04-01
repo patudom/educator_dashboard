@@ -12,7 +12,7 @@
           <div class="name-item" v-if="names != null && !hideName" >
             {{ getName(index) }}
           </div>
-            <div class="response-item">
+            <div class="response-item" v-if="response !== ''">
             {{ response }}
             </div>
         </div>
@@ -113,8 +113,11 @@ export default {
   grid-template-rows: auto; */
   /* grid-gap: 10px; */
 
-  padding: 0.5rem 0rem;
+  padding: 0.5rem 0.5rem;
   margin-left: 1rem;
+  /* border-radius: 10px; */
+  /* outline: 1px solid #888 ; */
+  /* box-shadow: 0 0 10px #222; */
 }
 
 .free-response-question div {
@@ -142,9 +145,11 @@ export default {
   display: inline-block;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
-  color: var(--md-grey-900);
-  background-color: var(--md-amber-100);
-
+  /* color: var(--md-grey-900); */
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+  /* background-color: var(--md-amber-100); */
 }
 
 .name-item {
