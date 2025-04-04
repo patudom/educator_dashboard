@@ -117,10 +117,21 @@
     width: 100%;
 }
 
+
+ 
+.v-slide-group__content.v-tabs-bar__content {
+
+}
+
 .cds-dashboard .vertical-tabs[aria-selected="true"] {
     background-color: var(--md-deep-orange-800) !important;
     color: white;
 }
+
+.cds-dashboard .vertical-tabs[aria-selected="false"] {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
 
 .cds-dashboard .v-tabs--vertical .v-tabs-slider {
     color:  var(--md-deep-orange-800);

@@ -33,16 +33,15 @@ def initStudentID(student_id, roster):
                 student_id.set(None)
             return
     student_id.set(None)
-    return 
+    return
 
 
 @solara.component
-def Dashboard(roster: Reactive[Roster] | Roster, student_names = None, add_names = False): 
+def Dashboard(roster: Reactive[Roster] | Roster, student_names=None, add_names=False):
     logger.info(" ========= dashboard component =========")
     roster = solara.use_reactive(roster)
     are_names_set = solara.use_reactive(add_names)
-    
-    
+
     # student_id = solara.use_reactive(None)
     student_names = solara.use_reactive(student_names)
     # if 'cds-student-names' in solara.cache.storage:
@@ -58,61 +57,54 @@ def Dashboard(roster: Reactive[Roster] | Roster, student_names = None, add_names
     #         logger.debug("no student names in cache")
     # else:
     #     logger.debug("no cache for student names")
-    
+
     show_student_tab = solara.use_reactive(0)
     sub_tab_index = solara.use_reactive(0)
+
     def on_sid_set(value):
         if value is not None:
             logger.info(f"Setting student_id to {value}")
             show_student_tab.set(1)
+
     student_id = solara.use_reactive(None, on_change=print_function_name(on_sid_set))
-    
+
     if roster.value is None:
         return
-    
+
     if are_names_set.value:
         roster.value.set_student_names({row['student_id']: row['name'] for _, row in student_names.value.iterrows()})
         # roster.value.short_report(refresh = True)
         roster.value.refresh_data()
         # roster.set(roster.value)
-    
-    # a non-displaying component to 
+
+    # a non-displaying component to
     # make sure the student_id is valid
     initStudentID(student_id, roster)
 
     # ClassProgress(df, roster)
-    labels = ['Stage 1: </br> Velocities', 
-              'Stage 2: </br> Distance Intro', 
-              'Stage 3: </br> Distances',
-              'Stage 4: </br> Universe Age',
-              'Stage 5: </br> Uncertainties',
-              'Stage 6: </br> Professional Data'
-              ]
-    
-    stage_titles = ['Velocities', 
-              'Distance Intro', 
-              'Distances',
-              'Universe Age',
-              'Uncertainties',
-              'Professional Data'
-              ]
-    
+    labels = [
+        'Stage 1: </br> Velocities', 'Stage 2: </br> Distance Intro', 'Stage 3: </br> Distances',
+        'Stage 4: </br> Universe Age', 'Stage 5: </br> Uncertainties', 'Stage 6: </br> Professional Data'
+    ]
+
+    stage_titles = ['Velocities', 'Distance Intro', 'Distances', 'Universe Age', 'Uncertainties', 'Professional Data']
+
     with solara.GridFixed(columns=1, row_gap='10px', justify_items='stretch', align_items='start'):
         with solara.Card(elevation=4):
             with solara.Row(classes=["align-center"]):
-                solara.Markdown (f"## Class Progress")
+                solara.Markdown(f"## Class Progress")
                 ClassProgress(roster)
                 rv.Spacer(style_="flex-grow: 1;")
                 # solara.Markdown (f"{student_names.value}")
                 StudentNameLoad(roster, student_names, names_set=are_names_set)
-                DownloadReport(roster) 
-            StudentProgressTable(roster, student_id = student_id, stage_labels = labels, height='50vh')
+                DownloadReport(roster)
+            StudentProgressTable(roster, student_id=student_id, stage_labels=labels, height='50vh')
 
         with solara.Card(elevation=4):
             solara.Markdown(f"##Student Responses and Data")
 
             # Heads up: Tabs are considered experimental in Solara and the API may change in the future
-            with Tabs(vertical=True, align='right', dark=True, value = show_student_tab):
+            with Tabs(vertical=True, align='right', value=show_student_tab, background_color="#1565c0"):
                 
                 with Tab(label="Class Summary", icon_name="mdi-text-box-outline", classes=["vertical-tabs"]):
                     StudentQuestionsSummary(roster, student_id, stage_labels = stage_titles, which_tab = sub_tab_index)
